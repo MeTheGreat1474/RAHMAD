@@ -1,0 +1,4 @@
+- make choose image for mobile
+- send image to backend along with the text
+- ai model logic implementation
+- test and debug

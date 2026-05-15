@@ -2,15 +2,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const runBtn = document.getElementById('run-btn');
     const processStream = document.getElementById('process-stream');
     const resultsSection = document.getElementById('results-section');
-    
+
+    // ── Image upload ────────────────────────────────────────────
+    const uploadZone = document.getElementById('image-upload');
+    const fileInput = document.getElementById('image-file-input');
+    const placeholder = document.getElementById('image-placeholder');
+    const previewWrap = document.getElementById('image-preview-wrap');
+    const previewImg = document.getElementById('image-preview');
+    const removeBtn = document.getElementById('image-remove-btn');
+
+    function loadImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            placeholder.hidden = true;
+            previewWrap.hidden = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Click anywhere on the zone to open file picker
+    uploadZone.addEventListener('click', (e) => {
+        if (e.target === removeBtn) return; // handled below
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+        loadImageFile(fileInput.files[0]);
+    });
+
+    // Remove / reset
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        previewImg.src = '';
+        fileInput.value = '';
+        previewWrap.hidden = true;
+        placeholder.hidden = false;
+    });
+
+    // Drag-and-drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        loadImageFile(file);
+    });
+    // ────────────────────────────────────────────────────────────
+
     const streamSteps = [
-        { text: "PRE-PROCESSING INPUT...", status: "OK", delay: 800 },
-        { text: "RUNNING EARLY PREDICTOR...", status: "OK", delay: 1200 },
-        { text: "FETCHING EVIDENCE...", status: "OK", delay: 1500 },
-        { text: "SEARCHING FOR SIMILAR IMAGES...", status: "OK", delay: 2000 },
-        { text: "DEBATING...", status: "OK", delay: 2500 },
-        { text: "SYNTHESIZING RESULTS...", status: "OK", delay: 1800 },
-        { text: "OUTPUTTING PREDICTION...", status: "OK", delay: 1000 }
+        { text: "PRE-PROCESSING INPUT...", status: "OK", delay: 100 },
+        { text: "RUNNING EARLY PREDICTOR...", status: "OK", delay: 100 },
+        { text: "FETCHING EVIDENCE...", status: "OK", delay: 100 },
+        { text: "SEARCHING FOR SIMILAR IMAGES...", status: "OK", delay: 100 },
+        { text: "DEBATING...", status: "OK", delay: 100 },
+        { text: "SYNTHESIZING RESULTS...", status: "OK", delay: 100 },
+        { text: "OUTPUTTING PREDICTION...", status: "OK", delay: 100 }
     ];
 
     function getCurrentTime() {
@@ -24,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createLogLine(text, status, isFinal = false) {
         const line = document.createElement('div');
         line.className = 'log-line';
-        
+
         const timeSpan = document.createElement('span');
         timeSpan.className = 'log-time';
         timeSpan.textContent = `[${getCurrentTime()}]`;
@@ -34,13 +90,17 @@ document.addEventListener('DOMContentLoaded', () => {
         textSpan.textContent = ` ${text}`;
 
         const statusSpan = document.createElement('span');
-        statusSpan.className = 'log-status';
-        statusSpan.textContent = isFinal ? status : 'IN PROGRESS';
+        const displayStatus = isFinal ? status : 'IN PROGRESS';
+        const statusClass = displayStatus === 'OK' ? 'log-status--ok'
+            : displayStatus === 'IN PROGRESS' ? 'log-status--in-progress'
+                : 'log-status--fail';
+        statusSpan.className = `log-status ${statusClass}`;
+        statusSpan.textContent = displayStatus;
 
         line.appendChild(timeSpan);
         line.appendChild(textSpan);
         line.appendChild(statusSpan);
-        
+
         return line;
     }
 
@@ -71,14 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // We will execute the steps sequentially
         for (let i = 0; i < streamSteps.length; i++) {
             const step = streamSteps[i];
-            
+
             // Create the line initially with IN PROGRESS
             const line = createLogLine(step.text, step.status, false);
             processStream.appendChild(line);
-            
+
             // Show the remaining future steps as [ ]
             const futureLines = [];
-            for(let j = i + 1; j < streamSteps.length; j++) {
+            for (let j = i + 1; j < streamSteps.length; j++) {
                 const fLine = document.createElement('div');
                 fLine.className = 'log-line';
                 fLine.style.color = 'var(--border-light)';
@@ -90,9 +150,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wait for the simulated delay
             await new Promise(resolve => setTimeout(resolve, step.delay));
 
-            // Update to OK
-            line.querySelector('.log-status').textContent = step.status;
-            
+            // Update to final status (text + colour class)
+            const statusEl = line.querySelector('.log-status');
+            statusEl.textContent = step.status;
+            statusEl.classList.remove('log-status--in-progress', 'log-status--ok', 'log-status--fail');
+            const finalClass = step.status === 'OK' ? 'log-status--ok' : 'log-status--fail';
+            statusEl.classList.add(finalClass);
+
             // Remove future placeholder lines so we can redraw them next tick
             futureLines.forEach(l => l.remove());
         }
@@ -146,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         runBtn.disabled = false;
         runBtn.style.opacity = '1';
         runBtn.textContent = 'RUN NEWS DETECTION';
-        
+
         // Reveal results
         resultsSection.classList.remove('hidden');
         resultsSection.classList.add('visible');

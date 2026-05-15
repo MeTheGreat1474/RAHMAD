@@ -1,11 +1,35 @@
 # RAHMAD
 Retrieval-Augmented Hybrid Multi-Agent Debate
 
-To run: 
-Step 1 — Open a terminal in your project folder and run:
-powershell
-cd c:\Users\ahmad\Documents\Programming\fyp\RAHMAD
-python app.py
+## Project Structure
+```
+RAHMAD/
+├── app.py              # Flask entry point
+├── requirements.txt    # Python dependencies
+├── README.md
+├── frontend/           # UI assets (HTML, CSS, JS)
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+├── backend/            # Python backend logic / API modules
+│   └── __init__.py
+└── model/              # AI model code
+    └── __init__.py
+```
 
-Step 2 — Open your browser and go to:
+## Running the App
+
+**Step 1** — Install dependencies:
+```powershell
+pip install -r requirements.txt
+```
+
+**Step 2** — Start the Flask server:
+```powershell
+python app.py
+```
+
+**Step 3** — Open your browser and go to:
+```
 http://127.0.0.1:5000
+```
