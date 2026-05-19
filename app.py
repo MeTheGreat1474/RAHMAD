@@ -14,6 +14,11 @@ def serve_frontend():
     """Serve the main dashboard HTML file."""
     return send_from_directory('frontend', 'index.html')
 
+@app.route('/res/<path:filename>')
+def serve_res(filename):
+    """Serve static files from the res/ directory."""
+    return send_from_directory('res', filename)
+
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
     # 1. Receive the data from the frontend
@@ -22,11 +27,17 @@ def analyze():
     if not data or 'text' not in data:
         return jsonify({"error": "No text provided"}), 400
 
-    input_text = data['text']
+    input_text = data.get('text', '')
+    image_data = data.get('image', None) # Base64 string or URL
+    
     print(f"Received input for analysis: {input_text[:50]}...")
+    if image_data:
+        print(f"Image attached: {image_data[:30]}...")
+    else:
+        print("No image attached.")
 
     # 2. Run the AI analysis pipeline.
-    response_data = analyze_text(input_text)
+    response_data = analyze_text(input_text, image_data)
 
     return jsonify(response_data)
 

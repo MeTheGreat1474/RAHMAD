@@ -11,15 +11,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewImg = document.getElementById('image-preview');
     const removeBtn = document.getElementById('image-remove-btn');
 
+    // Mobile elements
+    const mobileImgBtn = document.getElementById('mobile-img-btn');
+    const mobileFilename = document.getElementById('mobile-filename');
+    const mobileRemoveBtn = document.getElementById('mobile-remove-btn');
+
     function loadImageFile(file) {
         if (!file || !file.type.startsWith('image/')) return;
         const reader = new FileReader();
         reader.onload = (e) => {
+            // Desktop update
             previewImg.src = e.target.result;
             placeholder.hidden = true;
             previewWrap.hidden = false;
+
+            // Mobile update
+            if (mobileFilename) mobileFilename.textContent = file.name;
+            if (mobileRemoveBtn) mobileRemoveBtn.hidden = false;
         };
         reader.readAsDataURL(file);
+    }
+
+    function resetImageUpload() {
+        // Desktop reset
+        previewImg.src = '';
+        fileInput.value = '';
+        previewWrap.hidden = true;
+        placeholder.hidden = false;
+
+        // Mobile reset
+        if (mobileFilename) mobileFilename.textContent = 'Choose image…';
+        if (mobileRemoveBtn) mobileRemoveBtn.hidden = true;
     }
 
     // Click anywhere on the zone to open file picker
@@ -28,6 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.click();
     });
 
+    // Mobile button trigger
+    if (mobileImgBtn) {
+        mobileImgBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
     fileInput.addEventListener('change', () => {
         loadImageFile(fileInput.files[0]);
     });
@@ -35,11 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Remove / reset
     removeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        previewImg.src = '';
-        fileInput.value = '';
-        previewWrap.hidden = true;
-        placeholder.hidden = false;
+        resetImageUpload();
     });
+
+    if (mobileRemoveBtn) {
+        mobileRemoveBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetImageUpload();
+        });
+    }
 
     // Drag-and-drop
     uploadZone.addEventListener('dragover', (e) => {
@@ -107,6 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function simulateProcess() {
         // Get input text
         const textInput = document.getElementById('text-input').value;
+        
+        // Get image if it exists and is visible
+        const previewWrap = document.getElementById('image-preview-wrap');
+        const imageInput = (!previewWrap.hidden) ? document.getElementById('image-preview').src : null;
 
         // Reset state
         runBtn.disabled = true;
@@ -122,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text: textInput })
+            body: JSON.stringify({ text: textInput, image: imageInput })
         }).then(res => res.json()).catch(err => {
             console.error('Error fetching from backend:', err);
             return null;

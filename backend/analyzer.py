@@ -16,9 +16,9 @@ Expected return shape:
 """
 
 
-def analyze_text(input_text: str) -> dict:
+def analyze_text(input_text: str, image_data: str = None) -> dict:
     """
-    Analyze the given news text and return a structured verdict.
+    Analyze the given news text and optional image and return a structured verdict.
 
     This is currently a placeholder — swap in your real model here.
     """
@@ -53,6 +53,7 @@ def analyze_text(input_text: str) -> dict:
         ),
         "key_facts": [
             "Input Received: The Flask backend successfully intercepted the POST request.",
+            f"Image Status: {'Image detected and received' if image_data else 'No image provided'}.",
             "Processing Simulation: The backend simulated an analysis delay.",
             "Dynamic Output: This JSON payload was constructed dynamically.",
         ],
