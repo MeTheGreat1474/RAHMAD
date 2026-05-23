@@ -14,6 +14,8 @@
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Inter', sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
+
+    --layout-padding: 10vw;
 }
 
 * {
@@ -27,32 +29,31 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     line-height: 1.6;
-    padding: 2rem;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-.container {
+.container,
+.topbar-content,
+.footer-content {
     width: 100%;
-    max-width: 1800px;
+    max-width: calc(1600px + (2 * var(--layout-padding)));
     margin: 0 auto;
-    /* padding: 0 3rem; */
+    padding-left: var(--layout-padding);
+    padding-right: var(--layout-padding);
 }
 
 /* Topbar */
 .topbar {
     padding: 1.5rem 0;
-    margin: -2rem -2rem 2rem -2rem;
-    /* Extend outside body padding */
     border-bottom: 2px solid var(--text-main);
-    width: 100;
+    margin-bottom: 2rem;
+    width: 100%;
 }
 
 .topbar-content {
-    width: 100%;
-    max-width: 1800px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -530,15 +531,11 @@ footer {
     background-color: var(--text-main);
     color: white;
     padding: 1.5rem 0;
-    margin: 0 -2rem -2rem -2rem;
-    /* Extend outside body padding */
     margin-top: auto;
+    width: 100%;
 }
 
 .footer-content {
-    width: 100%;
-    max-width: 1800px;
-    margin: 0 auto;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -614,17 +611,13 @@ footer {
 /* Mobile phone */
 @media (max-width: 600px) {
 
-    body {
-        padding: 1rem;
+    :root {
+        --layout-padding: 1rem;
     }
 
     /* Topbar: hide the subtitle on very small screens */
     .topbar {
-        margin: -1rem -1rem 1.5rem -1rem;
-    }
-
-    .topbar-content {
-        padding: 0 1rem;
+        margin: 0 0 1.5rem 0;
     }
 
     .topbar-left strong {
@@ -781,12 +774,10 @@ footer {
 
     /* Footer */
     footer {
-        margin: 0 -1rem -1rem -1rem;
         padding: 1.25rem 0;
     }
 
     .footer-content {
-        padding: 0 1rem;
         flex-direction: row;
         align-items: flex-start;
         gap: 0.5rem;

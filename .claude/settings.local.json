@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(where python3 *)",
+      "Bash(where jupyter *)",
+      "Read(//c/Users/User/AppData/Local/Programs\" 2>/dev/**)"
+    ]
+  }
+}
