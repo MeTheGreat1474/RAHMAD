@@ -1,2 +1,12 @@
+# Web framework
 Flask==3.0.3
 Flask-CORS==4.0.1
+
+# Input pre-processing
+clean-text[gpl]==0.6.0      # cleantext — text normalisation
+Pillow>=10.0.0              # PIL image loading
+
+# CLIP tokeniser + image processor + LoRA
+transformers>=4.40.0
+torch>=2.2.0
+peft>=0.10.0                # LoRA adapter loading (PeftModel)
