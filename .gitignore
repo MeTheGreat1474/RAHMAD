@@ -1,0 +1,7 @@
+﻿# Model checkpoints and outputs
+early_predictor_output/
+*.pt
+*.safetensors
+__pycache__/
+*.pyc
+fyp-env-win/
