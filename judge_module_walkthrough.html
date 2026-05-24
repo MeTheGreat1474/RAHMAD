@@ -1,0 +1,199 @@
+
+<style>
+  .jm { font-family: var(--font-sans); padding: 1rem 0; }
+  .section { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 1.25rem; overflow: hidden; }
+  .sec-header { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; cursor: pointer; user-select: none; }
+  .sec-header:hover { background: var(--color-background-secondary); }
+  .sec-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--border-radius-md); white-space: nowrap; }
+  .sec-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .sec-sub { font-size: 13px; color: var(--color-text-secondary); margin-left: auto; }
+  .chevron { font-size: 14px; color: var(--color-text-tertiary); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .sec-body { border-top: 0.5px solid var(--color-border-tertiary); padding: 1rem; display: none; }
+  .sec-body.open { display: block; }
+  .desc { font-size: 14px; color: var(--color-text-secondary); line-height: 1.65; margin-bottom: 0.75rem; }
+  .tweak { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.6rem 0.85rem; margin-bottom: 0.6rem; }
+  .tweak-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .tweak-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  pre { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; color: var(--color-text-primary); overflow-x: auto; margin: 0.75rem 0 0; white-space: pre; }
+  .tag-adjustable { background: #EAF3DE; color: #3B6D11; }
+  .tag-logic { background: #E6F1FB; color: #185FA5; }
+  .tag-config { background: #FAEEDA; color: #854F0B; }
+  .tag-error { background: #FCEBEB; color: #A32D2D; }
+  .tag-fixed { background: #F1EFE8; color: #5F5E5A; }
+  @media (prefers-color-scheme: dark) {
+    .tag-adjustable { background: #27500A; color: #C0DD97; }
+    .tag-logic { background: #0C447C; color: #B5D4F4; }
+    .tag-config { background: #633806; color: #FAC775; }
+    .tag-error { background: #791F1F; color: #F7C1C1; }
+    .tag-fixed { background: #444441; color: #D3D1C7; }
+  }
+</style>
+
+<div class="jm">
+  <h2 class="sr-only">Judge module walkthrough — each section of judge.py explained</h2>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-config">Config</span>
+      <span class="sec-title">API constants</span>
+      <span class="sec-sub">URL · model · limits</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">These three lines wire the module to OpenRouter. <code>_MAX_TEXT_CHARS</code> caps how much article text is sent so you don't blow the model's context window.</p>
+      <div class="tweak"><div class="tweak-label">What to adjust</div><div class="tweak-text">Only touch <code>_MODEL_ID</code> if you want to swap models. <code>_MAX_TEXT_CHARS = 6000</code> is safe for most articles — raise it if your articles are very long and the model supports it.</div></div>
+      <pre>_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+_MODEL_ID       = "openrouter/owl-alpha"
+_MAX_TEXT_CHARS = 6000</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-adjustable">Adjustable</span>
+      <span class="sec-title">System prompt</span>
+      <span class="sec-sub">Role · task · output schema</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">This is the most important thing to tune. It tells the model who it is, what it receives, and how to reason. The last paragraph enforces strict JSON output — keep that part intact.</p>
+      <div class="tweak"><div class="tweak-label">Good things to tweak</div><div class="tweak-text">The reasoning instructions — "Reason carefully through the article's claims, writing style, internal consistency, emotional framing, and any factual red flags." You can add more heuristics here, e.g. add "Look for sensationalist headlines mismatched with body content" or "Check if named sources are verifiable."</div></div>
+      <div class="tweak"><div class="tweak-label">Do NOT change</div><div class="tweak-text">The JSON schema block at the bottom. The parser in <code>_parse_response()</code> depends on these exact field names.</div></div>
+      <pre>_SYSTEM_PROMPT = """\
+You are a professional news fact-checker ...
+
+Reason carefully through the article's claims,
+writing style, internal consistency, emotional
+framing, and any factual red flags. The EP signal
+is one useful data point — you may agree or
+disagree with it based on your own analysis.
+
+IMPORTANT: Respond with a single valid JSON only.
+{
+  "verdict": "REAL CONTENT"|"MANIPULATED CONTENT"|"INCONCLUSIVE",
+  "color_class": "real"|"manipulated"|"inconclusive",
+  "confidence": "&lt;number&gt;%",
+  "justification": "&lt;2–3 sentence explanation&gt;",
+  "key_facts": ["&lt;obs 1&gt;", "&lt;obs 2&gt;", "&lt;obs 3&gt;"]
+}"""</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-adjustable">Adjustable</span>
+      <span class="sec-title">User message template</span>
+      <span class="sec-sub">How EP signal + article are formatted</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">This is the actual message sent per-request. It stitches the EP result (label, probability, confidence) with the cleaned article text. The note after the EP block tells the model not to blindly trust it.</p>
+      <div class="tweak"><div class="tweak-label">What to tweak</div><div class="tweak-text">The framing note — "treat it as evidence, not as a definitive answer." You can strengthen or weaken how much authority the EP carries, e.g. change it to "The EP signal is highly reliable for clear-cut cases." You can also add extra context fields here (e.g. article source URL, publish date) if your frontend sends them.</div></div>
+      <pre>_USER_TEMPLATE = """\
+=== EARLY PREDICTOR SIGNAL ===
+Label       : {ep_label}
+Probability : {ep_prob:.4f}  (0.0 = Real, 1.0 = Fake)
+Confidence  : {ep_confidence}
+
+Note: treat it as evidence, not a definitive answer.
+
+=== ARTICLE TEXT ===
+{llm_text}
+
+Analyse the article and return your verdict as JSON."""</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-config">Config</span>
+      <span class="sec-title">Judge.__init__</span>
+      <span class="sec-sub">temperature · max_tokens · API key</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">Sets up the model parameters. <code>temperature=0.2</code> keeps outputs deterministic and consistent — good for structured JSON. The API key is read from your <code>.env</code> file automatically.</p>
+      <div class="tweak"><div class="tweak-label">What to tweak</div><div class="tweak-text"><code>temperature</code>: raise toward 0.5–0.7 if you want more varied justifications. Keep it low (0.1–0.3) for consistent JSON structure. <code>max_tokens=1024</code> is plenty — lower it to 512 to cut cost if justifications are being truncated anyway.</div></div>
+      <pre>def __init__(self, api_key=None, temperature=0.2, max_tokens=1024):
+    self.api_key     = api_key or os.environ.get("OPENROUTER_API_KEY")
+    self.temperature = temperature
+    self.max_tokens  = max_tokens</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-fixed">Fixed</span>
+      <span class="sec-title">_call_api</span>
+      <span class="sec-sub">HTTP request to OpenRouter</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">Sends the POST request. The <code>HTTP-Referer</code> and <code>X-Title</code> headers are required by OpenRouter for rate-limit attribution — they don't affect the response. <code>timeout=60</code> prevents the Flask thread from hanging if OpenRouter is slow.</p>
+      <div class="tweak"><div class="tweak-label">What to tweak</div><div class="tweak-text">Only <code>timeout</code> if needed. You can also add <code>"stream": True</code> here later if you want to stream the response to the frontend.</div></div>
+      <pre>headers = {
+    "Authorization": f"Bearer {self.api_key}",
+    "HTTP-Referer":  "https://rahmad.local",
+    "X-Title":       "RAHMAD Fake News Detector",
+}
+payload = {
+    "model": _MODEL_ID,
+    "messages": [system_msg, user_msg],
+    "temperature": self.temperature,
+    "max_tokens":  self.max_tokens,
+}</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-logic">Logic</span>
+      <span class="sec-title">_parse_response</span>
+      <span class="sec-sub">JSON extraction + verdict normalisation</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">Strips markdown fences if the model wraps its output in them, parses JSON, then normalises the verdict string to one of three exact values. This is what maps "FAKE", "MANIPULATED", "FALSE" etc. to "MANIPULATED CONTENT".</p>
+      <div class="tweak"><div class="tweak-label">What to tweak</div><div class="tweak-text">The normalisation rules. Currently: if "REAL" in verdict → "REAL CONTENT", if "MANIPULATED" or "FAKE" → "MANIPULATED CONTENT", else "INCONCLUSIVE". Add more aliases here if the model keeps returning unusual strings like "MISINFORMATION" or "SATIRE".</div></div>
+      <pre>if "REAL" in raw_verdict and "MANIPULATED" not in raw_verdict:
+    verdict, color_class = "REAL CONTENT", "real"
+elif "MANIPULATED" in raw_verdict or "FAKE" in raw_verdict:
+    verdict, color_class = "MANIPULATED CONTENT", "manipulated"
+else:
+    verdict, color_class = "INCONCLUSIVE", "inconclusive"</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-header" onclick="toggle(this)">
+      <span class="sec-badge tag-error">Fallback</span>
+      <span class="sec-title">_fallback_response</span>
+      <span class="sec-sub">Safe output on any error</span>
+      <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+    </div>
+    <div class="sec-body">
+      <p class="desc">If the API call fails (bad key, network timeout, rate limit) or the JSON can't be parsed, this returns INCONCLUSIVE with 0% confidence rather than crashing Flask. The error message is passed through to the frontend.</p>
+      <div class="tweak"><div class="tweak-label">What to tweak</div><div class="tweak-text">The fallback justification text shown to users. Currently it exposes the technical error — you may want to replace it with a friendlier message for production.</div></div>
+      <pre>return {
+    "verdict":       "INCONCLUSIVE",
+    "color_class":   "inconclusive",
+    "confidence":    "0.0%",
+    "justification": f"Judge Module error: {error_msg}",
+    "key_facts":     ["Check OPENROUTER_API_KEY and connection."],
+    "links": [],
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const chev = header.querySelector('.chevron');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+  }
+</script>

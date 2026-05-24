@@ -267,6 +267,27 @@ class EarlyPredictor:
         """
         Run CLIP encoders → concatenate → MLP → scalar probability.
         """
+        prob, _, _, _ = self._forward_verbose(input_ids, attention_mask, pixel_values)
+        return prob
+
+    def _forward_verbose(
+        self,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        pixel_values: torch.Tensor,
+    ) -> tuple[float, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Same as _forward() but also returns the intermediate CLIP tensors
+        for logging and inspection.
+
+        Returns
+        -------
+        tuple:
+            probability  : float          — scalar ∈ [0, 1]
+            text_embeds  : torch.Tensor   — [1, 512]
+            image_embeds : torch.Tensor   — [1, 512]
+            fused        : torch.Tensor   — [1, 1024]
+        """
         with torch.no_grad():
             text_embeds  = self.clip.get_text_features(
                 input_ids=input_ids,
@@ -279,7 +300,7 @@ class EarlyPredictor:
         fused = torch.cat([text_embeds, image_embeds], dim=-1)  # [1, 1024]
         prob  = self.mlp(fused)                                  # [1] or scalar
 
-        return float(prob.squeeze().cpu())
+        return float(prob.squeeze().cpu()), text_embeds, image_embeds, fused
 
     @staticmethod
     def _build_verdict(probability: float, fake_thr: float, real_thr: float) -> dict:
@@ -385,6 +406,40 @@ class EarlyPredictor:
 
         probability = self._forward(input_ids, attention_mask, pixel_values)
         return self._build_verdict(probability, self.fake_threshold, self.real_threshold)
+
+    def predict_from_tensors_verbose(
+        self,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        pixel_values: torch.Tensor,
+    ) -> tuple[dict, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Same as predict_from_tensors() but also returns the raw CLIP embeddings
+        for pipeline logging.
+
+        Parameters
+        ----------
+        input_ids      : torch.Tensor  [1, 77]
+        attention_mask : torch.Tensor  [1, 77]
+        pixel_values   : torch.Tensor  [1, 3, 224, 224]
+
+        Returns
+        -------
+        tuple:
+            result       : dict          — same as predict_from_tensors()
+            text_embeds  : torch.Tensor  — [1, 512]  CLIP text encoder output
+            image_embeds : torch.Tensor  — [1, 512]  CLIP image encoder output
+            fused        : torch.Tensor  — [1, 1024] concatenated embedding
+        """
+        input_ids      = input_ids.to(self.device)
+        attention_mask = attention_mask.to(self.device)
+        pixel_values   = pixel_values.to(self.device)
+
+        probability, text_embeds, image_embeds, fused = self._forward_verbose(
+            input_ids, attention_mask, pixel_values
+        )
+        result = self._build_verdict(probability, self.fake_threshold, self.real_threshold)
+        return result, text_embeds, image_embeds, fused
 
 
 # ---------------------------------------------------------------------------

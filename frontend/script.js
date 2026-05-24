@@ -207,7 +207,14 @@ document.addEventListener('DOMContentLoaded', () => {
             verdictText.innerHTML = responseData.verdict.replace(' ', '<br>');
             verdictText.className = 'verdict-text ' + responseData.color_class;
 
-            document.getElementById('confidence-score').textContent = responseData.confidence;
+            const confEl = document.getElementById('confidence-score');
+            confEl.textContent = responseData.confidence;
+            const confValue = parseFloat(responseData.confidence);
+            confEl.className = 'confidence-score ' + (
+                confValue < 50  ? 'conf-low' :
+                confValue < 70  ? 'conf-mid' :
+                                  'conf-high'
+            );
             document.getElementById('justification-text').textContent = responseData.justification;
 
             // Update key facts

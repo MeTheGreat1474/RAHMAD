@@ -12,3 +12,6 @@ fyp-env-win/
 __pycache__/
 *.pyc
 fyp-env-win/
+
+# Environment / secrets
+.env

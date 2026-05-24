@@ -1,0 +1,185 @@
+================================================================================
+  RAHMAD PIPELINE LOG  —  2026-05-25  02:43:41
+================================================================================
+
+[1]  PRE-PROCESSING  —  INPUT
+------------------------------------------------------------
+    raw_text:
+      "Anwar slams critics over 2008 petrol pledge\n\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\n\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.\n\n"The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).\n\n"But we are now   … [875 chars total]"
+
+    image.size            : 700 × 466 px
+    image.mode            : RGB
+
+[2]  PRE-PROCESSING  —  OUTPUT
+------------------------------------------------------------
+    llm_text  (cleaned full text — goes to Judge):
+      "Anwar slams critics over 2008 petrol pledge\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.\n"The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).\n"But we are now at R  … [868 chars total]"
+
+    lead_text  (headline + 1st sentence — goes to CLIP):
+      "anwar slams critics over 2008 petrol pledge kuala kangsar: prime minister datuk seri anwar ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices."
+
+    input_ids             : shape=[1, 77]  dtype=torch.int64  min=269  max=49407  first_12=[49406, 34261, 18907, 16946, 962, 273, 271, 271, 279, 18149, 11507, 30336, … (65 more)]
+    attention_mask        : shape=[1, 77]  dtype=torch.int64  min=0  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
+    pixel_values          : shape=[1, 3, 224, 224]  norm=487.7971  min=-1.7521  max=+2.1459  first_6=[+1.6238, +1.6238, +1.6384, +1.6530, +1.6676, +1.6384, … (150522 more)]
+
+[3]  CLIP ENCODER  —  OUTPUT
+------------------------------------------------------------
+    text_embeds  [1×512]  : shape=[1, 512]  norm=7.7606  min=-0.9395  max=+2.0518  first_8=[+0.2078, +0.1848, -0.2147, -0.0665, +0.1332, -0.2445, +0.1302, +1.6681, … (504 more)]
+    image_embeds [1×512]  : shape=[1, 512]  norm=10.7245  min=-5.6825  max=+2.0860  first_8=[-0.0901, +0.1407, +0.2782, +0.2299, +0.7369, -0.0142, +0.1553, -0.0981, … (504 more)]
+    fused        [1×1024] : shape=[1, 1024]  norm=13.2379  min=-5.6825  max=+2.0860  first_8=[+0.2078, +0.1848, -0.2147, -0.0665, +0.1332, -0.2445, +0.1302, +1.6681, … (1016 more)]
+
+[4]  EARLY PREDICTOR  —  OUTPUT
+------------------------------------------------------------
+    probability           : 0.527585   (0.0 = Real, 1.0 = Fake)
+    label                 : UNCERTAIN
+    confidence            : 52.8%
+    pass_to_agents        : True
+
+[5]  JUDGE (LLM)  —  INPUT
+------------------------------------------------------------
+    --- SYSTEM PROMPT ---
+      You are a professional news fact-checker and investigative media analyst working for RAHMAD (Reliable Automated Hybrid Multi-Agent Detection). Your role is to classify news articles into misinformation categories using structured, evidence-based reasoning.
+      
+      ══════════════════════════════════════════════════
+      SECTION 1 — YOUR CONSTITUTION
+      ══════════════════════════════════════════════════
+      Follow these principles at all times before forming any judgment:
+      
+        P1. EVIDENCE OVER INTUITION
+            Every claim in your verdict must be grounded in specific, observable signals from the article text. Do not classify based on gut feeling or surface-level tone alone.
+      
+        P2. ABSENCE OF EVIDENCE ≠ EVIDENCE OF FALSEHOOD
+            Missing citations, unnamed sources, or lack of verifiable detail do not automatically indicate fabrication. Consider what is plausible for the article's domain and publication type.
+      
+        P3. DISTINGUISH WRITING STYLE FROM INTENT
+            Sensationalist, emotional, or informal language is a signal, not a verdict. Satire uses irony deliberately; misleading content uses facts deceptively. Do not conflate the two.
+      
+        P4. CONTEXT DETERMINES MEANING
+            A factually accurate statement can still be MISLEADING CONTENT if it is framed to lead the reader to a false conclusion. Always assess framing, not just factual accuracy.
+      
+        P5. CALIBRATED CONFIDENCE
+            Only exceed 85% confidence when at least three independent signals from different categories (style, structure, source, content) all point to the same classification. Default to INCONCLUSIVE when evidence is mixed or insufficient.
+      
+        P6. TREAT EP AS EVIDENCE, NOT AUTHORITY
+            The Early Predictor signal is a multimodal binary estimate (Real/Fake). Treat it as one useful data point. You may agree with it, partially agree, or override it — but always explain why.
+      
+      ══════════════════════════════════════════════════
+      SECTION 2 — CLASSIFICATION TYPES
+      ══════════════════════════════════════════════════
+      Classify the article into exactly one of the following, or INCONCLUSIVE if none clearly apply.
+      
+        1. SATIRE OR PARODY
+           Uses humor, irony, or sarcasm to critique or comment on current events. No strict intention to deceive, but can be mistaken for real news and shared as fact.
+      
+        2. FALSE CONNECTION
+           Headlines, visuals, or captions do not accurately support the article content. Usually employed to create clickbait or mislead readers who only skim the headline.
+      
+        3. MISLEADING CONTENT
+           Real information, facts, or quotes framed in a way that leads to a false conclusion. Includes using facts out of context to support a specific bias or agenda.
+      
+        4. IMPOSTER CONTENT
+           Fake information claiming to be from a legitimate, trusted source. Includes impersonating an established news outlet, government official, or organisation to grant the false information a veneer of credibility.
+      
+        5. MANIPULATED CONTENT
+           Genuine images, documents, or video footage altered to deceive audiences. Examples include heavily editing a video out of context or using photo-editing software to change the meaning of a photograph.
+      
+        6. FABRICATED CONTENT
+           Entirely invented information, articles, or visuals designed to deliberately deceive, manipulate emotions, or push propaganda. Frequently involves AI-generated text or deepfake visuals.
+      
+        7. CREDIBLE
+           No misinformation signals were detected across all analysis dimensions — style, framing, sourcing, internal consistency, and headline-to-body alignment all appear legitimate. Use this when the article reads as a well-sourced, factually grounded news report with no manipulation, fabrication, false framing, or impersonation patterns. Important: this does not certify the article as factually true — only that no misinformation patterns were found in the text.
+      
+        8. INCONCLUSIVE
+           Use this ONLY when signals are genuinely mixed or contradictory — some red flags are present but insufficient to confidently assign a specific misinformation type. Do NOT use INCONCLUSIVE as a fallback for articles that simply appear legitimate; use CREDIBLE for those.
+      
+      ══════════════════════════════════════════════════
+      SECTION 3 — YOUR REASONING PROTOCOL
+      ══════════════════════════════════════════════════
+      Work through ALL seven steps in order before forming your verdict. Capture your thinking in the "reasoning" field of your JSON output.
+      
+        STEP 1 — DOMAIN ORIENTATION (Step-Back)
+          Before reading closely, ask: What domain does this article operate in (health, politics, science, celebrity, finance, entertainment)? What does a legitimate article in this domain typically look like? What are the common manipulation tactics used in this domain? Answering these questions first will anchor your analysis in the right frame of reference.
+      
+        STEP 2 — CLAIM EXTRACTION
+          Identify the 3–5 most important factual claims made in the article. For each claim, label it as: VERIFIABLE (can be fact-checked), VAGUE (lacks specifics), or UNFALSIFIABLE (cannot be disproved by design). A high ratio of vague or unfalsifiable claims is a red flag.
+      
+        STEP 3 — INTERNAL CONSISTENCY AUDIT
+          Check for internal consistency: Does the headline match the body? Do quotes match their attributed sources? Are statistics internally coherent (e.g. percentages that sum to more than 100)? Does the article contradict itself? Flag every mismatch with a specific example.
+      
+        STEP 4 — FRAMING AND STYLE ANALYSIS
+          Assess emotional language, urgency cues ("BREAKING", "SHOCKING"), appeals to fear or outrage, and whether the writing style matches the claimed publication type. Look for narrative patterns common in propaganda: in-group vs. out-group framing, appeals to unnamed authorities, and loaded or demonizing language.
+      
+        STEP 5 — SOURCE AND ATTRIBUTION ANALYSIS
+          Evaluate source credibility and transparency. Are sources named and traceable? Are institutions or officials quoted in ways that seem authentic? Does the article claim affiliation with a known outlet while showing signs of impersonation (e.g. slight name variation, unfamiliar domain)?
+      
+        STEP 6 — EP SIGNAL INTEGRATION
+          Now consider the Early Predictor's signal. State whether it agrees or disagrees with your analysis so far. If it agrees, note which signals corroborate it. If it disagrees, explicitly state why you are overriding it — or whether it is causing you to reconsider a signal you underweighted.
+      
+        STEP 7 — SELF-CRITIQUE (Self-Refine)
+          Before committing to a verdict, challenge yourself: What is the strongest argument AGAINST your current classification? Could you be misreading satire as fabrication, or vice versa? Could cultural context, technical jargon, or incomplete information be distorting your reading? If the counter-argument is strong enough to change your classification or materially reduce your confidence, update accordingly.
+      
+      ══════════════════════════════════════════════════
+      SECTION 4 — OUTPUT FORMAT
+      ══════════════════════════════════════════════════
+      Respond with a single valid JSON object only. No markdown fences, no prose outside the JSON. Use exactly this schema:
+      
+      {
+        "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 5–8 concise sentences>",
+        "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
+        "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
+        "confidence": "<number>%",
+        "justification": "<2–3 sentence explanation of your final verdict, citing specific signals from the article>",
+        "key_facts": ["<observation 1>", "<observation 2>", "<observation 3>"]
+      }
+
+    --- USER MESSAGE ---
+      === EARLY PREDICTOR SIGNAL ===
+      Label       : UNCERTAIN
+      Probability : 0.5276  (0.0 = Real, 1.0 = Fake)
+      Confidence  : 52.8%
+      
+      Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it as evidence, not as a definitive answer. You must run your own full reasoning protocol before reaching a verdict.
+      
+      === ARTICLE TEXT ===
+      Anwar slams critics over 2008 petrol pledge
+      KUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.
+      Anwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.
+      "The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).
+      "But we are now at RM1.99, among the lowest in the world, compared only to Brunei, which is slightly lower than us.
+      "All oil-producing countries, including the UAE, are now raising oil prices," he said.
+      Anwar had pledged in 2008 to reduce petrol prices if the Opposition at the time won the general election.
+      Separately, Anwar said reforms require time and cannot be achieved immediately.
+      
+      Now work through your 7-step reasoning protocol and return your verdict as a JSON object.
+
+[6]  JUDGE (LLM)  —  OUTPUT
+------------------------------------------------------------
+    --- RAW API RESPONSE ---
+      {
+        "reasoning": "STEP 1 — DOMAIN ORIENTATION: This is a political news article about a Malaysian politician defending a past policy pledge. Legitimate political reporting in this domain typically includes direct quotes, named sources, and contextual background. Common manipulation tactics include taking quotes out of context and misleading framing of past statements. STEP 2 — CLAIM EXTRACTION: (1) Anwar pledged in 2008 to lower petrol prices if the Opposition won — VERIFIABLE historical claim. (2) Oil in Saudi Arabia was 50 sen at that time — VERIFIABLE but oddly specific and unusual claim. (3) Current price is RM1.99, among lowest in world — VERIFIABLE. (4) Brunei is slightly lower — VERIFIABLE. (5) All oil-producing countries including UAE are raising prices — VAGUE, lacks specifics. STEP 3 — INTERNAL CONSISTENCY: The headline says Anwar 'slams critics' and the body supports this with his direct quotes. However, the claim that Saudi oil was '50 sen' in 2008 is highly suspicious — Saudi oil prices were nowhere near 50 sen (roughly USD $0.12) per litre in 2008; this appears to be a factual error or misquotation. The article does not flag this anomaly. STEP 4 — FRAMING AND STYLE: The writing is straightforward news reporting with direct quotes. No sensationalist language, urgency cues, or emotional manipulation detected. The tone is neutral and matches standard political reporting. STEP 5 — SOURCE AND ATTRIBUTION: The article attributes quotes directly to Anwar at a specific event (Malay College Kuala Kangsar, April 4). No impersonation signals detected. However, the article lacks a named publication source or byline, which is a minor transparency concern but not decisive. STEP 6 — EP SIGNAL INTEGRATION: The EP signal is UNCERTAIN at 52.8%, essentially a coin flip. My analysis has identified one significant red flag — the implausible '50 sen' claim — but the rest of the article reads as standard political reporting. The EP signal neither strongly supports nor contradicts my assessment. STEP 7 — SELF-CRITIQUE: The strongest counter-argument is that this is simply a poorly fact-checked but genuine news report rather than deliberate misinformation. The '50 sen' claim could be a transcription error or mishearing by a reporter rather than intentional fabrication. However, presenting an implausible factual claim without correction or context could qualify as misleading. On balance, the article presents a real political figure's real remarks, but the uncritical inclusion of a dubious factual claim (50 sen oil price) without any journalistic scrutiny or correction leans toward MISLEADING CONTENT — real quotes framed with an unchallenged false factual assertion that supports Anwar's defense.",
+        "verdict": "MISLEADING CONTENT",
+        "color_class": "misleading",
+        "confidence": "62%",
+        "justification": "The article reports real remarks by a real political figure at a verifiable event, but it uncritically includes Anwar's claim that Saudi oil was '50 sen' in 2008 — a highly implausible factual assertion that goes unchallenged by the reporter. This unverified claim is used to support Anwar's defense of his 2008 petrol price pledge, framing the criticism against him as based on a misunderstanding. The lack of journalistic fact-checking on this key supporting claim makes the content misleading, even if the quotes themselves are genuine.",
+        "key_facts": [
+          "Article reports Anwar Ibrahim's direct quotes at a specific event on April 4 at Malay College Kuala Kangsar",
+          "Anwar's claim that Saudi oil was '50 sen' in 2008 is highly implausible and presented without journalistic challenge or correction",
+          "No named publication source or byline is provided for the article",
+          "The article's framing defends Anwar by suggesting critics took his 2008 pledge out of context, using the unverified 50 sen claim as supporting evidence"
+        ]
+      }
+
+    --- PARSED VERDICT ---
+    verdict               : MISLEADING CONTENT
+    color_class           : misleading
+    confidence            : 62%
+    justification         : The article reports real remarks by a real political figure at a verifiable event, but it uncritically includes Anwar's claim that Saudi oil was '50 sen' in 2008 — a highly implausible factual assertion that goes unchallenged by the reporter. This unverified claim is used to support Anwar's defense …
+    key_facts             : [4 item(s)]
+      1. Article reports Anwar Ibrahim's direct quotes at a specific event on April 4 at Malay College Kuala Kangsar
+      2. Anwar's claim that Saudi oil was '50 sen' in 2008 is highly implausible and presented without journalistic challenge or correction
+      3. No named publication source or byline is provided for the article
+      4. The article's framing defends Anwar by suggesting critics took his 2008 pledge out of context, using the unverified 50 sen claim as supporting evidence
+
+================================================================================
+  END OF LOG  |  total elapsed: 61.23s
+================================================================================

@@ -10,6 +10,7 @@
     --red-alert: #9e2a2b;
     --orange-alert: #ee7b30;
     --green: #249831;
+    --grey-inconclusive: #6b7280;
 
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Inter', sans-serif;
@@ -427,8 +428,34 @@ textarea {
     text-transform: uppercase;
 }
 
-.verdict-text.manipulated {
+h2.verdict-text.real,
+h2.verdict-text.credible {
+    color: var(--green);
+}
+
+h2.verdict-text.satire,
+h2.verdict-text.false-connection,
+h2.verdict-text.misleading,
+h2.verdict-text.imposter,
+h2.verdict-text.manipulated,
+h2.verdict-text.fabricated {
     color: var(--red-alert);
+}
+
+h2.verdict-text.inconclusive {
+    color: var(--grey-inconclusive);
+}
+
+.confidence-score.conf-low {
+    color: var(--red-alert);
+}
+
+.confidence-score.conf-mid {
+    color: var(--orange-alert);
+}
+
+.confidence-score.conf-high {
+    color: var(--green);
 }
 
 .confidence-score {
@@ -466,7 +493,7 @@ textarea {
 
 .justification-content li {
     margin-bottom: 0.8rem;
-    font-size: 1rem;
+    font-size: 1.05rem;
 }
 
 /* Links Col */

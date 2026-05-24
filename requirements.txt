@@ -10,3 +10,7 @@ Pillow>=10.0.0              # PIL image loading
 transformers>=4.40.0
 torch>=2.2.0
 peft>=0.10.0                # LoRA adapter loading (PeftModel)
+
+# Judge Module — OpenRouter API
+requests>=2.31.0            # HTTP calls to OpenRouter
+python-dotenv>=1.0.0        # load OPENROUTER_API_KEY from .env file

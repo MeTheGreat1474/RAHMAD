@@ -2,6 +2,12 @@ import time
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
+
+# Load OPENROUTER_API_KEY (and any other secrets) from a .env file if present.
+# This must happen before importing analyzer so the Judge picks up the key.
+from dotenv import load_dotenv
+load_dotenv()
+
 from backend.analyzer import analyze_text
 
 # Point Flask's static folder to frontend/ so it serves
