@@ -1,11 +1,11 @@
 ================================================================================
-  RAHMAD PIPELINE LOG  —  2026-05-25  02:43:41
+  RAHMAD PIPELINE LOG  —  2026-05-29  21:55:53
 ================================================================================
 
 [1]  PRE-PROCESSING  —  INPUT
 ------------------------------------------------------------
     raw_text:
-      "Anwar slams critics over 2008 petrol pledge\n\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\n\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.\n\n"The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).\n\n"But we are now   … [875 chars total]"
+      "Another hiker goes missing \n\nIPOH: Another hiker has gone missing amid a spate of recent incidents, reigniting concerns over safety on jungle trails. The latest case comes just days after a 19-year-old girl was found dead after losing her way at Bukit Changkat Asa.\n\nIn the latest case, rescuers resumed the search and rescue (SAR) mission for a 49-year-old woman who went missing while climbing Gunung Batu Putih on May 23, deploying a new operations team of eight personnel.\n\nPerak Fire and Rescue   … [2891 chars total]"
 
     image.size            : 700 × 466 px
     image.mode            : RGB
@@ -13,27 +13,27 @@
 [2]  PRE-PROCESSING  —  OUTPUT
 ------------------------------------------------------------
     llm_text  (cleaned full text — goes to Judge):
-      "Anwar slams critics over 2008 petrol pledge\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.\n"The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).\n"But we are now at R  … [868 chars total]"
+      "Another hiker goes missing\nIPOH: Another hiker has gone missing amid a spate of recent incidents, reigniting concerns over safety on jungle trails. The latest case comes just days after a 19-year-old girl was found dead after losing her way at Bukit Changkat Asa.\nIn the latest case, rescuers resumed the search and rescue (SAR) mission for a 49-year-old woman who went missing while climbing Gunung Batu Putih on May 23, deploying a new operations team of eight personnel.\nPerak Fire and Rescue Depa  … [2872 chars total]"
 
     lead_text  (headline + 1st sentence — goes to CLIP):
-      "anwar slams critics over 2008 petrol pledge kuala kangsar: prime minister datuk seri anwar ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices."
+      "another hiker goes missing ipoh: another hiker has gone missing amid a spate of recent incidents, reigniting concerns over safety on jungle trails. the latest case comes just days after a 19-year-old girl was found dead after losing her way at bukit changkat asa."
 
-    input_ids             : shape=[1, 77]  dtype=torch.int64  min=269  max=49407  first_12=[49406, 34261, 18907, 16946, 962, 273, 271, 271, 279, 18149, 11507, 30336, … (65 more)]
+    input_ids             : shape=[1, 77]  dtype=torch.int64  min=267  max=49407  first_12=[49406, 1380, 40947, 2635, 3423, 40218, 327, 281, 1380, 40947, 791, 3601, … (65 more)]
     attention_mask        : shape=[1, 77]  dtype=torch.int64  min=0  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
     pixel_values          : shape=[1, 3, 224, 224]  norm=487.7971  min=-1.7521  max=+2.1459  first_6=[+1.6238, +1.6238, +1.6384, +1.6530, +1.6676, +1.6384, … (150522 more)]
 
 [3]  CLIP ENCODER  —  OUTPUT
 ------------------------------------------------------------
-    text_embeds  [1×512]  : shape=[1, 512]  norm=7.7606  min=-0.9395  max=+2.0518  first_8=[+0.2078, +0.1848, -0.2147, -0.0665, +0.1332, -0.2445, +0.1302, +1.6681, … (504 more)]
+    text_embeds  [1×512]  : shape=[1, 512]  norm=8.1062  min=-1.0234  max=+3.5387  first_8=[+0.0615, +0.3477, -0.0266, -0.1775, -0.2875, +0.0920, +0.0596, +1.4466, … (504 more)]
     image_embeds [1×512]  : shape=[1, 512]  norm=10.7245  min=-5.6825  max=+2.0860  first_8=[-0.0901, +0.1407, +0.2782, +0.2299, +0.7369, -0.0142, +0.1553, -0.0981, … (504 more)]
-    fused        [1×1024] : shape=[1, 1024]  norm=13.2379  min=-5.6825  max=+2.0860  first_8=[+0.2078, +0.1848, -0.2147, -0.0665, +0.1332, -0.2445, +0.1302, +1.6681, … (1016 more)]
+    fused        [1×1024] : shape=[1, 1024]  norm=13.4434  min=-5.6825  max=+3.5387  first_8=[+0.0615, +0.3477, -0.0266, -0.1775, -0.2875, +0.0920, +0.0596, +1.4466, … (1016 more)]
 
 [4]  EARLY PREDICTOR  —  OUTPUT
 ------------------------------------------------------------
-    probability           : 0.527585   (0.0 = Real, 1.0 = Fake)
-    label                 : UNCERTAIN
-    confidence            : 52.8%
-    pass_to_agents        : True
+    probability           : 0.882479   (0.0 = Real, 1.0 = Fake)
+    label                 : FAKE
+    confidence            : 88.2%
+    pass_to_agents        : False
 
 [5]  JUDGE (LLM)  —  INPUT
 ------------------------------------------------------------
@@ -124,7 +124,7 @@
       Respond with a single valid JSON object only. No markdown fences, no prose outside the JSON. Use exactly this schema:
       
       {
-        "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 5–8 concise sentences>",
+        "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences>",
         "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
         "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
         "confidence": "<number>%",
@@ -134,21 +134,31 @@
 
     --- USER MESSAGE ---
       === EARLY PREDICTOR SIGNAL ===
-      Label       : UNCERTAIN
-      Probability : 0.5276  (0.0 = Real, 1.0 = Fake)
-      Confidence  : 52.8%
+      Label       : FAKE
+      Probability : 0.8825  (0.0 = Real, 1.0 = Fake)
+      Confidence  : 88.2%
       
       Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it as evidence, not as a definitive answer. You must run your own full reasoning protocol before reaching a verdict.
       
       === ARTICLE TEXT ===
-      Anwar slams critics over 2008 petrol pledge
-      KUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.
-      Anwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.
-      "The statement was made when the price of oil in Saudi Arabia was 50 sen at that time," he said during a question-and-answer session at Malay College Kuala Kangsar here on Saturday (April 4).
-      "But we are now at RM1.99, among the lowest in the world, compared only to Brunei, which is slightly lower than us.
-      "All oil-producing countries, including the UAE, are now raising oil prices," he said.
-      Anwar had pledged in 2008 to reduce petrol prices if the Opposition at the time won the general election.
-      Separately, Anwar said reforms require time and cannot be achieved immediately.
+      Another hiker goes missing
+      IPOH: Another hiker has gone missing amid a spate of recent incidents, reigniting concerns over safety on jungle trails. The latest case comes just days after a 19-year-old girl was found dead after losing her way at Bukit Changkat Asa.
+      In the latest case, rescuers resumed the search and rescue (SAR) mission for a 49-year-old woman who went missing while climbing Gunung Batu Putih on May 23, deploying a new operations team of eight personnel.
+      Perak Fire and Rescue Department assistant director of operations Sabarodzi Nor Ahmad said the latest rescue team was deployed to Bukit Berapit 2 aboard an AW139 helicopter.
+      "They comprised eight STORM personnel and one Forestry Mountain Guide (MGP) from the first rescue team that entered Gunung Batu Putih on May 25 and exited safely this morning (yesterday) after encountering heavy rain and strong winds at Berapit 2 during the night," he said.
+      He said the operation remained focused around the Gunung Raya area based on clues discovered earlier.
+      On Tuesday, the discovery of a water bottle and supplement packets believed to belong to the missing hiker, Jaslinda Saludin, at Gunung Batu Putih here provided the latest lead to the SAR team.
+      The items were found along the route leading to Gunung Raya, where the victim is believed to have strayed from the original hiking trail.
+      Jaslinda was reported to have begun the Trans Spencer Chapman hike at 2am on May 23 with 13 other individuals and two MGPs via the Pos Gedung-Gunung Bah Gading-Gunung Batu Putih-Kuala Woh route.
+      She and another hiker, Mohd Hanafi Neikmad, 41, experienced health problems and stopped.
+      However, Jaslinda was reported to have continued her ascent to the mountain peak and was last seen by an MGP at 7.30am on Sunday, Bernama reported.
+      In a report by The Star dated May 14, seasoned hikers advised that proper preparation, awareness and safety precautions were vital to ensure an enjoyable experience on the trails.
+      They said hikers should monitor weather conditions, use walking poles, especially when descending steep slopes, and avoid hiking late in the evening on unfamiliar trails.
+      The advice from seasoned hikers comes in the wake of recent incidents of missing hikers.
+      Last year, a 34-year-old hiker from Kedah was found dead at Gunung Liang Barat in Perak after reportedly suffering hypothermia during a hiking expedition.
+      In the case of teenager Nur Izzati Humaira Azizul, who died after losing her way while hiking Bukit Changkat Asa with her family last Saturday, she is believed to have attempted to reach the foot of the hill alone after feeling fatigued. She was reported missing shortly after.
+      On Tuesday, the teenager's body was discovered off the hiking trail by search and rescue teams at 11.59am.
+      She was found about 500m from where she was last seen and one kilometre from the incident control post.
       
       Now work through your 7-step reasoning protocol and return your verdict as a JSON object.
 
@@ -156,30 +166,30 @@
 ------------------------------------------------------------
     --- RAW API RESPONSE ---
       {
-        "reasoning": "STEP 1 — DOMAIN ORIENTATION: This is a political news article about a Malaysian politician defending a past policy pledge. Legitimate political reporting in this domain typically includes direct quotes, named sources, and contextual background. Common manipulation tactics include taking quotes out of context and misleading framing of past statements. STEP 2 — CLAIM EXTRACTION: (1) Anwar pledged in 2008 to lower petrol prices if the Opposition won — VERIFIABLE historical claim. (2) Oil in Saudi Arabia was 50 sen at that time — VERIFIABLE but oddly specific and unusual claim. (3) Current price is RM1.99, among lowest in world — VERIFIABLE. (4) Brunei is slightly lower — VERIFIABLE. (5) All oil-producing countries including UAE are raising prices — VAGUE, lacks specifics. STEP 3 — INTERNAL CONSISTENCY: The headline says Anwar 'slams critics' and the body supports this with his direct quotes. However, the claim that Saudi oil was '50 sen' in 2008 is highly suspicious — Saudi oil prices were nowhere near 50 sen (roughly USD $0.12) per litre in 2008; this appears to be a factual error or misquotation. The article does not flag this anomaly. STEP 4 — FRAMING AND STYLE: The writing is straightforward news reporting with direct quotes. No sensationalist language, urgency cues, or emotional manipulation detected. The tone is neutral and matches standard political reporting. STEP 5 — SOURCE AND ATTRIBUTION: The article attributes quotes directly to Anwar at a specific event (Malay College Kuala Kangsar, April 4). No impersonation signals detected. However, the article lacks a named publication source or byline, which is a minor transparency concern but not decisive. STEP 6 — EP SIGNAL INTEGRATION: The EP signal is UNCERTAIN at 52.8%, essentially a coin flip. My analysis has identified one significant red flag — the implausible '50 sen' claim — but the rest of the article reads as standard political reporting. The EP signal neither strongly supports nor contradicts my assessment. STEP 7 — SELF-CRITIQUE: The strongest counter-argument is that this is simply a poorly fact-checked but genuine news report rather than deliberate misinformation. The '50 sen' claim could be a transcription error or mishearing by a reporter rather than intentional fabrication. However, presenting an implausible factual claim without correction or context could qualify as misleading. On balance, the article presents a real political figure's real remarks, but the uncritical inclusion of a dubious factual claim (50 sen oil price) without any journalistic scrutiny or correction leans toward MISLEADING CONTENT — real quotes framed with an unchallenged false factual assertion that supports Anwar's defense.",
-        "verdict": "MISLEADING CONTENT",
-        "color_class": "misleading",
-        "confidence": "62%",
-        "justification": "The article reports real remarks by a real political figure at a verifiable event, but it uncritically includes Anwar's claim that Saudi oil was '50 sen' in 2008 — a highly implausible factual assertion that goes unchallenged by the reporter. This unverified claim is used to support Anwar's defense of his 2008 petrol price pledge, framing the criticism against him as based on a misunderstanding. The lack of journalistic fact-checking on this key supporting claim makes the content misleading, even if the quotes themselves are genuine.",
+        "reasoning": "STEP 1 — DOMAIN ORIENTATION: This is a local news article about a missing hiker in Perak, Malaysia. Legitimate articles in this domain typically include named officials, specific dates, locations, and references to prior incidents for context. Common manipulation tactics in this domain include fabricated missing-person stories or exaggerated safety warnings. STEP 2 — CLAIM EXTRACTION: (1) A 49-year-old woman, Jaslinda Saludin, went missing on May 23 while climbing Gunung Batu Putih — VERIFIABLE (named person, date, location). (2) A 19-year-old girl was found dead at Bukit Changkat Asa — VERIFIABLE (named victim implied, specific location). (3) Rescuers deployed eight STORM personnel and one MGP via AW139 helicopter — VERIFIABLE (specific unit, equipment, named official). (4) Items (water bottle, supplement packets) were found along the route — VERIFIABLE. (5) Jaslinda began the Trans Spencer Chapman hike at 2am with 13 others and two MGPs — VERIFIABLE. All claims are specific and verifiable. STEP 3 — INTERNAL CONSISTENCY AUDIT: The headline 'Another hiker goes missing' matches the body content. The timeline is coherent: May 23 departure, last seen at 7:30am Sunday (May 25), items found Tuesday, SAR resumed. The article references prior incidents (teenager's death, last year's hiker death) consistently. No contradictions detected. STEP 4 — FRAMING AND STYLE ANALYSIS: The tone is factual and measured, not sensationalist. It uses standard news reporting language with quotes from a named official (Sabarodzi Nor Ahmad). References to Bernama and The Star add credibility. No emotional manipulation, urgency cues, or loaded language detected. STEP 5 — SOURCE AND ATTRIBUTION ANALYSIS: The article quotes a named official with a specific title (Perak Fire and Rescue Department assistant director of operations). It cites Bernama (Malaysian national news agency) and The Star (established Malaysian newspaper). Locations, unit names (STORM, MGP), and equipment (AW139 helicopter) are specific and consistent with Malaysian emergency services. No signs of impersonation. STEP 6 — EP SIGNAL INTEGRATION: The EP signal labels this FAKE with 88.2% confidence. However, my analysis across all dimensions — specific named sources, verifiable claims, internal consistency, measured tone, proper attribution — shows no misinformation signals. The EP signal may be reacting to the 'spate of incidents' framing or the domain (missing persons stories can be fabricated), but the article's specificity and sourcing are strong indicators of legitimacy. I am overriding the EP signal because the textual evidence overwhelmingly supports a credible local news report. STEP 7 — SELF-CRITIQUE: The strongest argument against CREDIBLE is that the EP model detected something — perhaps the article's structure resembles known fake news templates about missing persons. However, the level of operational detail (AW139 helicopter, STORM personnel, MGP, specific trail routes, named official) is highly consistent with genuine Malaysian news reporting and would be unusually specific for fabrication. I see no reason to downgrade from CREDIBLE.",
+        "verdict": "CREDIBLE",
+        "color_class": "credible",
+        "confidence": "82%",
+        "justification": "The article contains multiple verifiable specifics — named individuals (Jaslinda Saludin, Sabarodzi Nor Ahmad), precise dates and times, established Malaysian news sources (Bernama, The Star), and detailed operational information consistent with genuine Perak emergency services reporting. No internal contradictions, sensationalist framing, impersonation signals, or fabrication patterns were detected. The EP signal is overridden due to strong textual evidence of legitimacy.",
         "key_facts": [
-          "Article reports Anwar Ibrahim's direct quotes at a specific event on April 4 at Malay College Kuala Kangsar",
-          "Anwar's claim that Saudi oil was '50 sen' in 2008 is highly implausible and presented without journalistic challenge or correction",
-          "No named publication source or byline is provided for the article",
-          "The article's framing defends Anwar by suggesting critics took his 2008 pledge out of context, using the unverified 50 sen claim as supporting evidence"
+          "Named official Sabarodzi Nor Ahmad quoted with specific title and operational details",
+          "Specific timeline: May 23 departure, last seen 7:30am Sunday, items found Tuesday",
+          "References to established Malaysian news outlets Bernama and The Star",
+          "Detailed operational specifics: AW139 helicopter, STORM personnel, Forestry Mountain Guide, Trans Spencer Chapman trail route"
         ]
       }
 
     --- PARSED VERDICT ---
-    verdict               : MISLEADING CONTENT
-    color_class           : misleading
-    confidence            : 62%
-    justification         : The article reports real remarks by a real political figure at a verifiable event, but it uncritically includes Anwar's claim that Saudi oil was '50 sen' in 2008 — a highly implausible factual assertion that goes unchallenged by the reporter. This unverified claim is used to support Anwar's defense …
+    verdict               : CREDIBLE
+    color_class           : credible
+    confidence            : 82%
+    justification         : The article contains multiple verifiable specifics — named individuals (Jaslinda Saludin, Sabarodzi Nor Ahmad), precise dates and times, established Malaysian news sources (Bernama, The Star), and detailed operational information consistent with genuine Perak emergency services reporting. No interna…
     key_facts             : [4 item(s)]
-      1. Article reports Anwar Ibrahim's direct quotes at a specific event on April 4 at Malay College Kuala Kangsar
-      2. Anwar's claim that Saudi oil was '50 sen' in 2008 is highly implausible and presented without journalistic challenge or correction
-      3. No named publication source or byline is provided for the article
-      4. The article's framing defends Anwar by suggesting critics took his 2008 pledge out of context, using the unverified 50 sen claim as supporting evidence
+      1. Named official Sabarodzi Nor Ahmad quoted with specific title and operational details
+      2. Specific timeline: May 23 departure, last seen 7:30am Sunday, items found Tuesday
+      3. References to established Malaysian news outlets Bernama and The Star
+      4. Detailed operational specifics: AW139 helicopter, STORM personnel, Forestry Mountain Guide, Trans Spencer Chapman trail route
 
 ================================================================================
-  END OF LOG  |  total elapsed: 61.23s
+  END OF LOG  |  total elapsed: 55.77s
 ================================================================================

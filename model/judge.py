@@ -233,7 +233,7 @@ No markdown fences, no prose outside the JSON. \
 Use exactly this schema:
 
 {
-  "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 5–8 concise sentences>",
+  "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences>",
   "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
   "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
   "confidence": "<number>%",
