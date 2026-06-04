@@ -289,13 +289,13 @@ class EarlyPredictor:
             fused        : torch.Tensor   — [1, 1024]
         """
         with torch.no_grad():
-            text_embeds  = self.clip.get_text_features(
+            outputs = self.clip(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
-            )                                       # [1, 512]
-            image_embeds = self.clip.get_image_features(
                 pixel_values=pixel_values,
-            )                                       # [1, 512]
+            )
+            text_embeds  = outputs.text_embeds    # [1, 512]
+            image_embeds = outputs.image_embeds   # [1, 512]
 
         fused = torch.cat([text_embeds, image_embeds], dim=-1)  # [1, 1024]
         prob  = self.mlp(fused)                                  # [1] or scalar
