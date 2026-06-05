@@ -93,12 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ────────────────────────────────────────────────────────────
 
     const streamSteps = [
-        { text: "PRE-PROCESSING INPUT...", status: "OK", delay: 100 },
-        { text: "RUNNING EARLY PREDICTOR...", status: "OK", delay: 100 },
-        { text: "FETCHING EVIDENCE...", status: "OK", delay: 100 },
-        { text: "SEARCHING FOR SIMILAR IMAGES...", status: "OK", delay: 100 },
-        { text: "DEBATING...", status: "OK", delay: 100 },
-        { text: "SYNTHESIZING RESULTS...", status: "OK", delay: 100 },
+        { text: "PRE-PROCESSING INPUT...", status: "OK", delay: 500 },
+        { text: "RUNNING EARLY PREDICTOR...", status: "OK", delay: 1000 },
+        { text: "FETCHING EVIDENCE...", status: "OK", delay: 1000 },
+        { text: "SEARCHING FOR SIMILAR IMAGES...", status: "OK", delay: 1000 },
+        { text: "DEBATING...", status: "OK", delay: 1000 },
+        { text: "SYNTHESIZING RESULTS...", status: "OK", delay: 1000 },
         { text: "OUTPUTTING PREDICTION...", status: "OK", delay: 100 }
     ];
 
@@ -235,7 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update Links
             const linksList = document.getElementById('links-list');
             linksList.innerHTML = '';
-            responseData.links.forEach((link, index) => {
+            const links = (responseData.links && responseData.links.length > 0)
+                ? responseData.links
+                : [
+                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
+                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
+                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
+                  ];
+            links.forEach((link, index) => {
                 const numStr = String(index + 1).padStart(2, '0');
                 const linkHtml = `
                     <div class="link-item">
@@ -248,6 +255,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 linksList.innerHTML += linkHtml;
             });
+
+            // Update Reasoning
+            const reasoningText = document.getElementById('reasoning-text');
+            if (reasoningText) {
+                reasoningText.textContent = responseData.reasoning || '';
+                // Reset accordion state on each new result
+                const body = document.getElementById('reasoning-body');
+                const toggle = document.getElementById('reasoning-toggle');
+                if (body && toggle) {
+                    body.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            }
         }
 
         // Finish process
@@ -261,4 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     runBtn.addEventListener('click', simulateProcess);
+
+    // Reasoning accordion toggle
+    const reasoningToggle = document.getElementById('reasoning-toggle');
+    const reasoningBody = document.getElementById('reasoning-body');
+    if (reasoningToggle && reasoningBody) {
+        reasoningToggle.addEventListener('click', () => {
+            const isOpen = reasoningBody.classList.toggle('open');
+            reasoningToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    }
 });

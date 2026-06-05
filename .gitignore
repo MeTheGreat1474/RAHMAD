@@ -8,6 +8,9 @@ fyp-env-win/
 # Model outputs - stored in Google Drive instead
 **/early_predictor_output/
 
+# Model outputs
+output_log.txt
+
 # Python/env clutter
 __pycache__/
 *.pyc

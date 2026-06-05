@@ -64,7 +64,7 @@ log = logging.getLogger(__name__)
 # OpenRouter config
 # ---------------------------------------------------------------------------
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL_ID       = "openai/gpt-oss-120b:free"
+_MODEL_ID       = "openrouter/owl-alpha"
 
 # ---------------------------------------------------------------------------
 # Enhanced System Prompt

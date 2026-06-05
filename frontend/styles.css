@@ -496,6 +496,68 @@ h2.verdict-text.inconclusive {
     font-size: 1.05rem;
 }
 
+/* Reasoning Accordion */
+.reasoning-accordion {
+    margin-top: 2rem;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1rem;
+}
+
+.reasoning-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.reasoning-toggle:hover {
+    opacity: 1;
+}
+
+.chevron-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+}
+
+.reasoning-toggle[aria-expanded="true"] .chevron-icon {
+    transform: rotate(180deg);
+}
+
+.reasoning-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+.reasoning-body.open {
+    max-height: 9999px;
+}
+
+.reasoning-body h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.reasoning-body p {
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+    white-space: pre-wrap;
+}
+
 /* Links Col */
 .links-col {
     padding-left: 2rem;
