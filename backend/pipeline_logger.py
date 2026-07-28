@@ -192,14 +192,27 @@ class PipelineLogger:
         self._section(4, "EARLY PREDICTOR  —  SKIPPED")
         self._w(f"    Reason: {reason}")
 
+    def log_knowledge_retrieval(self, kr_data: dict) -> None:
+        self._section(5, "KNOWLEDGE RETRIEVAL  —  OUTPUT")
+        self._kv("claim_queried", kr_data.get("claim", ""))
+        articles = kr_data.get("articles", [])
+        self._kv("articles_queried", f"[{len(articles)} article(s) survived whitelist & heuristics]")
+        for i, art in enumerate(articles, 1):
+            self._w(f"      {i}. Headline : {art.get('headline', 'N/A')}")
+            self._w(f"         Source   : {art.get('source', 'N/A')}")
+            if art.get("date"):
+                self._w(f"         Date     : {art.get('date')}")
+        self._w()
+        self._block("CONDENSED SUMMARY (LLM)", kr_data.get("summary", ""))
+
     def log_judge_input(self, system_prompt: str, user_message: str) -> None:
-        self._section(5, "JUDGE (LLM)  —  INPUT")
+        self._section(6, "JUDGE (LLM)  —  INPUT")
         self._block("SYSTEM PROMPT", system_prompt)
         self._w()
         self._block("USER MESSAGE", user_message)
 
     def log_judge_output(self, raw_response: str, parsed: dict) -> None:
-        self._section(6, "JUDGE (LLM)  —  OUTPUT")
+        self._section(7, "JUDGE (LLM)  —  OUTPUT")
         self._block("RAW API RESPONSE", raw_response)
         self._w()
         self._w(f"    --- PARSED VERDICT ---")

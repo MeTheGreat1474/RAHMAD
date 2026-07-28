@@ -1,11 +1,11 @@
 ================================================================================
-  RAHMAD PIPELINE LOG  —  2026-06-04  22:52:35
+  RAHMAD PIPELINE LOG  —  2026-07-28  16:32:10
 ================================================================================
 
 [1]  PRE-PROCESSING  —  INPUT
 ------------------------------------------------------------
     raw_text:
-      "Hiking activities at Gunung Batu Putih suspended\n\nPETALING JAYA: The Perak government has decided to suspend hiking activities at Gunung Batu Putih with immediate effect.\n\nThis was confirmed by state forestry director Basri Abdul Manaf, who said that climbing activities would be halted for three to six months, Bernama reported.\n\n“We will look at the (level of) safety in that area. We also want to rehabilitate the area, and it will take three to six months,” he was quoted as saying after attendin  … [2203 chars total]"
+      "Govt ordered to pay RM195,000 over 2021 unlawful arrest of vigil participants\n\nKUALA LUMPUR: The High Court has ordered the government to pay RM195,000 in damages to 13 participants of a 2021 candlelight vigil at Dataran Merdeka after finding it vicariously liable for their unlawful arrest and detention by police.\n\nJudge Datuk Anand Ponnudurai awarded each plaintiff RM15,000 in general damages.\n\nHe declared that the plaintiffs' arrest and detention on Aug 19, 2021, were unlawful and breached the  … [4409 chars total]"
 
     image.size            : 700 × 466 px
     image.mode            : RGB
@@ -13,29 +13,79 @@
 [2]  PRE-PROCESSING  —  OUTPUT
 ------------------------------------------------------------
     llm_text  (cleaned full text — goes to Judge):
-      "Hiking activities at Gunung Batu Putih suspended\nPETALING JAYA: The Perak government has decided to suspend hiking activities at Gunung Batu Putih with immediate effect.\nThis was confirmed by state forestry director Basri Abdul Manaf, who said that climbing activities would be halted for three to six months, Bernama reported.\n"We will look at the (level of) safety in that area. We also want to rehabilitate the area, and it will take three to six months," he was quoted as saying after attending t  … [2191 chars total]"
+      "Govt ordered to pay RM195,000 over 2021 unlawful arrest of vigil participants\nKUALA LUMPUR: The High Court has ordered the government to pay RM195,000 in damages to 13 participants of a 2021 candlelight vigil at Dataran Merdeka after finding it vicariously liable for their unlawful arrest and detention by police.\nJudge Datuk Anand Ponnudurai awarded each plaintiff RM15,000 in general damages.\nHe declared that the plaintiffs' arrest and detention on Aug 19, 2021, were unlawful and breached their   … [4381 chars total]"
 
     lead_text  (headline + 1st sentence — goes to CLIP):
-      "hiking activities at gunung batu putih suspended petaling jaya: the perak government has decided to suspend hiking activities at gunung batu putih with immediate effect."
+      "govt ordered to pay rm195,000 over 2021 unlawful arrest of vigil participants kuala lumpur: the high court has ordered the government to pay rm195,000 in damages to 13 participants of a 2021 candlelight vigil at dataran merdeka after finding it vicariously liable for their unlawful arrest and detent"
 
-    input_ids             : shape=[1, 77]  dtype=torch.int64  min=269  max=49407  first_12=[49406, 9118, 6514, 536, 2748, 4334, 2121, 340, 755, 555, 327, 13126, … (65 more)]
-    attention_mask        : shape=[1, 77]  dtype=torch.int64  min=0  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
+    input_ids             : shape=[1, 77]  dtype=torch.int64  min=267  max=49407  first_12=[49406, 5345, 8335, 531, 3345, 8431, 272, 280, 276, 267, 271, 271, … (65 more)]
+    attention_mask        : shape=[1, 77]  dtype=torch.int64  min=1  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
     pixel_values          : shape=[1, 3, 224, 224]  norm=487.7971  min=-1.7521  max=+2.1459  first_6=[+1.6238, +1.6238, +1.6384, +1.6530, +1.6676, +1.6384, … (150522 more)]
 
 [3]  CLIP ENCODER  —  OUTPUT
 ------------------------------------------------------------
-    text_embeds  [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.1130  max=+0.4089  first_8=[-0.0011, +0.0035, -0.0042, -0.0322, -0.0468, +0.0302, +0.0448, +0.1866, … (504 more)]
+    text_embeds  [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.1860  max=+0.3253  first_8=[-0.0258, -0.0444, -0.0008, +0.0023, +0.0157, +0.0135, +0.0268, +0.1468, … (504 more)]
     image_embeds [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.5299  max=+0.1945  first_8=[-0.0084, +0.0131, +0.0259, +0.0214, +0.0687, -0.0013, +0.0145, -0.0091, … (504 more)]
-    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.5299  max=+0.4089  first_8=[-0.0011, +0.0035, -0.0042, -0.0322, -0.0468, +0.0302, +0.0448, +0.1866, … (1016 more)]
+    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.5299  max=+0.3253  first_8=[-0.0258, -0.0444, -0.0008, +0.0023, +0.0157, +0.0135, +0.0268, +0.1468, … (1016 more)]
 
 [4]  EARLY PREDICTOR  —  OUTPUT
 ------------------------------------------------------------
-    probability           : 0.515013   (0.0 = Real, 1.0 = Fake)
+    probability           : 0.474741   (0.0 = Real, 1.0 = Fake)
     label                 : UNCERTAIN
-    confidence            : 51.5%
+    confidence            : 47.5%
     pass_to_agents        : True
 
-[5]  JUDGE (LLM)  —  INPUT
+[5]  KNOWLEDGE RETRIEVAL  —  OUTPUT
+------------------------------------------------------------
+    claim_queried         : govt ordered to pay rm195,000 over 2021 unlawful arrest of vigil participants kuala lumpur: the high court has ordered the government to pay rm195,000 in damages to 13 participants of a 2021 candlelight vigil at dataran merdeka after finding it vicariously liable for their unlawful arrest and detention by police.
+    articles_queried      : [3 article(s) survived whitelist & heuristics]
+      1. Headline : High Court orders Malaysian govt, police to pay activists RM195,000 over unlawful 2021 vigil arrests | Malay Mail
+         Source   : https://www.malaymail.com/news/malaysia/2026/07/28/high-court-orders-malaysian-govt-police-to-pay-activists-rm195000-over-unlawful-2021-vigil-arrests/229239
+      2. Headline : Govt, police ordered to pay activists RM195,000 for wrongful arrests | FMT
+         Source   : https://www.freemalaysiatoday.com/category/nation/2026/07/28/govt-police-ordered-to-pay-activists-rm195-000-for-wrongful-arrests
+      3. Headline : Court awards RM195,000 to 13 activists over wrongful arrest | The Star
+         Source   : https://www.thestar.com.my/news/nation/2026/07/28/court-awards-rm195000-to-13-activists-over-wrongful-arrest
+
+    --- CONDENSED SUMMARY (LLM) ---
+      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
+      
+      ---
+      
+      #### **1. Key Entities, Names, and Roles**
+      
+      | Entity / Individual | Role / Description | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
+      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
+      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
+      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
+      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
+      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
+      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
+      
+      ---
+      
+      #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
+      
+      | Category | Detail | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
+      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
+      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
+      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
+      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
+      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
+      
+      ---
+      
+      #### **3. Timeline of Events and Corroborating Evidence**
+      
+      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
+      | :--- | :--- | :--- | :--- |
+      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
+      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
+
+[6]  JUDGE (LLM)  —  INPUT
 ------------------------------------------------------------
     --- SYSTEM PROMPT ---
       You are a professional news fact-checker and investigative media analyst working for RAHMAD (Reliable Automated Hybrid Multi-Agent Detection). Your role is to classify news articles into misinformation categories using structured, evidence-based reasoning.
@@ -55,13 +105,16 @@
             Sensationalist, emotional, or informal language is a signal, not a verdict. Satire uses irony deliberately; misleading content uses facts deceptively. Do not conflate the two.
       
         P4. CONTEXT DETERMINES MEANING
-            A factually accurate statement can still be MISLEADING CONTENT if it is framed to lead the reader to a false conclusion. Always assess framing, not just factual accuracy.
+            A factually accurate statement can still be MISLEADING CONTENT if it is framed to lead the reader to a false conclusion. Always assess framing.
       
         P5. CALIBRATED CONFIDENCE
             Only exceed 85% confidence when at least three independent signals from different categories (style, structure, source, content) all point to the same classification. Default to INCONCLUSIVE when evidence is mixed or insufficient.
       
         P6. TREAT EP AS EVIDENCE, NOT AUTHORITY
             The Early Predictor signal is a multimodal binary estimate (Real/Fake). Treat it as one useful data point. You may agree with it, partially agree, or override it — but always explain why.
+      
+        P7. CROSS-VERIFY WITH KNOWLEDGE RETRIEVAL EVIDENCE
+            The Knowledge Retrieval pipeline provides verified external evidence extracted from whitelisted, reputable news outlets via semantic similarity matching. Treat this external knowledge as authoritative ground-truth factual context. Cross-reference the core claims in the article text against this knowledge. Direct corroboration strongly supports a CREDIBLE classification, while direct contradiction signals FABRICATED, MISLEADING, or FALSE CONNECTION.
       
       ══════════════════════════════════════════════════
       SECTION 2 — CLASSIFICATION TYPES
@@ -112,8 +165,10 @@
         STEP 5 — SOURCE AND ATTRIBUTION ANALYSIS
           Evaluate source credibility and transparency. Are sources named and traceable? Are institutions or officials quoted in ways that seem authentic? Does the article claim affiliation with a known outlet while showing signs of impersonation (e.g. slight name variation, unfamiliar domain)?
       
-        STEP 6 — EP SIGNAL INTEGRATION
-          Now consider the Early Predictor's signal. State whether it agrees or disagrees with your analysis so far. If it agrees, note which signals corroborate it. If it disagrees, explicitly state why you are overriding it — or whether it is causing you to reconsider a signal you underweighted.
+        STEP 6 — EP SIGNAL & KNOWLEDGE RETRIEVAL INTEGRATION
+          Evaluate both evidence streams:
+          1. Knowledge Retrieval: Cross-reference claims extracted in Step 2 against the verified external knowledge summary. State clearly if external news corroborates, refutes, or is absent for the claims.
+          2. EP Signal: State whether the Early Predictor's vision-text score agrees or disagrees with your factual evaluation. Synthesize both to justify your classification and calibrate final confidence.
       
         STEP 7 — SELF-CRITIQUE (Self-Refine)
           Before committing to a verdict, challenge yourself: What is the strongest argument AGAINST your current classification? Could you be misreading satire as fabrication, or vice versa? Could cultural context, technical jargon, or incomplete information be distorting your reading? If the counter-argument is strong enough to change your classification or materially reduce your confidence, update accordingly.
@@ -121,7 +176,7 @@
       ══════════════════════════════════════════════════
       SECTION 4 — OUTPUT FORMAT
       ══════════════════════════════════════════════════
-      Respond with a single valid JSON object only. No markdown fences, no prose outside the JSON. Use exactly this schema:
+      Your output MUST be a single, valid JSON object formatted exactly as follows:
       
       {
         "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences>",
@@ -133,56 +188,145 @@
       }
 
     --- USER MESSAGE ---
+      === KNOWLEDGE RETRIEVAL EVIDENCE ===
+      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
+      
+      ---
+      
+      #### **1. Key Entities, Names, and Roles**
+      
+      | Entity / Individual | Role / Description | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
+      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
+      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
+      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
+      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
+      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
+      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
+      
+      ---
+      
+      #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
+      
+      | Category | Detail | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
+      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
+      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
+      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
+      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
+      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
+      
+      ---
+      
+      #### **3. Timeline of Events and Corroborating Evidence**
+      
+      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
+      | :--- | :--- | :--- | :--- |
+      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
+      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
+      
+      Note: This is verified external ground-truth evidence retrieved from reputable whitelisted news outlets via semantic similarity filtering.
+      
       === EARLY PREDICTOR SIGNAL ===
       Label       : UNCERTAIN
-      Probability : 0.5150  (0.0 = Real, 1.0 = Fake)
-      Confidence  : 51.5%
+      Probability : 0.4747  (0.0 = Real, 1.0 = Fake)
+      Confidence  : 47.5%
       
       Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it as evidence, not as a definitive answer. You must run your own full reasoning protocol before reaching a verdict.
       
+      === EXTERNAL KNOWLEDGE ===
+      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
+      
+      ---
+      
+      #### **1. Key Entities, Names, and Roles**
+      
+      | Entity / Individual | Role / Description | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
+      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
+      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
+      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
+      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
+      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
+      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
+      
+      ---
+      
+      #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
+      
+      | Category | Detail | Source Snippet(s) |
+      | :--- | :--- | :--- |
+      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
+      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
+      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
+      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
+      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
+      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
+      
+      ---
+      
+      #### **3. Timeline of Events and Corroborating Evidence**
+      
+      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
+      | :--- | :--- | :--- | :--- |
+      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
+      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
+      
       === ARTICLE TEXT ===
-      Hiking activities at Gunung Batu Putih suspended
-      PETALING JAYA: The Perak government has decided to suspend hiking activities at Gunung Batu Putih with immediate effect.
-      This was confirmed by state forestry director Basri Abdul Manaf, who said that climbing activities would be halted for three to six months, Bernama reported.
-      "We will look at the (level of) safety in that area. We also want to rehabilitate the area, and it will take three to six months," he was quoted as saying after attending the state-level International Day of Forests celebration, which was officiated by menteri besar Saarani Mohamad in Ipoh today.
-      Basri said his team would also examine in detail the standard operating procedures (SOP) for hiking activities, including the cut-off time for forest hikes in the state.
-      The move to suspend hiking activity comes after a female hiker, Jaslinda Saludin, 49, was reported missing on May 24.
-      Jaslinda was part of a group of 14 hikers and two mountain guides who began the Trans Spencer Chapman trek at 2am on May 23.
-      Jaslinda and another hiker reportedly experienced health issues and stopped along the route. However, Jaslinda later continued towards the summit and was last seen by a mountain guide at about 7.30am the next day.
-      Meanwhile, at a press conference, Saarani said that the Orang Asli community should be involved in every search and rescue (SAR) operation for missing persons in forest areas.
-      He said this is because the Orang Asli community better understands the ins and outs and the actual conditions of a particular forest area.
-      According to Saarani, the forest area is not only monitored by the forestry department, but is also inhabited by the Orang Asli community, who are the original inhabitants and possess extensive knowledge about the forest area.
-      "The maintenance of this forest, besides being overseen by the forestry department, also involves the local community, which consists of the Orang Asli people.
-      "Orang Asli communities, especially the Tok Batin, should be involved in hiking activities. When there are cases of missing persons, and when SAR operations are carried out, they should also be involved," he said, according to Bernama.
+      Govt ordered to pay RM195,000 over 2021 unlawful arrest of vigil participants
+      KUALA LUMPUR: The High Court has ordered the government to pay RM195,000 in damages to 13 participants of a 2021 candlelight vigil at Dataran Merdeka after finding it vicariously liable for their unlawful arrest and detention by police.
+      Judge Datuk Anand Ponnudurai awarded each plaintiff RM15,000 in general damages.
+      He declared that the plaintiffs' arrest and detention on Aug 19, 2021, were unlawful and breached their right to personal liberty under Articles 5(1) and 5(3) of the Federal Constitution.
+      However, Anand dismissed their claims under Article 10(1)(b) of the Federal Constitution, which concerns the right to peaceful assembly without arms.
+      He also rejected their claims for aggravated and exemplary damages, as well as misfeasance in public office.
+      The plaintiffs attended the vigil while measures under the Covid-19 Prevention and Control of Infectious Diseases legislation were in force.
+      They alleged that they were unlawfully arrested, wrongfully detained for four hours, assaulted and battered, denied access to legal representation, had their constitutional rights infringed, and that police had committed misfeasance in public office.
+      The 27 defendants, 23 of whom are policemen and officers, denied the allegations, contending that they had lawfully discharged their statutory duties in monitoring compliance with the prevailing public health regulations.
+      They said the plaintiffs repeatedly refused lawful directions to disperse and subsequently refused to cooperate with police by proceeding to the police station.
+      They maintained that any physical contact with certain plaintiffs involved no more than reasonable force and denied that the plaintiffs were deprived of legal representation.
+      Anand ruled that the plaintiffs were deprived of their liberty when they were arrested and compelled to go with police from Dataran Merdeka to the station.
+      "A reasonable person placed in the position of the plaintiffs would not have believed that he or she remained free to disregard the police instructions and simply walk away.
+      "Their identity cards had been retained. Their requests to travel independently had been refused.
+      "They were required to board police vehicles. Those who initially refused were compelled to do so.
+      "Upon arrival at the Dang Wangi police headquarters, they remained under police control until their eventual release.
+      "Those circumstances admit only one realistic conclusion.
+      "Whatever terminology may have been employed by the police officers at the scene, the plaintiffs had, by that stage, been deprived of their liberty in a manner amounting to an arrest in law.
+      "There was no warrant in this case. Accordingly, the court finds that the arrests of the plaintiffs were unlawful," he said.
+      Anand found that the plaintiffs had established a breach of their constitutional rights under Article 5(3) as they were denied reasonable and timely access to legal representation while being detained at the police station.
+      He said that although lawyers were eventually granted access, many statements had already been recorded and the plaintiffs had not been afforded a meaningful opportunity to consult their lawyers, who were permitted only to observe the recording of the statements.
+      He also found that the plaintiffs had established battery only in respect of the intentional application of force during the unlawful arrests and the marking of their forearms, to identify their seized belongings, without consent.
+      Anand said although the markings were for administrative convenience, the defendants admitted that no SOP required such a practice.
+      He added that the plaintiffs were not subjected to prolonged incarceration, oppressive interrogation or physical abuse, and rejected the allegation that excessive force was used.
+      He further found that police were engaged in a genuine law enforcement operation during an unprecedented public health emergency.
+      "While the officers exceeded the legal limits of their powers, I have accepted that they acted in the honest belief that their conduct was authorised by law.
+      "There is no evidence of malice, spite, targeted hostility or any deliberate abuse of public office," he said.
+      Federal counsel Anis Najwa Nazari appeared for the government, while the plaintiffs were represented by lawyers Kee Hui Yee and New Sin Yew.
       
       Now work through your 7-step reasoning protocol and return your verdict as a JSON object.
 
-[6]  JUDGE (LLM)  —  OUTPUT
+[7]  JUDGE (LLM)  —  OUTPUT
 ------------------------------------------------------------
     --- RAW API RESPONSE ---
       {
-        "reasoning": "STEP 1 — DOMAIN ORIENTATION: This is a local news article about a government decision to suspend hiking activities in Perak, Malaysia, following a missing hiker incident. Legitimate articles in this domain typically cite named officials, reference specific events, and report government actions through established news agencies like Bernama. Common manipulation tactics in this domain include exaggerating danger or fabricating official statements.\n\nSTEP 2 — CLAIM EXTRACTION: (1) The Perak government suspended hiking at Gunung Batu Putih — VERIFIABLE, attributed to state forestry director Basri Abdul Manaf. (2) The suspension will last 3–6 months for safety review and rehabilitation — VERIFIABLE, directly quoted. (3) Jaslinda Saludin, 49, went missing on May 24 during the Trans Spencer Chapman trek — VERIFIABLE, specific details provided. (4) Saarani Mohamad said Orang Asli should be involved in SAR operations — VERIFIABLE, attributed to a press conference and Bernama. All claims are specific and verifiable.\n\nSTEP 3 — INTERNAL CONSISTENCY AUDIT: The headline accurately reflects the body content about the suspension. The timeline is coherent — Jaslinda went missing on May 24, the announcement was made at an event in Ipoh. Quotes from Basri and Saarani are consistent with their roles. No contradictions detected.\n\nSTEP 4 — FRAMING AND STYLE ANALYSIS: The tone is neutral and factual, consistent with a Bernama wire report. No sensationalist language, urgency cues, or emotional manipulation. The framing is straightforward reporting of a government decision with context about the triggering incident.\n\nSTEP 5 — SOURCE AND ATTRIBUTION ANALYSIS: Sources are clearly named and traceable — Basri Abdul Manaf (state forestry director), Saarani Mohamad (menteri besar), and Bernama as the reporting agency. The article structure matches standard Malaysian news reporting conventions. No signs of impersonation.\n\nSTEP 6 — EP SIGNAL INTEGRATION: The EP signal is UNCERTAIN at 51.5%, essentially a coin flip. This aligns with my analysis — the article shows no red flags, but the EP model may have detected subtle patterns I cannot assess from text alone (e.g., metadata, image analysis). I see no reason to override my assessment based on this weak signal.\n\nSTEP 7 — SELF-CRITIQUE: The strongest counter-argument would be that I cannot verify whether Bernama actually published this exact text or whether the quotes are fabricated. However, the article contains highly specific details (names, dates, event names, organizational roles) that would be easily debunked if fabricated, making fabrication unlikely. The writing style is consistent with legitimate Malaysian news reporting. No misinformation patterns detected.",
+        "reasoning": "Step 1: Domain is Malaysian legal/political news — a High Court ruling on unlawful arrests during a 2021 COVID-19 vigil. Legitimate articles in this domain cite judges, constitutional articles, specific damages, and present both parties' arguments neutrally. Step 2: Extracted 12 verifiable claims including judge name (Datuk Anand Ponnudurai), RM195,000 total/RM15,000 each, 13 plaintiffs, Aug 19 2021 Dataran Merdeka, vicarious liability finding, Articles 5(1)/5(3) breach, Article 10(1)(b) dismissal, battery on forearm marking, rejection of excessive force/misfeasance, and lawyers' names. All are specific and fact-checkable. Step 3: Internal consistency is flawless — headline matches body, arithmetic checks (13×15,000=195,000), no contradictory statements, direct judicial quotes included. Step 4: Framing is neutral, professional legal journalism — no sensationalism, emotional language, or propaganda patterns; both sides' positions and the judge's nuanced reasoning (upholding some claims, dismissing others) are fairly reported. Step 5: Sources are transparent and traceable — named judge, named counsel for both sides, specific constitutional provisions, no unnamed authorities or impersonation signals. Step 6: Knowledge Retrieval evidence from Malay Mail, FMT, and The Star corroborates every material detail exactly; EP signal is uncertain (47.5%) but is a weak multimodal estimate outweighed by strong textual and external verification. Step 7: Self-critique — the only counter-argument is that a sophisticated fabrication could mimic real court reporting, but the granularity (forearm marking SOP admission, honest belief finding, specific lawyer names) across three independent reputable outlets makes fabrication implausible. No misinformation category fits; the article is a legitimate court report.",
         "verdict": "CREDIBLE",
         "color_class": "credible",
-        "confidence": "88%",
-        "justification": "The article is a well-sourced, factually grounded news report citing named officials (Basri Abdul Manaf, Saarani Mohamad), referencing a specific news agency (Bernama), and providing verifiable details including dates, locations, and specific events. No misinformation patterns were detected across style, framing, sourcing, internal consistency, or headline-to-body alignment.",
+        "confidence": "95%",
+        "justification": "The article is a factually accurate, neutrally framed court report whose every specific claim — judge, damages, legal reasoning, constitutional provisions, parties, and outcome — is corroborated by independent reputable Malaysian news outlets (Malay Mail, FMT, The Star) in the Knowledge Retrieval evidence. Internal consistency, sourcing transparency, and professional journalistic style all align with a credible news report.",
         "key_facts": [
-          "All key claims are attributed to named, traceable officials and the Bernama news agency",
-          "The article provides specific, verifiable details including dates (May 23-24), names (Jaslinda Saludin, Basri Abdul Manaf, Saarani Mohamad), and event names (Trans Spencer Chapman trek, International Day of Forests)",
-          "Writing style is neutral and consistent with standard Malaysian wire news reporting, with no sensationalist or manipulative framing"
-        ]
-      }
+          "All 12 verifiable claims match external knowledge retrieval from three reputable Malaysian outlets",
+          "Article presents nuanced ruling: upholds unlawful arrest/Article 5 claims but dismisses
 
     --- PARSED VERDICT ---
     verdict               : CREDIBLE
     color_class           : credible
-    confidence            : 88%
-    justification         : The article is a well-sourced, factually grounded news report citing named officials (Basri Abdul Manaf, Saarani Mohamad), referencing a specific news agency (Bernama), and providing verifiable details including dates, locations, and specific events. No misinformation patterns were detected across s…
-    key_facts             : [3 item(s)]
-      1. All key claims are attributed to named, traceable officials and the Bernama news agency
-      2. The article provides specific, verifiable details including dates (May 23-24), names (Jaslinda Saludin, Basri Abdul Manaf, Saarani Mohamad), and event names (Trans Spencer Chapman trek, International Day of Forests)
-      3. Writing style is neutral and consistent with standard Malaysian wire news reporting, with no sensationalist or manipulative framing
+    confidence            : 95%
+    justification         : The article is a factually accurate, neutrally framed court report whose every specific claim — judge, damages, legal reasoning, constitutional provisions, parties, and outcome — is corroborated by independent reputable Malaysian news outlets (Malay Mail, FMT, The Star) in the Knowledge Retrieval ev…
+    key_facts             : [0 item(s)]
 
 ================================================================================
-  END OF LOG  |  total elapsed: 31.77s
+  END OF LOG  |  total elapsed: 72.62s
 ================================================================================

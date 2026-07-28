@@ -578,6 +578,21 @@ h2.verdict-text.inconclusive {
     border-bottom: 1px solid var(--border-light);
 }
 
+.link-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.2rem 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.link-item:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
 .link-item:last-child {
     border-bottom: none;
 }
@@ -611,8 +626,10 @@ h2.verdict-text.inconclusive {
     line-height: 1.4;
 }
 
+.link-item:hover .link-title,
 .link-title:hover {
     text-decoration: underline;
+    color: var(--accent-blue, #0056b3);
 }
 
 /* Footer */

@@ -237,24 +237,57 @@ document.addEventListener('DOMContentLoaded', () => {
             linksList.innerHTML = '';
             const links = (responseData.links && responseData.links.length > 0)
                 ? responseData.links
-                : [
-                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
-                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
-                    { source: 'Source Pending', title: 'Supporting article link will appear here after analysis' },
-                  ];
-            links.forEach((link, index) => {
-                const numStr = String(index + 1).padStart(2, '0');
-                const linkHtml = `
+                : [];
+
+            if (links.length === 0) {
+                linksList.innerHTML = `
                     <div class="link-item">
-                        <div class="link-number">${numStr}</div>
+                        <div class="link-number">--</div>
                         <div class="link-details">
-                            <span class="link-source">${link.source}</span>
-                            <a href="#" class="link-title">${link.title}</a>
+                            <span class="link-source">NO EXTERNAL LINKS</span>
+                            <span class="link-title" style="opacity: 0.6;">No verified news links found for this query.</span>
                         </div>
                     </div>
                 `;
-                linksList.innerHTML += linkHtml;
-            });
+            } else {
+                links.forEach((link, index) => {
+                    const numStr = String(index + 1).padStart(2, '0');
+                    let sourceStr = "NEWS OUTLET";
+                    let titleStr = "Article Link";
+                    let urlStr = "#";
+
+                    if (typeof link === 'string') {
+                        urlStr = link;
+                        titleStr = link;
+                        try {
+                            sourceStr = new URL(link).hostname.replace('www.', '').toUpperCase();
+                        } catch(e) {
+                            sourceStr = "EXTERNAL SOURCE";
+                        }
+                    } else if (typeof link === 'object' && link !== null) {
+                        sourceStr = link.source || link.domain || "EXTERNAL SOURCE";
+                        titleStr = link.title || link.headline || link.url || "Article Link";
+                        urlStr = link.url || link.link || "#";
+
+                        if (sourceStr.startsWith('HTTP://') || sourceStr.startsWith('HTTPS://')) {
+                            try {
+                                sourceStr = new URL(sourceStr).hostname.replace('www.', '').toUpperCase();
+                            } catch(e) {}
+                        }
+                    }
+
+                    const linkHtml = `
+                        <div class="link-item" onclick="if('${urlStr}' !== '#') window.open('${urlStr}', '_blank', 'noopener,noreferrer');">
+                            <div class="link-number">${numStr}</div>
+                            <div class="link-details">
+                                <span class="link-source">${sourceStr}</span>
+                                <a href="${urlStr}" target="_blank" rel="noopener noreferrer" class="link-title" onclick="event.stopPropagation();">${titleStr}</a>
+                            </div>
+                        </div>
+                    `;
+                    linksList.innerHTML += linkHtml;
+                });
+            }
 
             // Update Reasoning
             const reasoningText = document.getElementById('reasoning-text');

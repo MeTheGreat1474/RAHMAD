@@ -14,3 +14,9 @@ peft>=0.10.0                # LoRA adapter loading (PeftModel)
 # Judge Module — OpenRouter API
 requests>=2.31.0            # HTTP calls to OpenRouter
 python-dotenv>=1.0.0        # load OPENROUTER_API_KEY from .env file
+
+# Knowledge Retrieval Pipeline
+duckduckgo-search>=5.0.0
+trafilatura>=1.8.0
+sentence-transformers>=2.2.0
+scikit-learn>=1.0.0

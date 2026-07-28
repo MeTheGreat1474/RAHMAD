@@ -40,6 +40,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _predictor = None
 _judge     = None
+_retriever = None
 
 
 def _get_predictor():
@@ -60,6 +61,16 @@ def _get_judge():
         _judge = Judge()
         log.info("[analyzer] Judge Module ready.")
     return _judge
+
+
+def _get_retriever():
+    global _retriever
+    if _retriever is None:
+        log.info("[analyzer] Loading Knowledge Retriever…")
+        from model.knowledge_retrieval import KnowledgeRetriever
+        _retriever = KnowledgeRetriever()
+        log.info("[analyzer] Knowledge Retriever ready.")
+    return _retriever
 
 
 # ---------------------------------------------------------------------------
@@ -208,12 +219,55 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             log.error(f"[analyzer] Early Predictor failed: {exc}", exc_info=True)
             plog.log_ep_skipped(f"EarlyPredictor error: {exc}")
 
+    # ── 4.5. Knowledge Retrieval ──────────────────────────────────────────
+    external_knowledge = ""
+    kr_articles = []
+    try:
+        retriever = _get_retriever()
+        claim_query = processed["lead_text"] if (has_clip and "lead_text" in processed) else input_text[:300]
+        kr_data = retriever.retrieve_detailed(claim_query)
+        external_knowledge = kr_data["summary"]
+        kr_articles = kr_data.get("articles", [])
+        plog.log_knowledge_retrieval(kr_data)
+    except Exception as exc:
+        log.error(f"[analyzer] Knowledge Retrieval failed: {exc}", exc_info=True)
+        plog.log_knowledge_retrieval({
+            "claim": input_text[:300],
+            "articles": [],
+            "summary": f"Knowledge Retrieval error: {exc}"
+        })
+
     # ── 5. Judge Module ───────────────────────────────────────────────────
     try:
         from model.judge import _SYSTEM_PROMPT   # module-level constant
 
+        print("\n" + "=" * 50)
+        print("  JUDGE MODULE (CLOUD LLM REASONING LAYER)")
+        print("=" * 50)
+        if external_knowledge:
+            print("  [OK] Forwarding synthesized Knowledge Summary to Judge context.")
+        else:
+            print("  [!] No external knowledge retrieved. Proceeding with article text & EP signal.")
+            
+        print(f"  Sending request to OpenRouter Cloud LLM... Please wait...")
+        
         judge  = _get_judge()
-        result = judge.analyze(llm_text, ep_result)
+        result = judge.analyze(llm_text, ep_result, external_knowledge=external_knowledge)
+        
+        # Populate frontend links from Knowledge Retrieval articles
+        if kr_articles:
+            formatted_links = []
+            from urllib.parse import urlparse
+            for a in kr_articles:
+                url = a.get("source") or a.get("url", "#")
+                headline = a.get("headline") or a.get("title", url)
+                domain = urlparse(url).netloc.replace("www.", "").upper() if url and url.startswith("http") else "EXTERNAL SOURCE"
+                formatted_links.append({
+                    "source": domain,
+                    "title": headline,
+                    "url": url
+                })
+            result["links"] = formatted_links
 
         # Log Judge input (prompt) and output (raw response + parsed)
         plog.log_judge_input(_SYSTEM_PROMPT, judge.last_user_message)

@@ -64,7 +64,7 @@ log = logging.getLogger(__name__)
 # OpenRouter config
 # ---------------------------------------------------------------------------
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL_ID       = "openrouter/owl-alpha"
+_MODEL_ID       = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 # ---------------------------------------------------------------------------
 # Enhanced System Prompt
@@ -99,7 +99,7 @@ uses facts deceptively. Do not conflate the two.
   P4. CONTEXT DETERMINES MEANING
       A factually accurate statement can still be MISLEADING \
 CONTENT if it is framed to lead the reader to a false conclusion. \
-Always assess framing, not just factual accuracy.
+Always assess framing.
 
   P5. CALIBRATED CONFIDENCE
       Only exceed 85% confidence when at least three independent \
@@ -111,6 +111,15 @@ INCONCLUSIVE when evidence is mixed or insufficient.
       The Early Predictor signal is a multimodal binary estimate \
 (Real/Fake). Treat it as one useful data point. You may agree \
 with it, partially agree, or override it — but always explain why.
+
+  P7. CROSS-VERIFY WITH KNOWLEDGE RETRIEVAL EVIDENCE
+      The Knowledge Retrieval pipeline provides verified external \
+evidence extracted from whitelisted, reputable news outlets via \
+semantic similarity matching. Treat this external knowledge as authoritative \
+ground-truth factual context. Cross-reference the core claims in \
+the article text against this knowledge. Direct corroboration \
+strongly supports a CREDIBLE classification, while direct \
+contradiction signals FABRICATED, MISLEADING, or FALSE CONNECTION.
 
 ══════════════════════════════════════════════════
 SECTION 2 — CLASSIFICATION TYPES
@@ -209,12 +218,14 @@ ways that seem authentic? Does the article claim affiliation \
 with a known outlet while showing signs of impersonation \
 (e.g. slight name variation, unfamiliar domain)?
 
-  STEP 6 — EP SIGNAL INTEGRATION
-    Now consider the Early Predictor's signal. State whether \
-it agrees or disagrees with your analysis so far. If it agrees, \
-note which signals corroborate it. If it disagrees, explicitly \
-state why you are overriding it — or whether it is causing you \
-to reconsider a signal you underweighted.
+  STEP 6 — EP SIGNAL & KNOWLEDGE RETRIEVAL INTEGRATION
+    Evaluate both evidence streams:
+    1. Knowledge Retrieval: Cross-reference claims extracted in Step 2 \
+against the verified external knowledge summary. State clearly if \
+external news corroborates, refutes, or is absent for the claims.
+    2. EP Signal: State whether the Early Predictor's vision-text score \
+agrees or disagrees with your factual evaluation. Synthesize both \
+to justify your classification and calibrate final confidence.
 
   STEP 7 — SELF-CRITIQUE (Self-Refine)
     Before committing to a verdict, challenge yourself: What is \
@@ -228,9 +239,7 @@ reduce your confidence, update accordingly.
 ══════════════════════════════════════════════════
 SECTION 4 — OUTPUT FORMAT
 ══════════════════════════════════════════════════
-Respond with a single valid JSON object only. \
-No markdown fences, no prose outside the JSON. \
-Use exactly this schema:
+Your output MUST be a single, valid JSON object formatted exactly as follows:
 
 {
   "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences>",
@@ -239,10 +248,15 @@ Use exactly this schema:
   "confidence": "<number>%",
   "justification": "<2–3 sentence explanation of your final verdict, citing specific signals from the article>",
   "key_facts": ["<observation 1>", "<observation 2>", "<observation 3>"]
-}\
+}
 """
 
 _USER_TEMPLATE = """\
+=== KNOWLEDGE RETRIEVAL EVIDENCE ===
+{external_knowledge}
+
+Note: This is verified external ground-truth evidence retrieved from reputable whitelisted news outlets via semantic similarity filtering.
+
 === EARLY PREDICTOR SIGNAL ===
 Label       : {ep_label}
 Probability : {ep_prob:.4f}  (0.0 = Real, 1.0 = Fake)
@@ -251,6 +265,9 @@ Confidence  : {ep_confidence}
 Note: This is a preliminary multimodal signal from a CLIP+LoRA model — \
 treat it as evidence, not as a definitive answer. You must run your own \
 full reasoning protocol before reaching a verdict.
+
+=== EXTERNAL KNOWLEDGE ===
+{external_knowledge}
 
 === ARTICLE TEXT ===
 {llm_text}
@@ -301,7 +318,7 @@ class Judge:
         self,
         api_key: str | None = None,
         temperature: float = 0.2,
-        max_tokens: int = 1024,
+        max_tokens: int = 2048,
     ):
         self.api_key     = api_key or os.environ.get("OPENROUTER_API_KEY", "")
         self.temperature = temperature
@@ -324,48 +341,72 @@ class Judge:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _build_user_message(self, llm_text: str, ep_result: dict) -> str:
-        """Format the user turn from article text and EP result."""
+    def _build_user_message(self, llm_text: str, ep_result: dict, external_knowledge: str = "") -> str:
+        """Format the user turn from article text, EP result, and external knowledge."""
         msg = _USER_TEMPLATE.format(
             ep_label      = ep_result.get("label", "UNKNOWN"),
             ep_prob       = ep_result.get("probability", 0.5),
             ep_confidence = ep_result.get("confidence", "N/A"),
+            external_knowledge = external_knowledge or "No external knowledge provided.",
             llm_text      = llm_text[:_MAX_TEXT_CHARS],
         )
         self.last_user_message = msg
         return msg
 
     def _call_api(self, user_message: str, temperature: float | None = None) -> str:
-        """POST to OpenRouter and return the raw content string."""
+        """POST to OpenRouter and return the raw content string with multi-model fallback."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type":  "application/json",
             "HTTP-Referer":  "https://rahmad.local",
             "X-Title":       "RAHMAD Fake News Detector",
         }
-        payload = {
-            "model": _MODEL_ID,
-            "messages": [
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user",   "content": user_message},
-            ],
-            "temperature": temperature if temperature is not None else self.temperature,
-            "max_tokens":  self.max_tokens,
-        }
+        
+        models_to_try = [
+            _MODEL_ID,
+            "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "inclusionai/ling-3.0-flash:free",
+            "poolside/laguna-m.1:free",
+        ]
 
-        log.info(f"[Judge] Sending request to OpenRouter — model: {_MODEL_ID}")
-        response = requests.post(
-            _OPENROUTER_URL,
-            headers=headers,
-            json=payload,
-            timeout=60,
-        )
-        response.raise_for_status()
+        last_err = None
+        for model in models_to_try:
+            print(f"  [Judge] Querying OpenRouter model '{model}'...")
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "user",   "content": user_message},
+                ],
+                "temperature": temperature if temperature is not None else self.temperature,
+                "max_tokens":  self.max_tokens,
+            }
 
-        content = response.json()["choices"][0]["message"]["content"]
-        log.info(f"[Judge] Response received ({len(content)} chars).")
-        self.last_raw_response = content
-        return content
+            log.info(f"[Judge] Sending request to OpenRouter — model: {model}")
+            try:
+                response = requests.post(
+                    _OPENROUTER_URL,
+                    headers=headers,
+                    json=payload,
+                    timeout=45,
+                )
+                response.raise_for_status()
+
+                resp_json = response.json()
+                if "choices" in resp_json and len(resp_json["choices"]) > 0:
+                    content = resp_json["choices"][0]["message"]["content"]
+                    log.info(f"[Judge] Response received ({len(content)} chars) from model {model}.")
+                    print(f"  [Judge] [OK] Verdict response received from '{model}' ({len(content)} chars).")
+                    self.last_raw_response = content
+                    return content
+                else:
+                    log.warning(f"[Judge] Model {model} response missing choices: {resp_json}")
+            except Exception as exc:
+                log.warning(f"[Judge] Model {model} failed: {exc}")
+                print(f"  [Judge] [!] Model '{model}' failed or timed out. Trying fallback...")
+                last_err = exc
+
+        raise RuntimeError(f"All OpenRouter LLM models failed. Last error: {last_err}")
 
     @staticmethod
     def _parse_response(raw: str) -> dict:
@@ -374,17 +415,50 @@ class Judge:
         Handles cases where the model wraps JSON in markdown code fences.
         Now also extracts the 'reasoning' field added by the enhanced prompt.
         """
+        # Remove markdown code fences and whitespace
         cleaned = re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
 
+        # Try parsing directly
+        data = None
         try:
             data = json.loads(cleaned)
         except json.JSONDecodeError:
+            # First attempt: find first '{' and matching/last '}'
             match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-            if not match:
+            if match:
+                json_str = match.group()
+                try:
+                    data = json.loads(json_str)
+                except json.JSONDecodeError:
+                    pass
+
+            if data is None:
+                # Second attempt: handle potential truncated JSON (e.g. max_tokens reached or unclosed quotes/brackets)
+                start_idx = cleaned.find("{")
+                if start_idx != -1:
+                    substring = cleaned[start_idx:]
+                    # Attempt to salvage truncated JSON by removing unclosed strings and closing brackets/braces
+                    # Try truncating up to last quote or comma and auto-closing braces
+                    for cutoff in range(len(substring), 0, -1):
+                        candidate = substring[:cutoff].rstrip(", \n\r\t")
+                        # count braces
+                        open_braces = candidate.count("{") - candidate.count("}")
+                        if open_braces > 0:
+                            # Close string if inside an unclosed string quote
+                            quotes = candidate.count('"') - candidate.count(r'\"')
+                            if quotes % 2 != 0:
+                                candidate += '"'
+                            candidate += "}" * open_braces
+                        try:
+                            data = json.loads(candidate)
+                            break
+                        except json.JSONDecodeError:
+                            continue
+
+            if data is None:
                 raise ValueError(
                     f"[Judge] Could not extract valid JSON from LLM response:\n{raw}"
                 )
-            data = json.loads(match.group())
 
         raw_verdict = str(data.get("verdict", "")).upper()
 
@@ -521,7 +595,7 @@ class Judge:
     # Public API
     # ------------------------------------------------------------------
 
-    def analyze(self, llm_text: str, ep_result: dict) -> dict:
+    def analyze(self, llm_text: str, ep_result: dict, external_knowledge: str = "") -> dict:
         """
         Standard single-pass analysis of a news article.
 
@@ -535,6 +609,8 @@ class Judge:
             Cleaned full article text from input_processing.clean_for_llm().
         ep_result : dict
             Output of EarlyPredictor.predict(). Pass {} if EP was skipped.
+        external_knowledge : str
+            Verified external knowledge retrieved for the claim.
 
         Returns
         -------
@@ -545,7 +621,7 @@ class Judge:
         self.last_raw_response = ""
         self.last_user_message = ""
         try:
-            user_message = self._build_user_message(llm_text, ep_result)
+            user_message = self._build_user_message(llm_text, ep_result, external_knowledge)
             raw_response = self._call_api(user_message)
             result       = self._parse_response(raw_response)
 
@@ -577,6 +653,7 @@ class Judge:
         ep_result: dict,
         n: int = 3,
         sc_temperature: float = 0.7,
+        external_knowledge: str = "",
     ) -> dict:
         """
         Self-Consistency analysis: run N parallel reasoning paths and
@@ -602,6 +679,8 @@ class Judge:
         sc_temperature : float
             Sampling temperature for each run (default 0.7). Higher than
             the standard temperature to encourage diverse reasoning paths.
+        external_knowledge : str
+            Verified external knowledge retrieved for the claim.
 
         Returns
         -------
@@ -609,7 +688,7 @@ class Judge:
             Aggregated verdict dict. Includes 'sc_votes' key showing the
             full vote breakdown across all N runs for transparency.
         """
-        user_message = self._build_user_message(llm_text, ep_result)
+        user_message = self._build_user_message(llm_text, ep_result, external_knowledge)
 
         log.info(
             f"[Judge][Self-Consistency] Starting {n} parallel runs "
