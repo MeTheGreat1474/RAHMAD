@@ -72,6 +72,16 @@ def _get_retriever():
         log.info("[analyzer] Knowledge Retriever ready.")
     return _retriever
 
+_ris_pipeline = None
+def _get_ris_pipeline():
+    global _ris_pipeline
+    if _ris_pipeline is None:
+        log.info("[analyzer] Loading Reverse Image Search Pipeline…")
+        from model.reverse_image_search import ReverseImageSearchPipeline
+        _ris_pipeline = ReverseImageSearchPipeline()
+        log.info("[analyzer] Reverse Image Search Pipeline ready.")
+    return _ris_pipeline
+
 
 # ---------------------------------------------------------------------------
 # Image decoding
@@ -237,6 +247,29 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "summary": f"Knowledge Retrieval error: {exc}"
         })
 
+    # ── 4.6. Reverse Image Search (RIS) ───────────────────────────────────
+    ris_summary = ""
+    ris_data_for_log = None
+    if has_clip and image_data and (image_data.startswith("http://") or image_data.startswith("https://") or image_data.startswith("data:")):
+        try:
+            print("  [Step 4.6] Initializing Reverse Image Search pipeline...")
+            ris_pipeline = _get_ris_pipeline()
+            ris_data = ris_pipeline.execute(input_text, image_data)
+            ris_data_for_log = ris_data
+            if ris_data["status"] == "success" and ris_data["visual_agent_summary"]:
+                ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nCategory: {ris_data['category']}\n{ris_data['visual_agent_summary']}"
+        except Exception as exc:
+            log.error(f"[analyzer] Reverse Image Search failed: {exc}", exc_info=True)
+            ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nRIS encountered an error: {exc}"
+            ris_data_for_log = {"status": "failed", "visual_agent_summary": f"RIS encountered an error: {exc}"}
+            print(f"  [X] RIS Pipeline Error: {exc}")
+            
+    # Log RIS output
+    plog.log_ris_output(ris_data_for_log)
+
+    # Combine KR and RIS knowledge for the Judge
+    # combined_knowledge = external_knowledge + ris_summary
+
     # ── 5. Judge Module ───────────────────────────────────────────────────
     try:
         from model.judge import _SYSTEM_PROMPT   # module-level constant
@@ -244,15 +277,20 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         print("\n" + "=" * 50)
         print("  JUDGE MODULE (CLOUD LLM REASONING LAYER)")
         print("=" * 50)
-        if external_knowledge:
-            print("  [OK] Forwarding synthesized Knowledge Summary to Judge context.")
+        if external_knowledge or ris_summary:
+            print("  [OK] Forwarding synthesized Knowledge Summary and RIS to Judge context.")
         else:
             print("  [!] No external knowledge retrieved. Proceeding with article text & EP signal.")
             
         print(f"  Sending request to OpenRouter Cloud LLM... Please wait...")
         
         judge  = _get_judge()
-        result = judge.analyze(llm_text, ep_result, external_knowledge=external_knowledge)
+        result = judge.analyze(
+            llm_text, 
+            ep_result, 
+            external_knowledge=external_knowledge.strip(),
+            ris_summary=ris_summary.strip()
+        )
         
         # Populate frontend links from Knowledge Retrieval articles
         if kr_articles:

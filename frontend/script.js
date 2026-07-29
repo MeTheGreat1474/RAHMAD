@@ -292,7 +292,27 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update Reasoning
             const reasoningText = document.getElementById('reasoning-text');
             if (reasoningText) {
-                reasoningText.textContent = responseData.reasoning || '';
+                let rawReasoning = responseData.reasoning || '';
+                
+                // Basic HTML escaping to prevent XSS
+                let formattedReasoning = rawReasoning
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+                    
+                // Format "STEP X" or "STEP X — SOMETHING" as headers
+                // This regex finds STEP followed by a number, captures the title up to a colon or newline, and consumes the colon/spacing
+                formattedReasoning = formattedReasoning.replace(/(STEP\s+\d+[^:\n]*?)(?::\s*|\n|$)/gi, function(match, p1) {
+                    return `<h4 style="margin-top: 18px; margin-bottom: 6px; font-size: 0.95rem; color: var(--text-primary); font-weight: 600; border-bottom: 1px solid var(--border-light); padding-bottom: 4px;">${p1}</h4>`;
+                });
+                
+                // Convert remaining newlines to <br> to preserve paragraphs
+                formattedReasoning = formattedReasoning.replace(/\n/g, '<br>');
+                
+                // Clean up any stray <br> tags immediately following a heading
+                formattedReasoning = formattedReasoning.replace(/<\/h4><br>/g, '</h4>');
+                
+                reasoningText.innerHTML = formattedReasoning;
                 // Reset accordion state on each new result
                 const body = document.getElementById('reasoning-body');
                 const toggle = document.getElementById('reasoning-toggle');

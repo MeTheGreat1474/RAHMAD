@@ -1,5 +1,5 @@
 ================================================================================
-  RAHMAD PIPELINE LOG  —  2026-07-28  16:32:10
+  RAHMAD PIPELINE LOG  —  2026-07-29  20:57:58
 ================================================================================
 
 [1]  PRE-PROCESSING  —  INPUT
@@ -7,7 +7,7 @@
     raw_text:
       "Govt ordered to pay RM195,000 over 2021 unlawful arrest of vigil participants\n\nKUALA LUMPUR: The High Court has ordered the government to pay RM195,000 in damages to 13 participants of a 2021 candlelight vigil at Dataran Merdeka after finding it vicariously liable for their unlawful arrest and detention by police.\n\nJudge Datuk Anand Ponnudurai awarded each plaintiff RM15,000 in general damages.\n\nHe declared that the plaintiffs' arrest and detention on Aug 19, 2021, were unlawful and breached the  … [4409 chars total]"
 
-    image.size            : 700 × 466 px
+    image.size            : 658 × 452 px
     image.mode            : RGB
 
 [2]  PRE-PROCESSING  —  OUTPUT
@@ -20,19 +20,19 @@
 
     input_ids             : shape=[1, 77]  dtype=torch.int64  min=267  max=49407  first_12=[49406, 5345, 8335, 531, 3345, 8431, 272, 280, 276, 267, 271, 271, … (65 more)]
     attention_mask        : shape=[1, 77]  dtype=torch.int64  min=1  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
-    pixel_values          : shape=[1, 3, 224, 224]  norm=487.7971  min=-1.7521  max=+2.1459  first_6=[+1.6238, +1.6238, +1.6384, +1.6530, +1.6676, +1.6384, … (150522 more)]
+    pixel_values          : shape=[1, 3, 224, 224]  norm=436.1229  min=-1.7923  max=+2.1459  first_6=[-0.2302, +0.2369, +0.6749, +0.8063, +0.7771, +0.4851, … (150522 more)]
 
 [3]  CLIP ENCODER  —  OUTPUT
 ------------------------------------------------------------
     text_embeds  [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.1860  max=+0.3253  first_8=[-0.0258, -0.0444, -0.0008, +0.0023, +0.0157, +0.0135, +0.0268, +0.1468, … (504 more)]
-    image_embeds [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.5299  max=+0.1945  first_8=[-0.0084, +0.0131, +0.0259, +0.0214, +0.0687, -0.0013, +0.0145, -0.0091, … (504 more)]
-    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.5299  max=+0.3253  first_8=[-0.0258, -0.0444, -0.0008, +0.0023, +0.0157, +0.0135, +0.0268, +0.1468, … (1016 more)]
+    image_embeds [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.5576  max=+0.2655  first_8=[-0.0318, +0.0194, -0.0171, -0.0206, +0.0390, -0.0344, +0.0094, -0.0133, … (504 more)]
+    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.5576  max=+0.3253  first_8=[-0.0258, -0.0444, -0.0008, +0.0023, +0.0157, +0.0135, +0.0268, +0.1468, … (1016 more)]
 
 [4]  EARLY PREDICTOR  —  OUTPUT
 ------------------------------------------------------------
-    probability           : 0.474741   (0.0 = Real, 1.0 = Fake)
+    probability           : 0.426856   (0.0 = Real, 1.0 = Fake)
     label                 : UNCERTAIN
-    confidence            : 47.5%
+    confidence            : 42.7%
     pass_to_agents        : True
 
 [5]  KNOWLEDGE RETRIEVAL  —  OUTPUT
@@ -41,49 +41,79 @@
     articles_queried      : [3 article(s) survived whitelist & heuristics]
       1. Headline : High Court orders Malaysian govt, police to pay activists RM195,000 over unlawful 2021 vigil arrests | Malay Mail
          Source   : https://www.malaymail.com/news/malaysia/2026/07/28/high-court-orders-malaysian-govt-police-to-pay-activists-rm195000-over-unlawful-2021-vigil-arrests/229239
-      2. Headline : Govt, police ordered to pay activists RM195,000 for wrongful arrests | FMT
-         Source   : https://www.freemalaysiatoday.com/category/nation/2026/07/28/govt-police-ordered-to-pay-activists-rm195-000-for-wrongful-arrests
-      3. Headline : Court awards RM195,000 to 13 activists over wrongful arrest | The Star
+      2. Headline : Court awards RM195,000 to 13 activists over wrongful arrest | The Star
          Source   : https://www.thestar.com.my/news/nation/2026/07/28/court-awards-rm195000-to-13-activists-over-wrongful-arrest
+      3. Headline : Govt, police ordered to pay activists RM195,000 for wrongful arrests | FMT
+         Source   : https://www.freemalaysiatoday.com/category/nation/2026/07/28/govt-police-ordered-to-pay-activists-rm195-000-for-wrongful-arrests
 
     --- CONDENSED SUMMARY (LLM) ---
-      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
+      ### Comprehensive Key-Fact Outline: High Court Ruling on 2021 Candlelight Vigil Arrests
       
       ---
       
       #### **1. Key Entities, Names, and Roles**
       
-      | Entity / Individual | Role / Description | Source Snippet(s) |
+      | Entity / Name | Role / Description | Source Snippet(s) |
       | :--- | :--- | :--- |
-      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
-      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
-      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
-      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
-      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
-      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
-      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
+      | **Justice Datuk Anand Ponnudurai** | Presiding High Court Judge; delivered the judgment and awarded damages. | Snippets 2, 7, 8 |
+      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; victims of the unlawful arrest and detention; recipients of the damages award. | Snippets 1, 2, 3, 4, 6 |
+      | **The Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. | Snippets 1, 2, 3, 6, 8 |
+      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers; held **directly liable** for wrongful arrest and detention. | Snippets 1, 2, 3, 6, 8 |
+      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | Snippet 2 |
+      | **Malay Mail** | News outlet publishing the primary report (Snippets 1, 2). | Snippets 1, 2 |
+      | **The Star** | News outlet publishing corroborating report (Snippets 3, 4, 5). | Snippets 3, 4, 5 |
       
       ---
       
       #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
       
-      | Category | Detail | Source Snippet(s) |
+      | Detail | Specifics | Source Snippet(s) |
       | :--- | :--- | :--- |
-      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
-      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
-      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
-      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
-      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
-      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
+      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by Government and Police). | Snippets 1, 2, 3, 6 |
+      | **Individual Award per Activist** | **RM15,000** each (13 activists × RM15,000 = RM195,000). | Snippets 2, 5, 7 |
+      | **Legal Basis for Liability** | **Vicarious Liability**: The Government held liable for the acts of its servants (police officers).<br>**Direct Liability**: Police officers held liable for executing the unlawful arrests. | Snippets 1, 8 |
+      | **Core Legal Finding** | The arrests and detention of the 13 activists were **unlawful** and **wrongful**. | Snippets 1, 2, 3, 6, 8 |
+      | **Judicial Reasoning (Quantum)** | Justice Anand Ponnudurai stated: *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | Snippet 5 |
+      | **Date of Judgment Delivery** | **July 28** (Year implied as 2023 or 2024 based on context of "today" in Snippet 1; Snippet 1 header says "KUALA LUMPUR, July 28"). | Snippet 1 |
       
       ---
       
       #### **3. Timeline of Events and Corroborating Evidence**
       
-      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
-      | :--- | :--- | :--- | :--- |
-      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
-      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
+      | Date / Period | Event / Action | Details & Corroboration |
+      | :--- | :--- | :--- |
+      | **August 19, 2021** | **Candlelight Vigil at Dataran Merdeka** | **Purpose:** Mourning victims who died from COVID-19.<br>**Location:** Dataran Merdeka, Kuala Lumpur.<br>**Context:** Held "amid the Covid-19 pandemic" (likely during Movement Control Order / SOPs restricting assembly).<br>**Corroboration:** Explicitly stated in Snippets 2, 3, 4, 6. |
+      | **August 19, 2021 (Same Day)** | **Arrests of Participants** | **Action:** Police arrested multiple participants, including the 13 plaintiffs.<br>**Nature:** Deemed "unlawful arrest and detention" by the High Court.<br>**Corroboration:** Snippets 1, 2, 3, 4, 6, 8. |
+      | **Post-Arrest (2021–2023/24)** | **Civil Suit Filed / Proceedings** | The 13 activists filed a civil suit against the Government and Police for wrongful arrest/false imprisonment. Proceedings involved presentation of "totality of evidence" (Snippet 5). |
+      | **July 28 (Judgment Date)** | **High Court Decision Delivered** | **Venue:** High Court, Kuala Lumpur.<br>**Outcome:**<br>1. Finding of **unlawful arrest**.<br>2. **Vicarious liability** imposed on Government.<br>
+
+[5B]  REVERSE IMAGE SEARCH  —  OUTPUT
+------------------------------------------------------------
+    category              : Identical Image, Different Context
+    matches_found         : [10 visually identical image(s) found]
+      1. Title  : File:Netanyahu official portrait (cropped).jpg - Wikipedia
+         Source : Wikipedia
+      2. Title  : Netanyahu set to visit Azerbaijan
+         Source : OC Media
+      3. Title  : Amazon.com: Benjamin Netanyahu Poster Print- Wall Art for ...
+         Source : Amazon.com
+      4. Title  : Netanyahu announces new settlements days before Israeli ...
+         Source : The Guardian
+      5. Title  : Benjamin Netanyahu Fast Facts | CNN
+         Source : CNN
+      6. Title  : Hungary, Israel seek closer ties as Orban campaign unnerves ...
+         Source : Reuters
+      7. Title  : File:Benjamin Netanyahu May 2015 (cropped).jpg - Wikimedia ...
+         Source : Wikimedia Commons
+      8. Title  : The Netanyahu Disaster - The Atlantic
+         Source : The Atlantic
+      9. Title  : U.S. Spy Agencies Say Netanyahu's Leadership 'in Jeopardy' - WSJ
+         Source : WSJ
+      10. Title  : President Trump will meet Israeli prime minister Benjamin ...
+         Source : x.com
+
+    --- VISUAL AGENT SUMMARY ---
+      The original claim reports on a Malaysian High Court ruling regarding unlawful arrests during a 2021 candlelight vigil at Dataran Merdeka. However, the visually identical images found online exclusively depict Benjamin Netanyahu, the Israeli Prime Minister, in various official and news contexts. There is no factual or contextual link between the Malaysian legal case and the subject of the images (Netanyahu), indicating the image is being used in a completely misleading and decontextualized manner.
 
 [6]  JUDGE (LLM)  —  INPUT
 ------------------------------------------------------------
@@ -115,6 +145,9 @@
       
         P7. CROSS-VERIFY WITH KNOWLEDGE RETRIEVAL EVIDENCE
             The Knowledge Retrieval pipeline provides verified external evidence extracted from whitelisted, reputable news outlets via semantic similarity matching. Treat this external knowledge as authoritative ground-truth factual context. Cross-reference the core claims in the article text against this knowledge. Direct corroboration strongly supports a CREDIBLE classification, while direct contradiction signals FABRICATED, MISLEADING, or FALSE CONNECTION.
+      
+        P8. CROSS-VERIFY VISUAL CONTEXT VIA REVERSE IMAGE SEARCH
+            If a Reverse Image Search summary is provided, use it to assess       whether the article's image is being used out-of-context. If the image       is flagged as 'Identical Image, Different Context', this strongly       supports a FALSE CONNECTION or MISLEADING CONTENT classification.
       
       ══════════════════════════════════════════════════
       SECTION 2 — CLASSIFICATION TYPES
@@ -165,10 +198,11 @@
         STEP 5 — SOURCE AND ATTRIBUTION ANALYSIS
           Evaluate source credibility and transparency. Are sources named and traceable? Are institutions or officials quoted in ways that seem authentic? Does the article claim affiliation with a known outlet while showing signs of impersonation (e.g. slight name variation, unfamiliar domain)?
       
-        STEP 6 — EP SIGNAL & KNOWLEDGE RETRIEVAL INTEGRATION
-          Evaluate both evidence streams:
+        STEP 6 — MULTIMODAL EVIDENCE INTEGRATION
+          Evaluate all three external evidence streams:
           1. Knowledge Retrieval: Cross-reference claims extracted in Step 2 against the verified external knowledge summary. State clearly if external news corroborates, refutes, or is absent for the claims.
-          2. EP Signal: State whether the Early Predictor's vision-text score agrees or disagrees with your factual evaluation. Synthesize both to justify your classification and calibrate final confidence.
+          2. Reverse Image Search (RIS): If RIS evidence is provided, analyze whether the image is Out-of-Context (OOC). If the visual agent flags the image as 'Identical Image, Different Context' or similar, you MUST strongly consider a FALSE CONNECTION or MISLEADING CONTENT verdict, even if the text itself appears credible.
+          3. EP Signal: State whether the Early Predictor's vision-text score agrees or disagrees with your factual and visual evaluation. Synthesize all evidence to justify your classification and calibrate final confidence.
       
         STEP 7 — SELF-CRITIQUE (Self-Refine)
           Before committing to a verdict, challenge yourself: What is the strongest argument AGAINST your current classification? Could you be misreading satire as fabrication, or vice versa? Could cultural context, technical jargon, or incomplete information be distorting your reading? If the counter-argument is strong enough to change your classification or materially reduce your confidence, update accordingly.
@@ -189,91 +223,59 @@
 
     --- USER MESSAGE ---
       === KNOWLEDGE RETRIEVAL EVIDENCE ===
-      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
+      ### Comprehensive Key-Fact Outline: High Court Ruling on 2021 Candlelight Vigil Arrests
       
       ---
       
       #### **1. Key Entities, Names, and Roles**
       
-      | Entity / Individual | Role / Description | Source Snippet(s) |
+      | Entity / Name | Role / Description | Source Snippet(s) |
       | :--- | :--- | :--- |
-      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
-      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
-      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
-      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
-      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
-      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
-      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
+      | **Justice Datuk Anand Ponnudurai** | Presiding High Court Judge; delivered the judgment and awarded damages. | Snippets 2, 7, 8 |
+      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; victims of the unlawful arrest and detention; recipients of the damages award. | Snippets 1, 2, 3, 4, 6 |
+      | **The Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. | Snippets 1, 2, 3, 6, 8 |
+      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers; held **directly liable** for wrongful arrest and detention. | Snippets 1, 2, 3, 6, 8 |
+      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | Snippet 2 |
+      | **Malay Mail** | News outlet publishing the primary report (Snippets 1, 2). | Snippets 1, 2 |
+      | **The Star** | News outlet publishing corroborating report (Snippets 3, 4, 5). | Snippets 3, 4, 5 |
       
       ---
       
       #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
       
-      | Category | Detail | Source Snippet(s) |
+      | Detail | Specifics | Source Snippet(s) |
       | :--- | :--- | :--- |
-      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
-      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
-      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
-      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
-      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
-      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
+      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by Government and Police). | Snippets 1, 2, 3, 6 |
+      | **Individual Award per Activist** | **RM15,000** each (13 activists × RM15,000 = RM195,000). | Snippets 2, 5, 7 |
+      | **Legal Basis for Liability** | **Vicarious Liability**: The Government held liable for the acts of its servants (police officers).<br>**Direct Liability**: Police officers held liable for executing the unlawful arrests. | Snippets 1, 8 |
+      | **Core Legal Finding** | The arrests and detention of the 13 activists were **unlawful** and **wrongful**. | Snippets 1, 2, 3, 6, 8 |
+      | **Judicial Reasoning (Quantum)** | Justice Anand Ponnudurai stated: *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | Snippet 5 |
+      | **Date of Judgment Delivery** | **July 28** (Year implied as 2023 or 2024 based on context of "today" in Snippet 1; Snippet 1 header says "KUALA LUMPUR, July 28"). | Snippet 1 |
       
       ---
       
       #### **3. Timeline of Events and Corroborating Evidence**
       
-      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
-      | :--- | :--- | :--- | :--- |
-      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
-      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
+      | Date / Period | Event / Action | Details & Corroboration |
+      | :--- | :--- | :--- |
+      | **August 19, 2021** | **Candlelight Vigil at Dataran Merdeka** | **Purpose:** Mourning victims who died from COVID-19.<br>**Location:** Dataran Merdeka, Kuala Lumpur.<br>**Context:** Held "amid the Covid-19 pandemic" (likely during Movement Control Order / SOPs restricting assembly).<br>**Corroboration:** Explicitly stated in Snippets 2, 3, 4, 6. |
+      | **August 19, 2021 (Same Day)** | **Arrests of Participants** | **Action:** Police arrested multiple participants, including the 13 plaintiffs.<br>**Nature:** Deemed "unlawful arrest and detention" by the High Court.<br>**Corroboration:** Snippets 1, 2, 3, 4, 6, 8. |
+      | **Post-Arrest (2021–2023/24)** | **Civil Suit Filed / Proceedings** | The 13 activists filed a civil suit against the Government and Police for wrongful arrest/false imprisonment. Proceedings involved presentation of "totality of evidence" (Snippet 5). |
+      | **July 28 (Judgment Date)** | **High Court Decision Delivered** | **Venue:** High Court, Kuala Lumpur.<br>**Outcome:**<br>1. Finding of **unlawful arrest**.<br>2. **Vicarious liability** imposed on Government.<br>
       
       Note: This is verified external ground-truth evidence retrieved from reputable whitelisted news outlets via semantic similarity filtering.
       
+      === REVERSE IMAGE SEARCH EVIDENCE ===
+      --- REVERSE IMAGE SEARCH FINDINGS ---
+      Category: Identical Image, Different Context
+      The original claim reports on a Malaysian High Court ruling regarding unlawful arrests during a 2021 candlelight vigil at Dataran Merdeka. However, the visually identical images found online exclusively depict Benjamin Netanyahu, the Israeli Prime Minister, in various official and news contexts. There is no factual or contextual link between the Malaysian legal case and the subject of the images (Netanyahu), indicating the image is being used in a completely misleading and decontextualized manner.
+      
       === EARLY PREDICTOR SIGNAL ===
       Label       : UNCERTAIN
-      Probability : 0.4747  (0.0 = Real, 1.0 = Fake)
-      Confidence  : 47.5%
+      Probability : 0.4269  (0.0 = Real, 1.0 = Fake)
+      Confidence  : 42.7%
       
       Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it as evidence, not as a definitive answer. You must run your own full reasoning protocol before reaching a verdict.
-      
-      === EXTERNAL KNOWLEDGE ===
-      ### Comprehensive Key-Fact Outline: High Court Ruling on Unlawful Arrest of 2021 Candlelight Vigil Participants
-      
-      ---
-      
-      #### **1. Key Entities, Names, and Roles**
-      
-      | Entity / Individual | Role / Description | Source Snippet(s) |
-      | :--- | :--- | :--- |
-      | **Justice Datuk Anand Ponnudurai** | Presiding Judge, High Court (Kuala Lumpur); delivered the judgment and awarded damages. | 1, 2, 4, 5 |
-      | **The 13 Activists / Plaintiffs** | Participants in the candlelight vigil; arrested on August 19, 2021; successfully sued for unlawful arrest and detention. | 1, 2, 3, 6, 7 |
-      | **Government of Malaysia (The Government)** | Defendant; held **vicariously liable** for the actions of the police officers. Ordered to pay damages jointly with the police. | 1, 2, 3, 5, 6 |
-      | **Royal Malaysia Police (PDRM) / Police Officers** | Defendant; the arresting officers. Held **directly liable** for wrongful arrest; government held vicariously liable for their conduct. | 1, 2, 3, 5, 6 |
-      | **Free Malaysia Today (FMT)** | News outlet reporting on the ruling (cited by Malay Mail in Snippet 2). | 2, 3, 4, 5 |
-      | **Malay Mail** | News outlet publishing the primary report (Snippet 1, 2). | 1, 2 |
-      | **The Star** | News outlet publishing independent report on the ruling. | 6, 7, 8 |
-      
-      ---
-      
-      #### **2. Monetary Amounts, Legal Rulings, and Official Outcomes**
-      
-      | Category | Detail | Source Snippet(s) |
-      | :--- | :--- | :--- |
-      | **Total Damages Awarded** | **RM195,000** (Total sum ordered to be paid by the Government and Police to the 13 activists). | 1, 3, 6 |
-      | **Individual Award** | **RM15,000 per activist** (13 activists × RM15,000 = RM195,000). | 2, 4, 8 |
-      | **Legal Basis for Liability** | **Vicarious Liability**: The Court held the **Government vicariously liable** for the unlawful acts of the police officers. The police officers (and by extension the Government) were found **liable for wrongful/unlawful arrest and detention**. | 1, 2, 5 |
-      | **Judicial Reasoning (Direct Quote)** | *"Having regard to the totality of the evidence in this case, this court considers that an award of RM15,000 to each plaintiff fairly and appropriately reflects the injuries established in these proceedings."* | 8 |
-      | **Nature of Arrests** | Ruled **unlawful** and **wrongful**. | 1, 2, 3, 5, 6, 7 |
-      | **Defendants Ordered to Pay** | **Government and Police** (jointly). | 1, 3, 6 |
-      
-      ---
-      
-      #### **3. Timeline of Events and Corroborating Evidence**
-      
-      | Date / Period | Event / Action | Corroborating Details & Evidence | Source Snippet(s) |
-      | :--- | :--- | :--- | :--- |
-      | **August 19, 2021** | **Candlelight Vigil & Arrests** | • **Location:** Dataran Merdeka, Kuala Lumpur.<br>• **Purpose:** Vigil to mourn victims who died from **COVID-19**.<br>• **Action:** Police arrested multiple participants; the 13 plaintiffs were **among those arrested**. | 2, 3, 6, 7 |
-      | **Post-August 19, 2021** | **Legal Proceedings Initiated** | • The 13 activists filed a civil suit against the Government and Police for unlawful arrest and detention. | Implied by
       
       === ARTICLE TEXT ===
       Govt ordered to pay RM195,000 over 2021 unlawful arrest of vigil participants
@@ -311,22 +313,28 @@
 ------------------------------------------------------------
     --- RAW API RESPONSE ---
       {
-        "reasoning": "Step 1: Domain is Malaysian legal/political news — a High Court ruling on unlawful arrests during a 2021 COVID-19 vigil. Legitimate articles in this domain cite judges, constitutional articles, specific damages, and present both parties' arguments neutrally. Step 2: Extracted 12 verifiable claims including judge name (Datuk Anand Ponnudurai), RM195,000 total/RM15,000 each, 13 plaintiffs, Aug 19 2021 Dataran Merdeka, vicarious liability finding, Articles 5(1)/5(3) breach, Article 10(1)(b) dismissal, battery on forearm marking, rejection of excessive force/misfeasance, and lawyers' names. All are specific and fact-checkable. Step 3: Internal consistency is flawless — headline matches body, arithmetic checks (13×15,000=195,000), no contradictory statements, direct judicial quotes included. Step 4: Framing is neutral, professional legal journalism — no sensationalism, emotional language, or propaganda patterns; both sides' positions and the judge's nuanced reasoning (upholding some claims, dismissing others) are fairly reported. Step 5: Sources are transparent and traceable — named judge, named counsel for both sides, specific constitutional provisions, no unnamed authorities or impersonation signals. Step 6: Knowledge Retrieval evidence from Malay Mail, FMT, and The Star corroborates every material detail exactly; EP signal is uncertain (47.5%) but is a weak multimodal estimate outweighed by strong textual and external verification. Step 7: Self-critique — the only counter-argument is that a sophisticated fabrication could mimic real court reporting, but the granularity (forearm marking SOP admission, honest belief finding, specific lawyer names) across three independent reputable outlets makes fabrication implausible. No misinformation category fits; the article is a legitimate court report.",
-        "verdict": "CREDIBLE",
-        "color_class": "credible",
-        "confidence": "95%",
-        "justification": "The article is a factually accurate, neutrally framed court report whose every specific claim — judge, damages, legal reasoning, constitutional provisions, parties, and outcome — is corroborated by independent reputable Malaysian news outlets (Malay Mail, FMT, The Star) in the Knowledge Retrieval evidence. Internal consistency, sourcing transparency, and professional journalistic style all align with a credible news report.",
+        "reasoning": "STEP 1: The article operates in the legal/political news domain, reporting a Malaysian High Court civil judgment on unlawful arrests during a 2021 COVID-era vigil. Legitimate court reports typically cite the judge, specific constitutional articles, damages breakdown, and counsel names. STEP 2: The article makes 11 specific, verifiable claims including the RM195,000 award (13 × RM15,000), Judge Datuk Anand Ponnudurai's findings on Articles 5(1)/5(3) violations, dismissal of Article 10(1)(b) and aggravated damages claims, and detailed factual findings on detention conditions and battery. STEP 3: Internal consistency is strong — headline matches body, arithmetic checks out, legal reasoning is coherent (unlawful arrest but no malice), and both parties' positions are fairly summarized. STEP 4: Framing is neutral, professional legal journalism — no sensationalism, emotional language, or propaganda patterns; the judge's adverse findings against plaintiffs are reported alongside favorable ones. STEP 5: Sourcing is transparent and traceable — judge, court, date, constitutional provisions, and counsel for both sides are named; no impersonation signals. STEP 6: Knowledge Retrieval evidence from three reputable outlets (Malay Mail, The Star, FMT) corroborates every material claim in the text. However, Reverse Image Search flags the article's image as 'Identical Image, Different Context' — the visual shows Benjamin Netanyahu in Israeli political contexts, with zero connection to the Malaysian case. EP signal is uncertain (42.7% fake). STEP 7: The text alone is highly credible, but the article as a multimodal unit deploys a completely unrelated image, creating a false connection between visual and content. The strongest counter-argument would be to classify as CREDIBLE based on text alone, but the protocol mandates weighing visual-text mismatch heavily.",
+        "verdict": "FALSE CONNECTION",
+        "color_class": "false-connection",
+        "confidence": "88%",
+        "justification": "The article's text is factually accurate and thoroughly corroborated by independent reputable sources, but the accompanying image depicts Israeli Prime Minister Benjamin Netanyahu and bears no factual or contextual relationship to the Malaysian High Court ruling. This constitutes a false connection between visual and textual content, likely intended as generic illustrative imagery but functioning as deceptive misrepresentation.",
         "key_facts": [
-          "All 12 verifiable claims match external knowledge retrieval from three reputable Malaysian outlets",
-          "Article presents nuanced ruling: upholds unlawful arrest/Article 5 claims but dismisses
+          "Text content fully corroborated by Knowledge Retrieval from Malay Mail, The Star, and Free Malaysia Today across all material claims (judge, damages, legal findings, dates, counsel).",
+          "Reverse Image Search confirms the article's image shows Benjamin Netanyahu in unrelated Israeli political contexts — 'Identical Image, Different Context' with no link to the Malaysian case.",
+          "Article exhibits no textual misinformation signals: neutral tone, balanced reporting, precise legal detail, and internal consistency."
+        ]
+      }
 
     --- PARSED VERDICT ---
-    verdict               : CREDIBLE
-    color_class           : credible
-    confidence            : 95%
-    justification         : The article is a factually accurate, neutrally framed court report whose every specific claim — judge, damages, legal reasoning, constitutional provisions, parties, and outcome — is corroborated by independent reputable Malaysian news outlets (Malay Mail, FMT, The Star) in the Knowledge Retrieval ev…
-    key_facts             : [0 item(s)]
+    verdict               : FALSE CONNECTION
+    color_class           : false-connection
+    confidence            : 88%
+    justification         : The article's text is factually accurate and thoroughly corroborated by independent reputable sources, but the accompanying image depicts Israeli Prime Minister Benjamin Netanyahu and bears no factual or contextual relationship to the Malaysian High Court ruling. This constitutes a false connection …
+    key_facts             : [3 item(s)]
+      1. Text content fully corroborated by Knowledge Retrieval from Malay Mail, The Star, and Free Malaysia Today across all material claims (judge, damages, legal findings, dates, counsel).
+      2. Reverse Image Search confirms the article's image shows Benjamin Netanyahu in unrelated Israeli political contexts — 'Identical Image, Different Context' with no link to the Malaysian case.
+      3. Article exhibits no textual misinformation signals: neutral tone, balanced reporting, precise legal detail, and internal consistency.
 
 ================================================================================
-  END OF LOG  |  total elapsed: 72.62s
+  END OF LOG  |  total elapsed: 245.75s
 ================================================================================

@@ -121,6 +121,12 @@ the article text against this knowledge. Direct corroboration \
 strongly supports a CREDIBLE classification, while direct \
 contradiction signals FABRICATED, MISLEADING, or FALSE CONNECTION.
 
+  P8. CROSS-VERIFY VISUAL CONTEXT VIA REVERSE IMAGE SEARCH
+      If a Reverse Image Search summary is provided, use it to assess \
+      whether the article's image is being used out-of-context. If the image \
+      is flagged as 'Identical Image, Different Context', this strongly \
+      supports a FALSE CONNECTION or MISLEADING CONTENT classification.
+
 ══════════════════════════════════════════════════
 SECTION 2 — CLASSIFICATION TYPES
 ══════════════════════════════════════════════════
@@ -218,14 +224,19 @@ ways that seem authentic? Does the article claim affiliation \
 with a known outlet while showing signs of impersonation \
 (e.g. slight name variation, unfamiliar domain)?
 
-  STEP 6 — EP SIGNAL & KNOWLEDGE RETRIEVAL INTEGRATION
-    Evaluate both evidence streams:
+  STEP 6 — MULTIMODAL EVIDENCE INTEGRATION
+    Evaluate all three external evidence streams:
     1. Knowledge Retrieval: Cross-reference claims extracted in Step 2 \
 against the verified external knowledge summary. State clearly if \
 external news corroborates, refutes, or is absent for the claims.
-    2. EP Signal: State whether the Early Predictor's vision-text score \
-agrees or disagrees with your factual evaluation. Synthesize both \
-to justify your classification and calibrate final confidence.
+    2. Reverse Image Search (RIS): If RIS evidence is provided, analyze \
+whether the image is Out-of-Context (OOC). If the visual agent flags \
+the image as 'Identical Image, Different Context' or similar, you MUST \
+strongly consider a FALSE CONNECTION or MISLEADING CONTENT verdict, \
+even if the text itself appears credible.
+    3. EP Signal: State whether the Early Predictor's vision-text score \
+agrees or disagrees with your factual and visual evaluation. Synthesize \
+all evidence to justify your classification and calibrate final confidence.
 
   STEP 7 — SELF-CRITIQUE (Self-Refine)
     Before committing to a verdict, challenge yourself: What is \
@@ -257,6 +268,9 @@ _USER_TEMPLATE = """\
 
 Note: This is verified external ground-truth evidence retrieved from reputable whitelisted news outlets via semantic similarity filtering.
 
+=== REVERSE IMAGE SEARCH EVIDENCE ===
+{ris_summary}
+
 === EARLY PREDICTOR SIGNAL ===
 Label       : {ep_label}
 Probability : {ep_prob:.4f}  (0.0 = Real, 1.0 = Fake)
@@ -265,9 +279,6 @@ Confidence  : {ep_confidence}
 Note: This is a preliminary multimodal signal from a CLIP+LoRA model — \
 treat it as evidence, not as a definitive answer. You must run your own \
 full reasoning protocol before reaching a verdict.
-
-=== EXTERNAL KNOWLEDGE ===
-{external_knowledge}
 
 === ARTICLE TEXT ===
 {llm_text}
@@ -318,7 +329,7 @@ class Judge:
         self,
         api_key: str | None = None,
         temperature: float = 0.2,
-        max_tokens: int = 2048,
+        max_tokens: int = 4096,
     ):
         self.api_key     = api_key or os.environ.get("OPENROUTER_API_KEY", "")
         self.temperature = temperature
@@ -341,13 +352,14 @@ class Judge:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _build_user_message(self, llm_text: str, ep_result: dict, external_knowledge: str = "") -> str:
+    def _build_user_message(self, llm_text: str, ep_result: dict, external_knowledge: str = "", ris_summary: str = "") -> str:
         """Format the user turn from article text, EP result, and external knowledge."""
         msg = _USER_TEMPLATE.format(
             ep_label      = ep_result.get("label", "UNKNOWN"),
             ep_prob       = ep_result.get("probability", 0.5),
             ep_confidence = ep_result.get("confidence", "N/A"),
-            external_knowledge = external_knowledge or "No external knowledge provided.",
+            external_knowledge = external_knowledge or "No external text knowledge provided.",
+            ris_summary   = ris_summary or "No Reverse Image Search data provided.",
             llm_text      = llm_text[:_MAX_TEXT_CHARS],
         )
         self.last_user_message = msg
@@ -415,8 +427,11 @@ class Judge:
         Handles cases where the model wraps JSON in markdown code fences.
         Now also extracts the 'reasoning' field added by the enhanced prompt.
         """
+        # Remove <think>...</think> reasoning blocks common in modern LLMs
+        cleaned = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+        
         # Remove markdown code fences and whitespace
-        cleaned = re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
+        cleaned = re.sub(r"```(?:json)?\s*", "", cleaned).strip().rstrip("`").strip()
 
         # Try parsing directly
         data = None
@@ -595,7 +610,7 @@ class Judge:
     # Public API
     # ------------------------------------------------------------------
 
-    def analyze(self, llm_text: str, ep_result: dict, external_knowledge: str = "") -> dict:
+    def analyze(self, llm_text: str, ep_result: dict, external_knowledge: str = "", ris_summary: str = "") -> dict:
         """
         Standard single-pass analysis of a news article.
 
@@ -621,7 +636,7 @@ class Judge:
         self.last_raw_response = ""
         self.last_user_message = ""
         try:
-            user_message = self._build_user_message(llm_text, ep_result, external_knowledge)
+            user_message = self._build_user_message(llm_text, ep_result, external_knowledge, ris_summary)
             raw_response = self._call_api(user_message)
             result       = self._parse_response(raw_response)
 
@@ -654,6 +669,7 @@ class Judge:
         n: int = 3,
         sc_temperature: float = 0.7,
         external_knowledge: str = "",
+        ris_summary: str = "",
     ) -> dict:
         """
         Self-Consistency analysis: run N parallel reasoning paths and
@@ -688,7 +704,7 @@ class Judge:
             Aggregated verdict dict. Includes 'sc_votes' key showing the
             full vote breakdown across all N runs for transparency.
         """
-        user_message = self._build_user_message(llm_text, ep_result, external_knowledge)
+        user_message = self._build_user_message(llm_text, ep_result, external_knowledge, ris_summary)
 
         log.info(
             f"[Judge][Self-Consistency] Starting {n} parallel runs "

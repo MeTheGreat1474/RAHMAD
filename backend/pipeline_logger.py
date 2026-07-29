@@ -73,7 +73,7 @@ class PipelineLogger:
     def _w(self, line: str = "") -> None:
         self._lines.append(line)
 
-    def _section(self, number: int, title: str) -> None:
+    def _section(self, number: int | str, title: str) -> None:
         self._w()
         self._w(f"[{number}]  {title}")
         self._w(_SEP_MINOR)
@@ -204,6 +204,23 @@ class PipelineLogger:
                 self._w(f"         Date     : {art.get('date')}")
         self._w()
         self._block("CONDENSED SUMMARY (LLM)", kr_data.get("summary", ""))
+
+    def log_ris_output(self, ris_data: dict | None) -> None:
+        self._section("5B", "REVERSE IMAGE SEARCH  —  OUTPUT")
+        if not ris_data or ris_data.get("status") != "success":
+            self._w("    [X] RIS skipped or failed.")
+            if ris_data and "visual_agent_summary" in ris_data:
+                self._w(f"        {ris_data['visual_agent_summary']}")
+            return
+
+        self._kv("category", ris_data.get("category", "Unknown"))
+        matches = ris_data.get("matches", [])
+        self._kv("matches_found", f"[{len(matches)} visually identical image(s) found]")
+        for i, match in enumerate(matches, 1):
+            self._w(f"      {i}. Title  : {match.get('title', 'N/A')}")
+            self._w(f"         Source : {match.get('source', 'N/A')}")
+        self._w()
+        self._block("VISUAL AGENT SUMMARY", ris_data.get("visual_agent_summary", ""))
 
     def log_judge_input(self, system_prompt: str, user_message: str) -> None:
         self._section(6, "JUDGE (LLM)  —  INPUT")
