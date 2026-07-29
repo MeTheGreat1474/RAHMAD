@@ -215,20 +215,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 confValue < 70  ? 'conf-mid' :
                                   'conf-high'
             );
-            document.getElementById('justification-text').textContent = responseData.justification;
+            // Helper for HTML escaping and markdown bold conversion
+            const formatMarkdownText = (text) => {
+                if (!text) return '';
+                let formatted = String(text)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+                
+                // Convert **text**, __text__, [bold]text[/bold], [b]text[/b], <b>text</b> into <strong>text</strong>
+                formatted = formatted.replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>');
+                formatted = formatted.replace(/__([\s\S]*?)__/g, '<strong>$1</strong>');
+                formatted = formatted.replace(/\[bold\]([\s\S]*?)\[\/bold\]/gi, '<strong>$1</strong>');
+                formatted = formatted.replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>');
+                formatted = formatted.replace(/&lt;b&gt;([\s\S]*?)&lt;\/b&gt;/gi, '<strong>$1</strong>');
+                formatted = formatted.replace(/&lt;strong&gt;([\s\S]*?)&lt;\/strong&gt;/gi, '<strong>$1</strong>');
+                return formatted;
+            };
+
+            const justificationEl = document.getElementById('justification-text');
+            if (justificationEl) {
+                justificationEl.innerHTML = formatMarkdownText(responseData.justification);
+            }
 
             // Update key facts
             const keyFactsList = document.getElementById('key-facts-list');
             keyFactsList.innerHTML = '';
             responseData.key_facts.forEach(fact => {
                 const li = document.createElement('li');
-                // Simple parsing for bold parts if they exist (e.g., "Location:")
-                const splitIndex = fact.indexOf(':');
-                if (splitIndex !== -1) {
-                    li.innerHTML = `<strong>${fact.substring(0, splitIndex + 1)}</strong>${fact.substring(splitIndex + 1)}`;
-                } else {
-                    li.textContent = fact;
+                let formattedFact = formatMarkdownText(fact);
+                // Simple parsing for bold colon parts if they exist (e.g., "Location:") and weren't already bolded
+                if (!formattedFact.includes('<strong>')) {
+                    const splitIndex = formattedFact.indexOf(':');
+                    if (splitIndex !== -1) {
+                        formattedFact = `<strong>${formattedFact.substring(0, splitIndex + 1)}</strong>${formattedFact.substring(splitIndex + 1)}`;
+                    }
                 }
+                li.innerHTML = formattedFact;
                 keyFactsList.appendChild(li);
             });
 
@@ -294,11 +317,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (reasoningText) {
                 let rawReasoning = responseData.reasoning || '';
                 
-                // Basic HTML escaping to prevent XSS
-                let formattedReasoning = rawReasoning
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
+                // Format markdown bold first
+                let formattedReasoning = formatMarkdownText(rawReasoning);
                     
                 // Format "STEP X" or "STEP X — SOMETHING" as headers
                 // This regex finds STEP followed by a number, captures the title up to a colon or newline, and consumes the colon/spacing

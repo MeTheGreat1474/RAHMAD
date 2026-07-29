@@ -250,15 +250,16 @@ reduce your confidence, update accordingly.
 ══════════════════════════════════════════════════
 SECTION 4 — OUTPUT FORMAT
 ══════════════════════════════════════════════════
-Your output MUST be a single, valid JSON object formatted exactly as follows:
+Your output MUST be a single, valid JSON object formatted exactly as follows.
+Important: Use markdown bolding (e.g. **key finding** or **critical claim**) to emphasize important phrases, entities, dates, and core evidence across "justification", "reasoning", and "key_facts".
 
 {
-  "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences>",
+  "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences, using **bold** for key concepts>",
   "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
   "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
   "confidence": "<number>%",
-  "justification": "<2–3 sentence explanation of your final verdict, citing specific signals from the article>",
-  "key_facts": ["<observation 1>", "<observation 2>", "<observation 3>"]
+  "justification": "<2–3 sentence explanation of your final verdict, using **bold** for critical signals and key entities>",
+  "key_facts": ["<observation 1 with **key points** bolded>", "<observation 2>", "<observation 3>"]
 }
 """
 
