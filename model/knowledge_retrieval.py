@@ -25,8 +25,21 @@ from backend.domain_whitelist import is_domain_whitelisted
 
 log = logging.getLogger(__name__)
 
-_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL_ID       = "nvidia/nemotron-3-ultra-550b-a55b:free"
+USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
+
+if USE_LOCAL_LLM:
+    _API_URL = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
+    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "qwen2.5:7b")
+    _HEADERS  = {"Content-Type": "application/json"}
+else:
+    _API_URL = "https://openrouter.ai/api/v1/chat/completions"
+    _MODEL_ID = "nvidia/nemotron-3-ultra-550b-a55b:free"
+    _HEADERS  = {
+        "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY', '')}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/rah-mad", 
+        "X-Title": "RAHMAD Knowledge Retrieval"
+    }
 
 class KnowledgeRetriever:
     def __init__(self, similarity_threshold: float = 0.35, max_age_years: int = 3):
@@ -42,9 +55,9 @@ class KnowledgeRetriever:
             log.error(f"Failed to load sentence-transformers: {e}")
             self.embedder = None
             
-        # Get OpenRouter API key
+        # Check API key if not using local LLM
         self.api_key = os.environ.get("OPENROUTER_API_KEY", "")
-        if not self.api_key:
+        if not USE_LOCAL_LLM and not self.api_key:
             log.warning("OPENROUTER_API_KEY not found in environment. LLM Synthesis will fail.")
 
     def retrieve(self, claim: str) -> str:
@@ -67,7 +80,8 @@ class KnowledgeRetriever:
         result_info = {
             "claim": claim,
             "articles": [],
-            "summary": "No external supporting knowledge available."
+            "summary": "No external supporting knowledge available.",
+            "llm_used": "Local LLM" if USE_LOCAL_LLM else "OpenRouter"
         }
         
         # 1. Link Retrieval
@@ -120,7 +134,7 @@ class KnowledgeRetriever:
         print(f"  [Step 4/5] [OK] {len(snippets)} snippet(s) passed similarity check.")
             
         # 5. LLM Synthesis
-        print("  [Step 5/5] Synthesizing summary via OpenRouter LLM...")
+        print(f"  [Step 5/5] Synthesizing summary via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter LLM'}...")
         summary = self.synthesize(claim, snippets)
         result_info["summary"] = summary
         
@@ -301,7 +315,7 @@ class KnowledgeRetriever:
         Calls OpenRouter API to produce a detailed, key-facts synthesis outlining
         all critical entities, dates, rulings, and figures across all articles.
         """
-        if not self.api_key:
+        if not USE_LOCAL_LLM and not self.api_key:
             return "\n\n".join(snippets)
             
         context = "\n\n".join([f"Snippet {i+1}:\n{s}" for i, s in enumerate(snippets)])
@@ -309,8 +323,12 @@ class KnowledgeRetriever:
         system_prompt = (
             "You are an expert research analyst. Your task is to analyze verified news article snippets "
             "and construct a comprehensive, detailed factual outline that covers ALL key facts, entities "
-            "(names, roles, organizations), dates, monetary amounts, court rulings, and event timelines. "
-            "Do not give a brief overview; provide a full, structured summary of all evidence."
+            "(names, roles, organizations), dates, monetary amounts, court rulings, and event timelines.\n"
+            "CRITICAL RULES:\n"
+            "1. ONLY include facts explicitly stated in the snippets.\n"
+            "2. DO NOT infer, guess, or extrapolate dates, locations, or outcomes.\n"
+            "3. If a specific date or year is not mentioned, state 'Date not specified'.\n"
+            "4. Provide a full, structured summary of the evidence presented without adding external knowledge."
         )
         
         user_prompt = (
@@ -319,22 +337,21 @@ class KnowledgeRetriever:
             "Please provide a comprehensive key-fact outline containing:\n"
             "1. Key Entities, Names, and Roles involved\n"
             "2. Monetary Amounts, Legal Rulings, or Official Outcomes\n"
-            "3. Timeline of Events and Corroborating Evidence"
+            "3. Timeline of Events and Corroborating Evidence\n\n"
+            "Remember: DO NOT hallucinate or infer information (especially dates or years) not explicitly found in the snippets."
         )
         
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/rah-mad", 
-            "X-Title": "RAHMAD Knowledge Retrieval"
-        }
+        headers = _HEADERS
         
-        models_to_try = [
-            _MODEL_ID,
-            "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "inclusionai/ling-3.0-flash:free",
-            "poolside/laguna-m.1:free",
-        ]
+        if USE_LOCAL_LLM:
+            models_to_try = [_MODEL_ID]
+        else:
+            models_to_try = [
+                _MODEL_ID,
+                "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+                "inclusionai/ling-3.0-flash:free",
+                "poolside/laguna-m.1:free",
+            ]
 
         for model in models_to_try:
             payload = {
@@ -347,8 +364,8 @@ class KnowledgeRetriever:
                 "max_tokens": 1200
             }
             try:
-                log.info(f"Calling OpenRouter API ({model}) for Knowledge Retrieval synthesis...")
-                resp = requests.post(_OPENROUTER_URL, headers=headers, json=payload, timeout=40)
+                log.info(f"Calling {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter API'} ({model}) for Knowledge Retrieval synthesis...")
+                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=40)
                 resp.raise_for_status()
                 
                 data = resp.json()

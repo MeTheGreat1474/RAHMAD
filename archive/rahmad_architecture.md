@@ -35,7 +35,7 @@ The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and 
 2. **Domain Whitelisting:** URLs are strictly filtered against a predefined list of trusted news outlets (`backend/domain_whitelist.py`) to prevent citing unreliable sources.
 3. **Extraction & Heuristics:** Uses `trafilatura` (fallback to `BeautifulSoup`) to scrape article metadata. It filters out non-English content, excessively short articles, and outdated content (>3 years old).
 4. **Semantic Verification:** Uses `sentence-transformers/all-MiniLM-L6-v2` to embed the claim and the article chunks. Cosine similarity is calculated to drop irrelevant snippets (similarity < threshold).
-5. **LLM Synthesis:** Surviving snippets are fed into a fast OpenRouter LLM (e.g., `nemotron-3-ultra-550b-a55b` or fallbacks). The LLM is instructed to construct a comprehensive outline of key facts, entities, and timelines, avoiding vague overviews.
+5. **LLM Synthesis:** Surviving snippets are fed into a local LLM (e.g., Ollama `qwen2.5:7b` when `USE_LOCAL_LLM=true`) or a fast OpenRouter LLM (e.g., `nemotron-3-ultra-550b-a55b` as fallback). The LLM is instructed to construct a comprehensive outline of key facts, entities, and timelines, avoiding vague overviews.
 
 ---
 
@@ -49,7 +49,7 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
 2. **Visual Query:** Executes a Google Lens search via SerpAPI using the public image URL.
 3. **Visual Filter (CLIP):** Downloads thumbnail results and embeds them using `clip-vit-base-patch32`. Computes cosine similarity against the original image. Results below a visual threshold (e.g. 0.8) are discarded to ensure only identical/highly similar images are analyzed.
 4. **Semantic Filter (MiniLM):** Uses `all-MiniLM-L6-v2` to compute semantic similarity between the user's original claim and the headlines/snippets of the visually identical image matches.
-5. **Visual Agent LLM:** Passes the semantic/visual dissonance findings to an LLM. The LLM determines if the image is being used Out-Of-Context (OOC), e.g., if the original image originates from a completely different year or event.
+5. **Visual Agent LLM:** Passes the semantic/visual dissonance findings to a visual agent LLM (local Ollama or OpenRouter, depending on `USE_LOCAL_LLM`). The LLM determines if the image is being used Out-Of-Context (OOC), e.g., if the original image originates from a completely different year or event.
 
 ---
 
@@ -76,5 +76,5 @@ The Judge module is the final arbiter. It consumes the raw article text, the Ear
 **Location:** `backend/analyzer.py`, `app.py`, `frontend/script.js`
 
 - **Analyzer (`analyzer.py`):** Acts as the central nervous system. It lazily loads the heavy machine learning models, handles fallback logic (e.g., text-only processing if no image is uploaded), routes data between modules, and coordinates the Pipeline Logger.
-- **Pipeline Logger (`pipeline_logger.py`):** Captures intermediate states, LLM prompts, and tensor shapes, logging them to the terminal and saving them to `output_log.txt`.
+- **Pipeline Logger (`pipeline_logger.py`):** Captures intermediate states, LLM prompts, tensor shapes, and tracks the LLM backend utilized, logging them to the terminal and saving them to `output_log.txt`.
 - **Frontend App:** A sleek vanilla JS/CSS web app that renders the analysis dynamically, parses Markdown bolding tags into HTML `<strong>`, and beautifully presents the reasoning accordion, confidence score, and verified external news links.

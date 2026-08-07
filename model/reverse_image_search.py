@@ -25,8 +25,22 @@ load_dotenv()
 
 log = logging.getLogger(__name__)
 
-_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL_ID       = "nvidia/nemotron-3-ultra-550b-a55b:free"
+USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
+
+if USE_LOCAL_LLM:
+    _API_URL = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
+    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "qwen2.5:7b")
+    _HEADERS  = {"Content-Type": "application/json"}
+else:
+    _API_URL = "https://openrouter.ai/api/v1/chat/completions"
+    _MODEL_ID = "nvidia/nemotron-3-ultra-550b-a55b:free"
+    _HEADERS  = {
+        "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY', '')}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/rah-mad",
+        "X-Title": "RAHMAD Visual Agent"
+    }
+
 _CLIP_MODEL_ID  = "openai/clip-vit-base-patch32"
 
 class ReverseImageSearchPipeline:
@@ -43,7 +57,7 @@ class ReverseImageSearchPipeline:
         
         if not self.serpapi_key:
             log.warning("SERPAPI_API_KEY not found in environment. RIS fetching will fail.")
-        if not self.openrouter_key:
+        if not USE_LOCAL_LLM and not self.openrouter_key:
             log.warning("OPENROUTER_API_KEY not found in environment. Visual Agent will fail.")
 
     def _init_models(self):
@@ -71,7 +85,8 @@ class ReverseImageSearchPipeline:
             "status": "success",
             "visual_agent_summary": "No out-of-context imagery detected or RIS failed.",
             "category": "Unknown",
-            "matches": []
+            "matches": [],
+            "llm_used": "Local LLM" if USE_LOCAL_LLM else "OpenRouter"
         }
         
         self._init_models()
@@ -98,7 +113,7 @@ class ReverseImageSearchPipeline:
             result_info["visual_agent_summary"] = "No contextual text passed the semantic similarity threshold."
             return result_info
             
-        print("  [Step 4/4] Synthesizing context via Visual Agent LLM...")
+        print(f"  [Step 4/4] Synthesizing context via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter'} Visual Agent...")
         summary_data = self.analyze_with_visual_agent(claim_text, semantically_filtered)
         
         result_info["category"] = summary_data.get("category", "Unknown")
@@ -324,7 +339,7 @@ class ReverseImageSearchPipeline:
         """
         Calls OpenRouter LLM to categorize the context.
         """
-        if not self.openrouter_key:
+        if not USE_LOCAL_LLM and not self.openrouter_key:
             return {"category": "Unknown", "summary": "OpenRouter API key missing."}
             
         context_str = "\n".join([f"- {r.get('title')} (Source: {r.get('source')})" for r in high_fidelity_results])
@@ -344,19 +359,17 @@ class ReverseImageSearchPipeline:
             "Respond ONLY in valid JSON format: {\"category\": \"...\", \"summary\": \"...\"}"
         )
         
-        headers = {
-            "Authorization": f"Bearer {self.openrouter_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/rah-mad",
-            "X-Title": "RAHMAD Visual Agent"
-        }
+        headers = _HEADERS
         
-        models_to_try = [
-            _MODEL_ID,
-            "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "inclusionai/ling-3.0-flash:free",
-            "poolside/laguna-m.1:free",
-        ]
+        if USE_LOCAL_LLM:
+            models_to_try = [_MODEL_ID]
+        else:
+            models_to_try = [
+                _MODEL_ID,
+                "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+                "inclusionai/ling-3.0-flash:free",
+                "poolside/laguna-m.1:free",
+            ]
         
         last_err = None
         for model in models_to_try:
@@ -371,8 +384,8 @@ class ReverseImageSearchPipeline:
             }
             
             try:
-                log.info(f"Visual Agent: trying model {model}...")
-                resp = requests.post(_OPENROUTER_URL, headers=headers, json=payload, timeout=30)
+                log.info(f"Visual Agent: trying model {model} (via {'Local' if USE_LOCAL_LLM else 'OpenRouter'})...")
+                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=30)
                 resp.raise_for_status()
                 data = resp.json()
                 

@@ -60,6 +60,7 @@ class PipelineLogger:
 
     def __init__(self):
         self._lines: list[str] = []
+        self._runtimes: dict[str, float] = {}
         self._start            = datetime.now()
         ts = self._start.strftime("%Y-%m-%d  %H:%M:%S")
         self._w(_SEP_MAJOR)
@@ -143,8 +144,11 @@ class PipelineLogger:
         else:
             self._kv("image", "None  (no image provided — EP will be skipped)")
 
-    def log_preprocessing_output(self, processed: dict) -> None:
+    def log_preprocessing_output(self, processed: dict, runtime: float | None = None) -> None:
         self._section(2, "PRE-PROCESSING  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["1. Pre-processing"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
 
         # llm_text
         llm = processed["llm_text"]
@@ -177,8 +181,11 @@ class PipelineLogger:
         self._kv("image_embeds [1×512]",  self._tensor_summary(image_embeds, n_vals=8))
         self._kv("fused        [1×1024]", self._tensor_summary(fused,        n_vals=8))
 
-    def log_ep_output(self, ep_result: dict) -> None:
+    def log_ep_output(self, ep_result: dict, runtime: float | None = None) -> None:
         self._section(4, "EARLY PREDICTOR  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["2. Early Predictor"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
         prob = ep_result.get("probability", None)
         self._kv("probability",
                  f"{prob:.6f}   (0.0 = Real, 1.0 = Fake)" if prob is not None else "N/A")
@@ -186,14 +193,21 @@ class PipelineLogger:
         self._kv("confidence",     ep_result.get("confidence",     "N/A"))
         self._kv("pass_to_agents", ep_result.get("pass_to_agents", "N/A"))
 
-    def log_ep_skipped(self, reason: str = "no image provided") -> None:
+    def log_ep_skipped(self, reason: str = "no image provided", runtime: float | None = None) -> None:
         self._section(3, "CLIP ENCODER  —  SKIPPED")
         self._w(f"    Reason: {reason}")
         self._section(4, "EARLY PREDICTOR  —  SKIPPED")
         self._w(f"    Reason: {reason}")
+        if runtime is not None:
+            self._runtimes["2. Early Predictor (Skipped)"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
 
-    def log_knowledge_retrieval(self, kr_data: dict) -> None:
+    def log_knowledge_retrieval(self, kr_data: dict, runtime: float | None = None) -> None:
         self._section(5, "KNOWLEDGE RETRIEVAL  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["3. Knowledge Retrieval"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
+        self._kv("llm_backend", kr_data.get("llm_used", "Unknown"))
         self._kv("claim_queried", kr_data.get("claim", ""))
         articles = kr_data.get("articles", [])
         self._kv("articles_queried", f"[{len(articles)} article(s) survived whitelist & heuristics]")
@@ -205,14 +219,18 @@ class PipelineLogger:
         self._w()
         self._block("CONDENSED SUMMARY (LLM)", kr_data.get("summary", ""))
 
-    def log_ris_output(self, ris_data: dict | None) -> None:
+    def log_ris_output(self, ris_data: dict | None, runtime: float | None = None) -> None:
         self._section("5B", "REVERSE IMAGE SEARCH  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["4. Reverse Image Search"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
         if not ris_data or ris_data.get("status") != "success":
             self._w("    [X] RIS skipped or failed.")
             if ris_data and "visual_agent_summary" in ris_data:
                 self._w(f"        {ris_data['visual_agent_summary']}")
             return
 
+        self._kv("llm_backend", ris_data.get("llm_used", "Unknown"))
         self._kv("category", ris_data.get("category", "Unknown"))
         matches = ris_data.get("matches", [])
         self._kv("matches_found", f"[{len(matches)} visually identical image(s) found]")
@@ -228,8 +246,11 @@ class PipelineLogger:
         self._w()
         self._block("USER MESSAGE", user_message)
 
-    def log_judge_output(self, raw_response: str, parsed: dict) -> None:
+    def log_judge_output(self, raw_response: str, parsed: dict, runtime: float | None = None) -> None:
         self._section(7, "JUDGE (LLM)  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["5. Judge Module"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
         self._block("RAW API RESPONSE", raw_response)
         self._w()
         self._w(f"    --- PARSED VERDICT ---")
@@ -249,6 +270,10 @@ class PipelineLogger:
 
     def save(self) -> Path:
         elapsed = (datetime.now() - self._start).total_seconds()
+        if self._runtimes:
+            self._section("SUMMARY", "MODULE RUNTIMES BREAKDOWN")
+            for name, r_time in self._runtimes.items():
+                self._kv(name, f"{r_time:.2f}s")
         self._w()
         self._w(_SEP_MAJOR)
         self._w(f"  END OF LOG  |  total elapsed: {elapsed:.2f}s")
@@ -258,3 +283,4 @@ class PipelineLogger:
         LOG_PATH.write_text(content, encoding="utf-8")
         print(f"[pipeline_logger] Log written -> {LOG_PATH}")
         return LOG_PATH
+

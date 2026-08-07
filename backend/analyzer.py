@@ -149,6 +149,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         verdict, color_class, confidence, justification, key_facts, links,
         ep_signal  — all ready for jsonify() in app.py.
     """
+    import time
+    t_pipeline_start = time.perf_counter()
+
     from backend.pipeline_logger import PipelineLogger
     plog = PipelineLogger()
 
@@ -169,7 +172,8 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "ep_signal":  {},
         }
 
-    # ── 1. Decode image ───────────────────────────────────────────────────
+    # ── 1. Decode image & 2. Pre-process inputs ────────────────────────────
+    t_prep_start = time.perf_counter()
     image = _decode_image(image_data)
 
     # ── Log stage 1: raw input ────────────────────────────────────────────
@@ -184,19 +188,26 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             processed = preprocess_inputs(input_text, image)
             llm_text  = processed["llm_text"]
             has_clip  = True
-            plog.log_preprocessing_output(processed)
+            prep_runtime = time.perf_counter() - t_prep_start
+            plog.log_preprocessing_output(processed, runtime=prep_runtime)
+            print(f"  [Step 1 & 2] Input Pre-processing completed in {prep_runtime:.2f}s")
         except Exception as exc:
             log.warning(f"[analyzer] preprocess_inputs failed: {exc} — falling back to text-only.")
             llm_text = clean_for_llm(input_text)
             has_clip = False
-            plog.log_ep_skipped(f"preprocess_inputs failed: {exc}")
+            prep_runtime = time.perf_counter() - t_prep_start
+            plog.log_ep_skipped(f"preprocess_inputs failed: {exc}", runtime=prep_runtime)
+            print(f"  [Step 1 & 2] Input Pre-processing failed in {prep_runtime:.2f}s — falling back to text-only.")
     else:
         log.info("[analyzer] No image — cleaning text for LLM only.")
         llm_text = clean_for_llm(input_text)
         has_clip = False
-        plog.log_ep_skipped("no image provided")
+        prep_runtime = time.perf_counter() - t_prep_start
+        plog.log_ep_skipped("no image provided", runtime=prep_runtime)
+        print(f"  [Step 1 & 2] Text Pre-processing completed in {prep_runtime:.2f}s (No image provided)")
 
     # ── 3 & 4. Early Predictor ────────────────────────────────────────────
+    t_ep_start = time.perf_counter()
     ep_result = _NO_IMAGE_EP.copy()
 
     if has_clip:
@@ -207,6 +218,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
                 processed["attention_mask"],
                 processed["pixel_values"],
             )
+            ep_runtime = time.perf_counter() - t_ep_start
             log.info(
                 f"[analyzer] EP → label={ep_result['label']}  "
                 f"p={ep_result['probability']:.4f}  "
@@ -219,17 +231,24 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             print(f"  Label          : {ep_result['label']}")
             print(f"  Confidence     : {ep_result['confidence']}")
             print(f"  Pass to Agents : {ep_result['pass_to_agents']}")
+            print(f"  Runtime        : {ep_runtime:.2f}s")
             print("=" * 50 + "\n")
 
             # Log CLIP tensors and EP verdict
             plog.log_clip_output(text_embeds, image_embeds, fused)
-            plog.log_ep_output(ep_result)
+            plog.log_ep_output(ep_result, runtime=ep_runtime)
 
         except Exception as exc:
+            ep_runtime = time.perf_counter() - t_ep_start
             log.error(f"[analyzer] Early Predictor failed: {exc}", exc_info=True)
-            plog.log_ep_skipped(f"EarlyPredictor error: {exc}")
+            plog.log_ep_skipped(f"EarlyPredictor error: {exc}", runtime=ep_runtime)
+            print(f"  [Step 3 & 4] Early Predictor failed in {ep_runtime:.2f}s: {exc}")
+    else:
+        ep_runtime = time.perf_counter() - t_ep_start
+        print(f"  [Step 3 & 4] Early Predictor skipped (Runtime: {ep_runtime:.2f}s)")
 
     # ── 4.5. Knowledge Retrieval ──────────────────────────────────────────
+    t_kr_start = time.perf_counter()
     external_knowledge = ""
     kr_articles = []
     try:
@@ -238,16 +257,21 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         kr_data = retriever.retrieve_detailed(claim_query)
         external_knowledge = kr_data["summary"]
         kr_articles = kr_data.get("articles", [])
-        plog.log_knowledge_retrieval(kr_data)
+        kr_runtime = time.perf_counter() - t_kr_start
+        plog.log_knowledge_retrieval(kr_data, runtime=kr_runtime)
+        print(f"  [Step 4.5] Knowledge Retrieval completed in {kr_runtime:.2f}s ({len(kr_articles)} article(s) retrieved)")
     except Exception as exc:
+        kr_runtime = time.perf_counter() - t_kr_start
         log.error(f"[analyzer] Knowledge Retrieval failed: {exc}", exc_info=True)
         plog.log_knowledge_retrieval({
             "claim": input_text[:300],
             "articles": [],
             "summary": f"Knowledge Retrieval error: {exc}"
-        })
+        }, runtime=kr_runtime)
+        print(f"  [Step 4.5] Knowledge Retrieval failed in {kr_runtime:.2f}s: {exc}")
 
     # ── 4.6. Reverse Image Search (RIS) ───────────────────────────────────
+    t_ris_start = time.perf_counter()
     ris_summary = ""
     ris_data_for_log = None
     if has_clip and image_data and (image_data.startswith("http://") or image_data.startswith("https://") or image_data.startswith("data:")):
@@ -258,19 +282,23 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             ris_data_for_log = ris_data
             if ris_data["status"] == "success" and ris_data["visual_agent_summary"]:
                 ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nCategory: {ris_data['category']}\n{ris_data['visual_agent_summary']}"
+            ris_runtime = time.perf_counter() - t_ris_start
+            print(f"  [Step 4.6] Reverse Image Search completed in {ris_runtime:.2f}s")
         except Exception as exc:
+            ris_runtime = time.perf_counter() - t_ris_start
             log.error(f"[analyzer] Reverse Image Search failed: {exc}", exc_info=True)
             ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nRIS encountered an error: {exc}"
             ris_data_for_log = {"status": "failed", "visual_agent_summary": f"RIS encountered an error: {exc}"}
-            print(f"  [X] RIS Pipeline Error: {exc}")
+            print(f"  [X] RIS Pipeline Error in {ris_runtime:.2f}s: {exc}")
+    else:
+        ris_runtime = time.perf_counter() - t_ris_start
+        print(f"  [Step 4.6] Reverse Image Search skipped (Runtime: {ris_runtime:.2f}s)")
             
     # Log RIS output
-    plog.log_ris_output(ris_data_for_log)
-
-    # Combine KR and RIS knowledge for the Judge
-    # combined_knowledge = external_knowledge + ris_summary
+    plog.log_ris_output(ris_data_for_log, runtime=ris_runtime)
 
     # ── 5. Judge Module ───────────────────────────────────────────────────
+    t_judge_start = time.perf_counter()
     try:
         from model.judge import _SYSTEM_PROMPT   # module-level constant
 
@@ -307,9 +335,11 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
                 })
             result["links"] = formatted_links
 
+        judge_runtime = time.perf_counter() - t_judge_start
+
         # Log Judge input (prompt) and output (raw response + parsed)
         plog.log_judge_input(_SYSTEM_PROMPT, judge.last_user_message)
-        plog.log_judge_output(judge.last_raw_response, result)
+        plog.log_judge_output(judge.last_raw_response, result, runtime=judge_runtime)
 
         log.info(
             f"[analyzer] Judge → {result['verdict']} ({result['confidence']})"
@@ -320,12 +350,28 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         print(f"  Verdict     : {result['verdict']}")
         print(f"  Confidence  : {result['confidence']}")
         print(f"  Color Class : {result['color_class']}")
+        print(f"  Runtime     : {judge_runtime:.2f}s")
+        print("=" * 50 + "\n")
+
+        total_runtime = time.perf_counter() - t_pipeline_start
+        print("=" * 50)
+        print("  PIPELINE MODULE RUNTIMES SUMMARY")
+        print("=" * 50)
+        print(f"  1. Pre-processing       : {prep_runtime:.2f}s")
+        print(f"  2. Early Predictor      : {ep_runtime:.2f}s")
+        print(f"  3. Knowledge Retrieval  : {kr_runtime:.2f}s")
+        print(f"  4. Reverse Image Search : {ris_runtime:.2f}s")
+        print(f"  5. Judge Module         : {judge_runtime:.2f}s")
+        print("-" * 50)
+        print(f"  Total Pipeline Runtime  : {total_runtime:.2f}s")
         print("=" * 50 + "\n")
 
         plog.save()
         return result
 
     except Exception as exc:
+        judge_runtime = time.perf_counter() - t_judge_start
+        total_runtime = time.perf_counter() - t_pipeline_start
         log.error(f"[analyzer] Judge Module failed: {exc}", exc_info=True)
         plog.save()
         return {
@@ -337,3 +383,4 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "links":         [],
             "ep_signal":     ep_result,
         }
+

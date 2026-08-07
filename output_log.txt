@@ -1,92 +1,97 @@
 ================================================================================
-  RAHMAD PIPELINE LOG  —  2026-07-29  21:14:46
+  RAHMAD PIPELINE LOG  —  2026-08-06  16:26:06
 ================================================================================
 
 [1]  PRE-PROCESSING  —  INPUT
 ------------------------------------------------------------
     raw_text:
-      "Anwar slams critics over 2008 petrol pledge\n\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public."
+      "Left-wing political outsider wins Democratic Senate primary in Michigan\n\nLeft-wing political outsider Abdul El-Sayed is projected to win Michigan's Democratic Senate primary, a race that exposed bitter divisions within the party over its future direction.\n\nThe former public health official is on track to narrowly beat moderate Democratic congresswoman Haley Stevens, according to CBS News, the BBC's US partner.\n\n"In the words of Mohammad Ali, 'We shook up the world,'" El-Sayed said, quoting the f  … [4550 chars total]"
 
-    image.size            : 700 × 466 px
+    image.size            : 800 × 450 px
     image.mode            : RGB
 
 [2]  PRE-PROCESSING  —  OUTPUT
 ------------------------------------------------------------
+    runtime               : 7.36s
     llm_text  (cleaned full text — goes to Judge):
-      "Anwar slams critics over 2008 petrol pledge\nKUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.\nAnwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public."
+      "Left-wing political outsider wins Democratic Senate primary in Michigan\nLeft-wing political outsider Abdul El-Sayed is projected to win Michigan's Democratic Senate primary, a race that exposed bitter divisions within the party over its future direction.\nThe former public health official is on track to narrowly beat moderate Democratic congresswoman Haley Stevens, according to CBS News, the BBC's US partner.\n"In the words of Mohammad Ali, 'We shook up the world,'" El-Sayed said, quoting the fame  … [4524 chars total]"
 
     lead_text  (headline + 1st sentence — goes to CLIP):
-      "anwar slams critics over 2008 petrol pledge kuala kangsar: prime minister datuk seri anwar ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices."
+      "left-wing political outsider wins democratic senate primary in michigan left-wing political outsider abdul el-sayed is projected to win michigan's democratic senate primary, a race that exposed bitter divisions within the party over its future direction."
 
-    input_ids             : shape=[1, 77]  dtype=torch.int64  min=269  max=49407  first_12=[49406, 34261, 18907, 16946, 962, 273, 271, 271, 279, 18149, 11507, 30336, … (65 more)]
+    input_ids             : shape=[1, 77]  dtype=torch.int64  min=267  max=49407  first_12=[49406, 1823, 268, 1340, 4197, 41196, 2718, 9149, 6843, 5814, 530, 6296, … (65 more)]
     attention_mask        : shape=[1, 77]  dtype=torch.int64  min=0  max=1  first_12=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, … (65 more)]
-    pixel_values          : shape=[1, 3, 224, 224]  norm=487.7971  min=-1.7521  max=+2.1459  first_6=[+1.6238, +1.6238, +1.6384, +1.6530, +1.6676, +1.6384, … (150522 more)]
+    pixel_values          : shape=[1, 3, 224, 224]  norm=426.2271  min=-1.7923  max=+2.1459  first_6=[+0.8501, +0.9230, +1.0398, +1.1566, +1.3026, +1.3610, … (150522 more)]
 
 [3]  CLIP ENCODER  —  OUTPUT
 ------------------------------------------------------------
-    text_embeds  [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.1211  max=+0.2644  first_8=[+0.0268, +0.0238, -0.0277, -0.0086, +0.0172, -0.0315, +0.0168, +0.2149, … (504 more)]
-    image_embeds [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.5299  max=+0.1945  first_8=[-0.0084, +0.0131, +0.0259, +0.0214, +0.0687, -0.0013, +0.0145, -0.0091, … (504 more)]
-    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.5299  max=+0.2644  first_8=[+0.0268, +0.0238, -0.0277, -0.0086, +0.0172, -0.0315, +0.0168, +0.2149, … (1016 more)]
+    text_embeds  [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.1270  max=+0.2724  first_8=[+0.0509, +0.0080, +0.0009, -0.0083, +0.0008, -0.0412, +0.0348, +0.2363, … (504 more)]
+    image_embeds [1×512]  : shape=[1, 512]  norm=1.0000  min=-0.2482  max=+0.2265  first_8=[+0.0247, -0.0055, -0.0040, -0.0327, +0.0203, +0.0053, -0.0281, +0.0580, … (504 more)]
+    fused        [1×1024] : shape=[1, 1024]  norm=1.4142  min=-0.2482  max=+0.2724  first_8=[+0.0509, +0.0080, +0.0009, -0.0083, +0.0008, -0.0412, +0.0348, +0.2363, … (1016 more)]
 
 [4]  EARLY PREDICTOR  —  OUTPUT
 ------------------------------------------------------------
-    probability           : 0.495453   (0.0 = Real, 1.0 = Fake)
+    runtime               : 2.37s
+    probability           : 0.466742   (0.0 = Real, 1.0 = Fake)
     label                 : UNCERTAIN
-    confidence            : 49.5%
+    confidence            : 46.7%
     pass_to_agents        : True
 
 [5]  KNOWLEDGE RETRIEVAL  —  OUTPUT
 ------------------------------------------------------------
-    claim_queried         : anwar slams critics over 2008 petrol pledge kuala kangsar: prime minister datuk seri anwar ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.
-    articles_queried      : [2 article(s) survived whitelist & heuristics]
-      1. Headline : Anwar slams critics over 2008 petrol pledge | The Star
-         Source   : https://www.thestar.com.my/news/nation/2026/04/04/anwar-slams-critics-over-2008-petrol-pledge
-      2. Headline : Anwar slams critics for bringing up past pledge to reduce fuel price | Free Malaysia Today
-         Source   : https://www.freemalaysiatoday.com/videos/qLwZLKoM9FE
+    runtime               : 52.47s
+    llm_backend           : Local LLM
+    claim_queried         : left-wing political outsider wins democratic senate primary in michigan left-wing political outsider abdul el-sayed is projected to win michigan's democratic senate primary, a race that exposed bitter divisions within the party over its future direction.
+    articles_queried      : [3 article(s) survived whitelist & heuristics]
+      1. Headline : Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan
+         Source   : https://www.bbc.com/news/articles/ckgdkpz07kvo
+      2. Headline : Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian
+         Source   : https://www.theguardian.com/us-news/2026/aug/05/michigan-senate-primary-results-abdul-el-sayed
+      3. Headline : Abdul El-Sayed wins Michigan Senate primary | AP News
+         Source   : https://apnews.com/article/michigan-primary-senate-elsayed-stevens-60c79349b60ffbf24a34d60b76e130ed
 
     --- CONDENSED SUMMARY (LLM) ---
-      ### Comprehensive Key-Fact Outline: Anwar Slams Critics Over 2008 Petrol Pledge
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] Left-wing political outsider Abdul El-Sayed is projected to win Michigan's Democratic Senate primary, a race that exposed bitter divisions within the party over its future direction.
       
-      **Source Material:** Verified Article Snippets (The Star, Free Malaysia Today)
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] In presidential elections Michigan is one of the crucial swing states. It voted for Democrat Joe Biden in 2020 but went for Trump in 2024.
       
-      ---
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] Left-wing outsider Abdul El-Sayed is narrowly ahead of establishment-backed congresswoman Haley Stevens.
       
-      #### 1. Key Entities, Names, and Roles
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] Abdul El-Sayed won the Democratic primary for US Senate in Michigan, becoming the latest leftwing candidate to capture the party’s nomination ahead of November’s midterm elections.
       
-      | Entity | Role / Title | Context / Actions Described in Snippets |
-      | :--- | :--- | :--- |
-      | **Datuk Seri Anwar Ibrahim** | **Prime Minister** (Current role at time of statement) | *   **Primary Actor:** Criticised critics mocking his 2008 pledge.<br>*   **Historical Role (2008):** Opposition Leader / Figure (implied by "Opposition at the time").<br>*   **Defense:** Stated his 2008 remarks were taken out of context to stir sentiments and mislead the public. |
-      | **Critics / Detractors** | Unspecified individuals/groups | *   **Action:** Mocked Anwar’s 2008 pledge to lower petrol prices.<br>*   **Accusation (by Anwar):** Took 2008 remarks out of context to stir up sentiments and mislead the public. |
-      | **The Opposition (2008)** | Political Bloc | *   **Context:** Anwar pledged to reduce petrol prices *if* the Opposition won the 2008 general election. |
-      | **The Star** | News Outlet | *   **Publisher:** Source of Snippets 1, 2, and 3. Headline: "Anwar slams critics over 2008 petrol pledge". |
-      | **Free Malaysia Today (FMT)** | News Outlet | *   **Publisher:** Source of Snippet 4. Headline: "Anwar slams critics for bringing up past pledge to reduce fuel price". |
-      | **Location: Kuala Kangsar** | Town / Parliamentary Constituency (Perak) | *   **Venue:** Dateline location for The Star report (Snippet 1), indicating where Anwar made the remarks. |
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] Donald Trump won Michigan in 2016 and 2024, though Joe Biden won it in 2020. Both the state’s current senators are Democrats and retaining the seat remains critical to Democrats’ hopes of winning back the US Senate this year, and a crucial part of the map for the 2028 presidential election.
       
-      ---
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] El-Sayed succeeded by a relatively close margin, in a sign that battleground state voters are still grappling over the direction of the Democratic party.
       
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] Abdul El-Sayed has won Michigan’s Democratic nomination for U.S. Senate, narrowly defeating U.S. Rep. Haley Stevens in a victory for the party’s progressive wing in a battleground state. He will face Republican Mike Rogers in November. (AP video: Mike Householder)
       
-      *   **Monetary Amounts:** **None specified.** Snippets reference a "pledge to lower petrol prices" and "reduce petrol prices" but cite **no specific price points, subsidy amounts, ringgit values, or percentage reductions**.
-      *   **Legal Rulings:** **None mentioned.** No court cases, judicial reviews, or legal proceedings are referenced in the provided text.
-      *   **Official Outcomes:**
-          *   **2008 General Election Result:** Implied **Loss** for the Opposition. Snippet 2 states the pledge was conditional ("*if* the Opposition... won"), and the context of "critics mocking the pledge" implies the condition was not met (Barisan Nasional retained federal power in 2008).
-          *   **Current Status (Time of Statement):** Anwar is **Prime Minister**; the 2008 pledge remains unfulfilled from that specific electoral cycle, prompting current criticism and his defense.
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] DETROIT (AP) — Abdul El-Sayed, a former public health official who harnessed Democratic frustration with the party establishment, narrowly defeated Rep. Haley Stevens in Michigan’s U.S. Senate primary, setting up a crucial test for progressives in a key battleground state.
       
-      ---
-      
-      #### 3. Timeline of Events and Corroborating Evidence
-      
-      | Date / Period | Event / Action | Source Snippet(s) | Corroborating Details / Evidence |
-      | :--- | :--- | :--- | :--- |
-      | **2008 (Pre-General Election)** | **Anwar makes Petrol Price Pledge.** | Snippet 2 | *   **Conditionality:** Pledged to reduce petrol prices **conditional** on the Opposition winning the 2008 General Election.<br>*   **Role:** Anwar was part of/leading the Opposition at the time. |
-      | **March 8, 2008** | **12th Malaysian General Election (GE12).** | *Inferred Context from Snippet 2* | *   **Outcome:** Opposition (Pakatan Rakyat) made historic gains (won 5 states, denied BN 2/3 majority) but **did not win federal power**. Condition for pledge unmet. |
-      | **2008 – July 2026 (Approx. 18 Years)** | **Criticism / Mockery of Pledge Persists.** | Snippets 1, 3, 4 | *   Critics repeatedly brought up the 2008 pledge to mock Anwar.<br>*   Anwar alleges these references are **"taken out of context"** (Snippet 3).<br>*   Anwar alleges intent is to **"stir up sentiments and mislead the public"** (Snippet 3). |
-      | **July 22, 2026** | **Anwar Responds / Slams Critics (Public Event).** | Snippets 1, 3, 4 | *   **Location:** **Kuala Kangsar** (Snippet 1).<br>*   **Capacity:** **Prime Minister Datuk Seri Anwar Ibrahim** (Snippet 1).
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] El-Sayed, 41, has never held elected office and entered the race seven years after losing Michigan’s Democratic gubernatorial primary by more than 20 percentage points. This time, running on an unapologetically progressive agenda, he overcame more than $60 million in outside spending and an opponent backed by many of Michigan’s top Democrats, including Gov. Gretchen Whitmer and outgoing Sen. Gary Peters, and Senate Democratic Leader Chuck Schumer.
 
 [5B]  REVERSE IMAGE SEARCH  —  OUTPUT
 ------------------------------------------------------------
-    [X] RIS skipped or failed.
-        No reverse image search results found.
+    runtime               : 32.25s
+    llm_backend           : Local LLM
+    category              : Identical Image, Different Context
+    matches_found         : [7 visually identical image(s) found]
+      1. Title  : Left-wing political outsider Abdul El-Sayed wins Democratic ...
+         Source : BBC
+      2. Title  : Left-wing political outsider Abdul El-Sayed wins Democratic ...
+         Source : BBC
+      3. Title  : After several strong recent polls, El-Sayed goes into the ...
+         Source : Facebook
+      4. Title  : Final U.S. Senate debate sees Stevens, El-Sayed attacking ...
+         Source : Detroit Free Press
+      5. Title  : Anti-Israel progressive Abdul El-Sayed projected to win ...
+         Source : Ynet News
+      6. Title  : The Morning: A nail-biter in Michigan
+         Source : ny times
+      7. Title  : See Haley Stevens and Abdul El-Sayed in high-stakes US ...
+         Source : USA Today
+
+    --- VISUAL AGENT SUMMARY ---
+      The images found online are all related to the same event - Abdul El-Sayed winning the Democratic Senate primary in Michigan. However, they were used in different contexts and sources, which could lead to a misleading impression that the image is only associated with this specific event without considering its broader context.
 
 [6]  JUDGE (LLM)  —  INPUT
 ------------------------------------------------------------
@@ -185,6 +190,7 @@
       ══════════════════════════════════════════════════
       Your output MUST be a single, valid JSON object formatted exactly as follows.
       Important: Use markdown bolding (e.g. **key finding** or **critical claim**) to emphasize important phrases, entities, dates, and core evidence across "justification", "reasoning", and "key_facts".
+      Important: When referring to the Early Predictor or Reverse Image Search, always use their full names in your output instead of shortforms like EP or RIS.
       
       {
         "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences, using **bold** for key concepts>",
@@ -197,93 +203,108 @@
 
     --- USER MESSAGE ---
       === KNOWLEDGE RETRIEVAL EVIDENCE ===
-      ### Comprehensive Key-Fact Outline: Anwar Slams Critics Over 2008 Petrol Pledge
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] Left-wing political outsider Abdul El-Sayed is projected to win Michigan's Democratic Senate primary, a race that exposed bitter divisions within the party over its future direction.
       
-      **Source Material:** Verified Article Snippets (The Star, Free Malaysia Today)
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] In presidential elections Michigan is one of the crucial swing states. It voted for Democrat Joe Biden in 2020 but went for Trump in 2024.
       
-      ---
+      [Left-wing political outsider Abdul El-Sayed wins Democratic Senate primary in Michigan] Left-wing outsider Abdul El-Sayed is narrowly ahead of establishment-backed congresswoman Haley Stevens.
       
-      #### 1. Key Entities, Names, and Roles
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] Abdul El-Sayed won the Democratic primary for US Senate in Michigan, becoming the latest leftwing candidate to capture the party’s nomination ahead of November’s midterm elections.
       
-      | Entity | Role / Title | Context / Actions Described in Snippets |
-      | :--- | :--- | :--- |
-      | **Datuk Seri Anwar Ibrahim** | **Prime Minister** (Current role at time of statement) | *   **Primary Actor:** Criticised critics mocking his 2008 pledge.<br>*   **Historical Role (2008):** Opposition Leader / Figure (implied by "Opposition at the time").<br>*   **Defense:** Stated his 2008 remarks were taken out of context to stir sentiments and mislead the public. |
-      | **Critics / Detractors** | Unspecified individuals/groups | *   **Action:** Mocked Anwar’s 2008 pledge to lower petrol prices.<br>*   **Accusation (by Anwar):** Took 2008 remarks out of context to stir up sentiments and mislead the public. |
-      | **The Opposition (2008)** | Political Bloc | *   **Context:** Anwar pledged to reduce petrol prices *if* the Opposition won the 2008 general election. |
-      | **The Star** | News Outlet | *   **Publisher:** Source of Snippets 1, 2, and 3. Headline: "Anwar slams critics over 2008 petrol pledge". |
-      | **Free Malaysia Today (FMT)** | News Outlet | *   **Publisher:** Source of Snippet 4. Headline: "Anwar slams critics for bringing up past pledge to reduce fuel price". |
-      | **Location: Kuala Kangsar** | Town / Parliamentary Constituency (Perak) | *   **Venue:** Dateline location for The Star report (Snippet 1), indicating where Anwar made the remarks. |
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] Donald Trump won Michigan in 2016 and 2024, though Joe Biden won it in 2020. Both the state’s current senators are Democrats and retaining the seat remains critical to Democrats’ hopes of winning back the US Senate this year, and a crucial part of the map for the 2028 presidential election.
       
-      ---
+      [Abdul El-Sayed wins Michigan Senate primary in defining race for Democrats | Michigan | The Guardian] El-Sayed succeeded by a relatively close margin, in a sign that battleground state voters are still grappling over the direction of the Democratic party.
       
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] Abdul El-Sayed has won Michigan’s Democratic nomination for U.S. Senate, narrowly defeating U.S. Rep. Haley Stevens in a victory for the party’s progressive wing in a battleground state. He will face Republican Mike Rogers in November. (AP video: Mike Householder)
       
-      *   **Monetary Amounts:** **None specified.** Snippets reference a "pledge to lower petrol prices" and "reduce petrol prices" but cite **no specific price points, subsidy amounts, ringgit values, or percentage reductions**.
-      *   **Legal Rulings:** **None mentioned.** No court cases, judicial reviews, or legal proceedings are referenced in the provided text.
-      *   **Official Outcomes:**
-          *   **2008 General Election Result:** Implied **Loss** for the Opposition. Snippet 2 states the pledge was conditional ("*if* the Opposition... won"), and the context of "critics mocking the pledge" implies the condition was not met (Barisan Nasional retained federal power in 2008).
-          *   **Current Status (Time of Statement):** Anwar is **Prime Minister**; the 2008 pledge remains unfulfilled from that specific electoral cycle, prompting current criticism and his defense.
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] DETROIT (AP) — Abdul El-Sayed, a former public health official who harnessed Democratic frustration with the party establishment, narrowly defeated Rep. Haley Stevens in Michigan’s U.S. Senate primary, setting up a crucial test for progressives in a key battleground state.
       
-      ---
-      
-      #### 3. Timeline of Events and Corroborating Evidence
-      
-      | Date / Period | Event / Action | Source Snippet(s) | Corroborating Details / Evidence |
-      | :--- | :--- | :--- | :--- |
-      | **2008 (Pre-General Election)** | **Anwar makes Petrol Price Pledge.** | Snippet 2 | *   **Conditionality:** Pledged to reduce petrol prices **conditional** on the Opposition winning the 2008 General Election.<br>*   **Role:** Anwar was part of/leading the Opposition at the time. |
-      | **March 8, 2008** | **12th Malaysian General Election (GE12).** | *Inferred Context from Snippet 2* | *   **Outcome:** Opposition (Pakatan Rakyat) made historic gains (won 5 states, denied BN 2/3 majority) but **did not win federal power**. Condition for pledge unmet. |
-      | **2008 – July 2026 (Approx. 18 Years)** | **Criticism / Mockery of Pledge Persists.** | Snippets 1, 3, 4 | *   Critics repeatedly brought up the 2008 pledge to mock Anwar.<br>*   Anwar alleges these references are **"taken out of context"** (Snippet 3).<br>*   Anwar alleges intent is to **"stir up sentiments and mislead the public"** (Snippet 3). |
-      | **July 22, 2026** | **Anwar Responds / Slams Critics (Public Event).** | Snippets 1, 3, 4 | *   **Location:** **Kuala Kangsar** (Snippet 1).<br>*   **Capacity:** **Prime Minister Datuk Seri Anwar Ibrahim** (Snippet 1).
+      [Abdul El-Sayed wins Michigan Senate primary | AP News] El-Sayed, 41, has never held elected office and entered the race seven years after losing Michigan’s Democratic gubernatorial primary by more than 20 percentage points. This time, running on an unapologetically progressive agenda, he overcame more than $60 million in outside spending and an opponent backed by many of Michigan’s top Democrats, including Gov. Gretchen Whitmer and outgoing Sen. Gary Peters, and Senate Democratic Leader Chuck Schumer.
       
       Note: This is verified external ground-truth evidence retrieved from reputable whitelisted news outlets via semantic similarity filtering.
       
       === REVERSE IMAGE SEARCH EVIDENCE ===
-      No Reverse Image Search data provided.
+      --- REVERSE IMAGE SEARCH FINDINGS ---
+      Category: Identical Image, Different Context
+      The images found online are all related to the same event - Abdul El-Sayed winning the Democratic Senate primary in Michigan. However, they were used in different contexts and sources, which could lead to a misleading impression that the image is only associated with this specific event without considering its broader context.
       
       === EARLY PREDICTOR SIGNAL ===
       Label       : UNCERTAIN
-      Probability : 0.4955  (0.0 = Real, 1.0 = Fake)
-      Confidence  : 49.5%
+      Probability : 0.4667  (0.0 = Real, 1.0 = Fake)
+      Confidence  : 46.7%
       
       Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it as evidence, not as a definitive answer. You must run your own full reasoning protocol before reaching a verdict.
       
       === ARTICLE TEXT ===
-      Anwar slams critics over 2008 petrol pledge
-      KUALA KANGSAR: Prime Minister Datuk Seri Anwar Ibrahim has criticised those who mocked his 2008 pledge to lower petrol prices.
-      Anwar said his remarks from that period have been taken out of context to stir up sentiments and mislead the public.
+      Left-wing political outsider wins Democratic Senate primary in Michigan
+      Left-wing political outsider Abdul El-Sayed is projected to win Michigan's Democratic Senate primary, a race that exposed bitter divisions within the party over its future direction.
+      The former public health official is on track to narrowly beat moderate Democratic congresswoman Haley Stevens, according to CBS News, the BBC's US partner.
+      "In the words of Mohammad Ali, 'We shook up the world,'" El-Sayed said, quoting the famed boxer's declaration after his underdog defeat of Sonny Liston in 1964.
+      He will face Republican and Trump ally Mike Rogers, in November's midterm elections. If elected, El-Sayed would become the first Muslim to serve in the US senate.
+      The final result was much closer than El-Sayed's camp had expected, with fewer than 15,000 votes - a margin of just under 1 percentage point out of more than 1.5 million ballots counted - separating him from Stevens as of late Wednesday morning.
+      "The movement to get money out of politics, put money in your pocket, and pass Medicare for All is a big movement," El-Sayed said on Wednesday, echoing a familiar refrain he had used on the campaign trail.
+      "I want to congratulate Abdul El-Sayed on winning the Democratic nomination for US Senate," Stevens said in a statement. "He is a doctor, a community health official, a Rhodes Scholar, and a dedicated Michigander. I am proud to offer my support as he takes on Mike Rogers in the general election."
+      The November midterm elections will determine the balance of power in Washington for the last two years of President Donald Trump's time in office.
+      Trump declared the Michigan Senate result "Great news for the Republican Party".
+      In his post on Truth Social, Trump referred to the Democratic Party as the "Dumocrats", and claimed their "crazy policies will only get worse!"
+      After a bruising and sometimes bitter campaign, El-Sayed hinted at bridge-building when he addressed supporters on Tuesday night, before the outcome was known.
+      "Whatever happens tonight, we have a responsibility to ensure that we unite, unite to make sure that [Republican] Mike Rogers never sees the inside of the US Senate."
+      El-Sayed, who was endorsed by left-wing politicians including Vermont Senator Bernie Sanders and New York City congresswoman Alexandria Ocasio-Cortez, has voiced support for progressive causes like universal healthcare and abolishing US Immigration and Customs Enforcement.
+      Stevens, 43, took a more moderate approach, pitching herself as the middle-of-the-road candidate who would appeal to voters unsure of which party to back in November. She made a promise to save manufacturing jobs in Michigan, should she be elected.
+      Stevens earned the endorsement of Michigan Governor Gretchen Whitmer, as well as outgoing Senator Gary Peters.
+      One of the biggest areas where the candidates disagreed was their stance on Israel.
+      El-Sayed spoke out against US involvement in the Middle East, including aid to Israel. Stevens, meanwhile, is staunchly pro-Israel and has said she supports upholding US aid to Israel without conditions.
+      El-Sayed's candidacy drew both support and opposition from Michigan's Jewish community due to his stance on the US-Israel relationship.
+      He has rejected allegations of anti-Semitism, which Trump renewed in his Truth Social post on Wednesday.
+      "I stand in solidarity with my Jewish sisters and brothers," El-Sayed said on Wednesday. "We can condemn anti-Semitism and at the same time, we can be talking about how we bring people together, and we can be talking about everybody's pain."
+      The Senate seat is currently held by a retiring Democrat. The last time the Midwestern state elected a Republican senator was in 1994.
+      In presidential elections Michigan is one of the crucial swing states. It voted for Democrat Joe Biden in 2020 but went for Trump in 2024.
+      A handful of other US states too held their primaries for statewide and national offices on Tuesday night, setting up partisan battles in November.
+      In Kansas, Democratic State Senator Cindy Holsher and Trump-backed Republican legislator Ty Masterson advanced in the governor's race.
+      In Ohio, Congressman Wesley Bell defeated former Congresswoman Cory Bush in a Democratic primary defined by the candidates' diverging stances on the US-Israel relationship.
+      Missouri voters also rejected a Republican-backed amendment that would have made it significantly harder to change the state's constitution, by raising the bar for passing citizen-led ballot initiatives.
       
       Now work through your 7-step reasoning protocol and return your verdict as a JSON object.
 
 [7]  JUDGE (LLM)  —  OUTPUT
 ------------------------------------------------------------
+    runtime               : 87.27s
     --- RAW API RESPONSE ---
       {
-        "reasoning": "STEP 1: Domain is Malaysian politics; legitimate articles feature named officials, specific locations, and contextualized political history. STEP 2: Four core claims extracted — Anwar criticized critics (VERIFIABLE), 2008 remarks taken out of context (VERIFIABLE), critics aim to stir sentiments (VERIFIABLE as allegation), event in Kuala Kangsar (VERIFIABLE). STEP 3: Headline matches body perfectly; no internal contradictions, statistics, or quote mismatches. STEP 4: Neutral journalistic style; no sensationalism, urgency cues, or loaded language. STEP 5: Content attributes statements to **Prime Minister Datuk Seri Anwar Ibrahim** (traceable); no outlet impersonation detected. STEP 6: **Knowledge Retrieval shows strong corroboration** — The Star and FMT snippets match headline, dateline, quotes, and context exactly; EP signal is UNCERTAIN (49.5%) which is neutral for brief text; no RIS data. STEP 7: Counter-argument (brevity = potential fabrication) fails because external knowledge confirms this exact lead appears in **verified whitelisted outlets**.",
+        "reasoning": "STEP 1: This is a political news article covering a US Senate primary in Michigan — a domain where legitimate reporting typically includes candidate names, vote margins, endorsements, policy positions, direct quotes, and historical context. STEP 2: All 13 core claims extracted are **VERIFIABLE** (election results, vote margins, candidate backgrounds, endorsements, policy stances, Trump's Truth Social post, other state primaries). No vague or unfalsifiable claims detected. STEP 3: **Internal consistency** is strong — headline matches body, quotes are attributed to named individuals, vote math is coherent (<15k votes ≈ 1% of 1.5M ballots), timeline (Tuesday election, Wednesday results) is logical, no self-contradictions. STEP 4: **Framing and style** are journalistic and neutral — no sensationalist language, emotional appeals, or propaganda patterns; both candidates' positions presented fairly; Trump's inflammatory rhetoric reported without amplification. STEP 5: **Source attribution** is transparent — CBS News (via BBC partnership), direct quotes from El-Sayed, Stevens, Trump; specific politicians and institutions named; no signs of impersonation. STEP 6: **Multimodal integration**: Knowledge Retrieval provides **strong corroboration** from AP News and The Guardian confirming every major claim (El-Sayed win, narrow margin vs Stevens, Mike Rogers opponent, endorsements, Trump's Michigan wins, El-Sayed background, $60M+ outside spending). Reverse Image Search shows 'Identical Image, Different Context' — normal for wire-service photos used across outlets, no evidence of visual misuse. Early Predictor signals UNCERTAIN (46.7% fake probability, low 46.7% confidence) — a weak signal outweighed by overwhelming textual and external evidence. STEP 7: **Self-critique** — the only counter-signal is the Early Predictor's uncertainty, but its low confidence and the convergence of style, structure, sourcing, internal consistency, and **multiple authoritative external sources** all pointing to legitimacy make a CREDIBLE verdict robust.",
         "verdict": "CREDIBLE",
         "color_class": "credible",
-        "confidence": "90%",
-        "justification": "The article text **exactly matches verified reporting** from The Star and Free Malaysia Today across headline, dateline (**Kuala Kangsar**), attributed statements, and political context. No misinformation signals — style, framing, sourcing, and internal consistency are all consistent with legitimate journalism. **Knowledge Retrieval provides direct corroboration** for every factual claim.",
+        "confidence": "95%",
+        "justification": "The article exhibits **no misinformation patterns** across all dimensions: its **journalistic style**, **transparent sourcing**, **internal consistency**, and **headline-body alignment** are all consistent with legitimate political reporting. **Knowledge Retrieval evidence from AP News and The Guardian independently corroborates every major factual claim**, including the election outcome, vote margin, candidate backgrounds, endorsements, and historical context. The Reverse Image Search finding reflects standard news-photo syndication, not manipulation. The Early Predictor's low-confidence UNCERTAIN signal is outweighed by the convergence of **five independent credibility indicators**.",
         "key_facts": [
-          "Article headline and lead paragraph **match verified snippets** from The Star and FMT word-for-word",
-          "**Datuk Seri Anwar Ibrahim** identified as Prime Minister criticizing critics of his **conditional 2008 petrol pledge**",
-          "**Kuala Kangsar** dateline confirmed as venue of remarks per external knowledge",
-          "Zero sensationalist language, urgency cues, or framing anomalies detected",
-          "Early Predictor signal **UNCERTAIN (49.5%)** — neutral for short text, does not contradict credibility"
+          "**All 13 core claims are verifiable and externally corroborated** by AP News and The Guardian (El-Sayed win, narrow margin, Mike Rogers opponent, endorsements, Trump's Michigan record, candidate backgrounds).",
+          "**Internal consistency audit reveals zero contradictions** — vote math, timeline, quote attributions, and framing all align.",
+          "**Source transparency is high** — CBS News, direct candidate quotes, named politicians and institutions; no impersonation signals.",
+          "**Reverse Image Search shows standard wire-photo reuse** ('Identical Image, Different Context'), not out-of-context manipulation.",
+          "**Early Predictor UNCERTAIN (46.7% confidence) is a weak signal** contradicted by strong multimodal evidence convergence."
         ]
       }
 
     --- PARSED VERDICT ---
     verdict               : CREDIBLE
     color_class           : credible
-    confidence            : 90%
-    justification         : The article text **exactly matches verified reporting** from The Star and Free Malaysia Today across headline, dateline (**Kuala Kangsar**), attributed statements, and political context. No misinformation signals — style, framing, sourcing, and internal consistency are all consistent with legitimate…
+    confidence            : 95%
+    justification         : The article exhibits **no misinformation patterns** across all dimensions: its **journalistic style**, **transparent sourcing**, **internal consistency**, and **headline-body alignment** are all consistent with legitimate political reporting. **Knowledge Retrieval evidence from AP News and The Guard…
     key_facts             : [5 item(s)]
-      1. Article headline and lead paragraph **match verified snippets** from The Star and FMT word-for-word
-      2. **Datuk Seri Anwar Ibrahim** identified as Prime Minister criticizing critics of his **conditional 2008 petrol pledge**
-      3. **Kuala Kangsar** dateline confirmed as venue of remarks per external knowledge
-      4. Zero sensationalist language, urgency cues, or framing anomalies detected
-      5. Early Predictor signal **UNCERTAIN (49.5%)** — neutral for short text, does not contradict credibility
+      1. **All 13 core claims are verifiable and externally corroborated** by AP News and The Guardian (El-Sayed win, narrow margin, Mike Rogers opponent, endorsements, Trump's Michigan record, candidate backgrounds).
+      2. **Internal consistency audit reveals zero contradictions** — vote math, timeline, quote attributions, and framing all align.
+      3. **Source transparency is high** — CBS News, direct candidate quotes, named politicians and institutions; no impersonation signals.
+      4. **Reverse Image Search shows standard wire-photo reuse** ('Identical Image, Different Context'), not out-of-context manipulation.
+      5. **Early Predictor UNCERTAIN (46.7% confidence) is a weak signal** contradicted by strong multimodal evidence convergence.
+
+[SUMMARY]  MODULE RUNTIMES BREAKDOWN
+------------------------------------------------------------
+    1. Pre-processing     : 7.36s
+    2. Early Predictor    : 2.37s
+    3. Knowledge Retrieval: 52.47s
+    4. Reverse Image Search: 32.25s
+    5. Judge Module       : 87.27s
 
 ================================================================================
-  END OF LOG  |  total elapsed: 87.00s
+  END OF LOG  |  total elapsed: 181.72s
 ================================================================================

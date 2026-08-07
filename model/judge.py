@@ -252,6 +252,7 @@ SECTION 4 — OUTPUT FORMAT
 ══════════════════════════════════════════════════
 Your output MUST be a single, valid JSON object formatted exactly as follows.
 Important: Use markdown bolding (e.g. **key finding** or **critical claim**) to emphasize important phrases, entities, dates, and core evidence across "justification", "reasoning", and "key_facts".
+Important: When referring to the Early Predictor or Reverse Image Search, always use their full names in your output instead of shortforms like EP or RIS.
 
 {
   "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences, using **bold** for key concepts>",
