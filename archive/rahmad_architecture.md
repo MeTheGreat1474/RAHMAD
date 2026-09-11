@@ -53,7 +53,24 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
 
 ---
 
-### 4. Judge Module (Reasoning Layer)
+### 4. Multi-Agent Debate (MAD) Module
+**Location:** `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`
+
+The MAD module is activated when the Early Predictor is uncertain. It instantiates a structured, parliamentary-style debate focusing strictly on the factual veracity and authenticity of the news claim.
+
+**Architecture & Flow:**
+1. **Context Summarization:** The orchestrator synthesizes the raw article and external knowledge into a focused factual summary.
+2. **Profile Generation:** Based on the context, the LLM generates specific expert profiles (e.g., Investigative Journalist, Forensic Data Analyst) to ensure diverse perspectives.
+3. **Structured Debate:** A 3-vs-3 debate takes place (Real News vs. Fake News). 
+   - **First Speakers:** Introduce the case and present core arguments and evidence.
+   - **Second Speakers:** Rebute the previous speaker's points and expand on their own team's case.
+   - **Third Speakers:** Provide final rebuttals and synthesize the team's overarching arguments without introducing new claims.
+4. **Shared Memory:** A `SharedMemoryBank` tracks the arguments round-by-round, ensuring agents have access to the complete history to form cohesive rebuttals.
+5. **Discourse Synthesis:** The orchestrator analyzes the completed debate and generates a consolidated discourse synthesis highlighting the strongest arguments regarding the article's veracity.
+
+---
+
+### 5. Judge Module (Reasoning Layer)
 **Location:** `model/judge.py`
 
 The Judge module is the final arbiter. It consumes the raw article text, the Early Predictor signal, the synthesized Knowledge Retrieval facts, and the Reverse Image Search forensic analysis.
@@ -72,7 +89,7 @@ The Judge module is the final arbiter. It consumes the raw article text, the Ear
 
 ---
 
-### 5. Backend Orchestrator & Frontend
+### 6. Backend Orchestrator & Frontend
 **Location:** `backend/analyzer.py`, `app.py`, `frontend/script.js`
 
 - **Analyzer (`analyzer.py`):** Acts as the central nervous system. It lazily loads the heavy machine learning models, handles fallback logic (e.g., text-only processing if no image is uploaded), routes data between modules, and coordinates the Pipeline Logger.

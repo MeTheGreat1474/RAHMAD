@@ -39,10 +39,11 @@ if TYPE_CHECKING:
     from PIL import Image as PILImage
 
 # ---------------------------------------------------------------------------
-# Log file location — project root (next to app.py)
+# Log file location — output folder in project root
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LOG_PATH      = _PROJECT_ROOT / "output_log.txt"
+_OUTPUT_DIR   = _PROJECT_ROOT / "output"
+LOG_PATH      = _OUTPUT_DIR / "output_log.txt"
 
 _SEP_MAJOR = "=" * 80
 _SEP_MINOR = "-" * 60
@@ -55,8 +56,9 @@ _SEP_MINOR = "-" * 60
 class PipelineLogger:
     """
     Accumulates structured log lines for one analysis run, then flushes the
-    full log to output_log.txt.  Create a new instance per request.
+    full log to output/output_log.txt. Create a new instance per request.
     """
+
 
     def __init__(self):
         self._lines: list[str] = []
@@ -224,6 +226,9 @@ class PipelineLogger:
         if runtime is not None:
             self._runtimes["4. Reverse Image Search"] = runtime
             self._kv("runtime", f"{runtime:.2f}s")
+        if ris_data and "search_url" in ris_data:
+            self._kv("search_url", ris_data["search_url"])
+            
         if not ris_data or ris_data.get("status") != "success":
             self._w("    [X] RIS skipped or failed.")
             if ris_data and "visual_agent_summary" in ris_data:
@@ -239,6 +244,25 @@ class PipelineLogger:
             self._w(f"         Source : {match.get('source', 'N/A')}")
         self._w()
         self._block("VISUAL AGENT SUMMARY", ris_data.get("visual_agent_summary", ""))
+
+    def log_mad_output(self, mad_summary: str, agents_info: list[dict], runtime: float | None = None) -> None:
+        self._section("5C", "MULTI-AGENT DEBATE (MAD)  —  OUTPUT")
+        if runtime is not None:
+            self._runtimes["4.5. Multi-Agent Debate"] = runtime
+            self._kv("runtime", f"{runtime:.2f}s")
+            
+        if not mad_summary or mad_summary.startswith("MAD encountered an error") or mad_summary.startswith("No Multi-Agent Debate"):
+            self._w("    [X] MAD skipped or failed.")
+            self._w(f"        {mad_summary}")
+            return
+            
+        self._kv("agents_participating", f"[{len(agents_info)} Agents]")
+        for i, agent in enumerate(agents_info, 1):
+            self._w(f"      {i}. {agent['name']} ({agent['side']}) - {agent['profile']}")
+        self._w()
+        self._kv("full_arguments_log", "output/MAD_output.txt")
+        self._w()
+        self._block("CONSOLIDATED DEBATE SUMMARY", mad_summary)
 
     def log_judge_input(self, system_prompt: str, user_message: str) -> None:
         self._section(6, "JUDGE (LLM)  —  INPUT")
@@ -280,7 +304,9 @@ class PipelineLogger:
         self._w(_SEP_MAJOR)
 
         content = "\n".join(self._lines) + "\n"
+        _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         LOG_PATH.write_text(content, encoding="utf-8")
         print(f"[pipeline_logger] Log written -> {LOG_PATH}")
         return LOG_PATH
+
 

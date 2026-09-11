@@ -92,7 +92,8 @@ class ReverseImageSearchPipeline:
         self._init_models()
         
         print("  [Step 1/4] Fetching Reverse Image Search results...")
-        raw_results = self.fetch_results(image_url)
+        raw_results, search_url = self.fetch_results(image_url)
+        result_info["search_url"] = search_url
         if not raw_results:
             print("  [Step 1/4] [X] No results found.")
             result_info["status"] = "failed"
@@ -190,12 +191,13 @@ class ReverseImageSearchPipeline:
 
         return None
 
-    def fetch_results(self, image_url: str) -> List[Dict]:
+    def fetch_results(self, image_url: str) -> tuple[List[Dict], str]:
         """
         Uses SerpApi (Google Lens) to fetch visually similar images and context.
+        Returns the results list and the public URL used for the search.
         """
         if not self.serpapi_key:
-            return []
+            return [], image_url
             
         search_url = image_url
         if image_url.startswith("data:"):
@@ -214,10 +216,10 @@ class ReverseImageSearchPipeline:
                     log.info(f"Image uploaded successfully: {search_url}")
                 else:
                     log.error("Failed to upload image to all fallback public hosts.")
-                    return []
+                    return [], search_url
             except Exception as e:
                 log.error(f"Error uploading image for RIS: {e}")
-                return []
+                return [], search_url
                 
         results = []
         try:
@@ -243,7 +245,7 @@ class ReverseImageSearchPipeline:
         except Exception as e:
             log.error(f"Error fetching RIS results: {e}")
             
-        return results
+        return results, search_url
         
     def _download_image(self, url: str) -> Image.Image:
         try:

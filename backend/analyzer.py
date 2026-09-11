@@ -82,6 +82,16 @@ def _get_ris_pipeline():
         log.info("[analyzer] Reverse Image Search Pipeline ready.")
     return _ris_pipeline
 
+_mad_orchestrator = None
+def _get_mad_orchestrator():
+    global _mad_orchestrator
+    if _mad_orchestrator is None:
+        log.info("[analyzer] Loading MAD Orchestrator…")
+        from model.mad_orchestrator import OrchestratorAgent
+        _mad_orchestrator = OrchestratorAgent()
+        log.info("[analyzer] MAD Orchestrator ready.")
+    return _mad_orchestrator
+
 
 # ---------------------------------------------------------------------------
 # Image decoding
@@ -297,6 +307,30 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     # Log RIS output
     plog.log_ris_output(ris_data_for_log, runtime=ris_runtime)
 
+    # ── 4.7. Multi-Agent Debate (MAD) ─────────────────────────────────────
+    t_mad_start = time.perf_counter()
+    mad_summary = ""
+    agents_info = []
+    # Only run MAD if EP says pass to agents (or if no image and EP skipped)
+    if ep_result.get("pass_to_agents", True):
+        try:
+            print("  [Step 4.7] Initializing Multi-Agent Debate (MAD) locally...")
+            orchestrator = _get_mad_orchestrator()
+            mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
+            mad_runtime = time.perf_counter() - t_mad_start
+            print(f"  [Step 4.7] Multi-Agent Debate completed in {mad_runtime:.2f}s")
+        except Exception as exc:
+            mad_runtime = time.perf_counter() - t_mad_start
+            log.error(f"[analyzer] MAD failed: {exc}", exc_info=True)
+            mad_summary = f"MAD encountered an error: {exc}"
+            print(f"  [X] MAD Pipeline Error in {mad_runtime:.2f}s: {exc}")
+    else:
+        mad_runtime = time.perf_counter() - t_mad_start
+        mad_summary = "No Multi-Agent Debate needed. Early Predictor is highly confident."
+        print(f"  [Step 4.7] Multi-Agent Debate skipped based on EP confidence (Runtime: {mad_runtime:.2f}s)")
+        
+    plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
+
     # ── 5. Judge Module ───────────────────────────────────────────────────
     t_judge_start = time.perf_counter()
     try:
@@ -305,10 +339,10 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         print("\n" + "=" * 50)
         print("  JUDGE MODULE (CLOUD LLM REASONING LAYER)")
         print("=" * 50)
-        if external_knowledge or ris_summary:
-            print("  [OK] Forwarding synthesized Knowledge Summary and RIS to Judge context.")
+        if external_knowledge or ris_summary or mad_summary:
+            print("  [OK] Forwarding synthesized KR, RIS, and MAD context to Judge.")
         else:
-            print("  [!] No external knowledge retrieved. Proceeding with article text & EP signal.")
+            print("  [!] No external context retrieved. Proceeding with article text & EP signal.")
             
         print(f"  Sending request to OpenRouter Cloud LLM... Please wait...")
         
@@ -317,7 +351,8 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             llm_text, 
             ep_result, 
             external_knowledge=external_knowledge.strip(),
-            ris_summary=ris_summary.strip()
+            ris_summary=ris_summary.strip(),
+            mad_summary=mad_summary.strip()
         )
         
         # Populate frontend links from Knowledge Retrieval articles
@@ -361,6 +396,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         print(f"  2. Early Predictor      : {ep_runtime:.2f}s")
         print(f"  3. Knowledge Retrieval  : {kr_runtime:.2f}s")
         print(f"  4. Reverse Image Search : {ris_runtime:.2f}s")
+        print(f"  4.5. Multi-Agent Debate : {mad_runtime:.2f}s")
         print(f"  5. Judge Module         : {judge_runtime:.2f}s")
         print("-" * 50)
         print(f"  Total Pipeline Runtime  : {total_runtime:.2f}s")
