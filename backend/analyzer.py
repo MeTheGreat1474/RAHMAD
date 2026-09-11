@@ -290,8 +290,16 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             ris_pipeline = _get_ris_pipeline()
             ris_data = ris_pipeline.execute(input_text, image_data)
             ris_data_for_log = ris_data
-            if ris_data["status"] == "success" and ris_data["visual_agent_summary"]:
-                ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nCategory: {ris_data['category']}\n{ris_data['visual_agent_summary']}"
+            if ris_data["status"] == "success" and (ris_data.get("judge_summary") or ris_data.get("visual_agent_summary")):
+                ooc_status = "YES (Decontextualized / Misattributed)" if ris_data.get("is_out_of_context") else "NO (Authentic Context / Non-Deceptive)"
+                exec_summary = ris_data.get("judge_summary") or ris_data.get("visual_agent_summary")
+                ris_summary = (
+                    f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\n"
+                    f"Category: {ris_data['category']}\n"
+                    f"Out-of-Context Imagery Detected: {ooc_status}\n"
+                    f"Confidence: {ris_data.get('confidence', 'Medium')}\n"
+                    f"Executive Evidence Summary for Judge:\n{exec_summary}"
+                )
             ris_runtime = time.perf_counter() - t_ris_start
             print(f"  [Step 4.6] Reverse Image Search completed in {ris_runtime:.2f}s")
         except Exception as exc:
@@ -303,6 +311,11 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     else:
         ris_runtime = time.perf_counter() - t_ris_start
         print(f"  [Step 4.6] Reverse Image Search skipped (Runtime: {ris_runtime:.2f}s)")
+        try:
+            ris_pipeline = _get_ris_pipeline()
+            ris_pipeline.log_skipped(input_text, reason="No image provided with news query.")
+        except Exception as exc:
+            log.warning(f"[analyzer] Could not log skipped RIS: {exc}")
             
     # Log RIS output
     plog.log_ris_output(ris_data_for_log, runtime=ris_runtime)

@@ -15,17 +15,23 @@ class OrchestratorAgent:
         
     def summarize_context(self, article, external_knowledge):
         prompt = (
-            f"Analyze the following article and external verified knowledge for a fact-checking debate on news veracity.\n"
-            f"Extract and summarize:\n"
+            f"Analyze the following article for a fact-checking debate on news veracity.\n"
+            f"Extract and analyze:\n"
             f"1. The specific core factual claims made in the article (who said what, what events allegedly happened).\n"
-            f"2. The verified external facts that corroborate or contradict these claims.\n"
-            f"3. Analysis of the current political/social climate and any potential biases or agendas the article might be propagating.\n\n"
+            f"2. Analysis of the current political/social climate and any potential biases, framing, or agendas the article might be propagating.\n\n"
             f"Focus strictly on the factual veracity of the claims (did the reported events/statements actually occur in reality?) and how the political framing affects this authenticity.\n\n"
-            f"Article:\n{article}\n\n"
-            f"External Knowledge:\n{external_knowledge}"
+            f"Article:\n{article}"
         )
-        system_prompt = "You are an objective fact-checking orchestrator summarizing claims and evidence for a news veracity debate."
-        return self.llm.generate(prompt=prompt, system_prompt=system_prompt)
+        system_prompt = "You are an objective fact-checking orchestrator analyzing article claims and political/media context."
+        article_analysis = self.llm.generate(prompt=prompt, system_prompt=system_prompt)
+
+        ext_section = external_knowledge.strip() if external_knowledge else "No external knowledge provided."
+        combined_context = (
+            f"{article_analysis.strip()}\n\n"
+            f"**Verified External Knowledge (Direct from Knowledge Retrieval):**\n"
+            f"{ext_section}"
+        )
+        return combined_context
         
     def assign_profiles(self, topic_summary):
         prompt = f"""Given the following summary of news claims and evidence, generate 6 diverse domain-specific fact-checking and investigative profiles relevant to verifying the factual veracity and authenticity of these claims.

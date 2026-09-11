@@ -233,17 +233,26 @@ class PipelineLogger:
             self._w("    [X] RIS skipped or failed.")
             if ris_data and "visual_agent_summary" in ris_data:
                 self._w(f"        {ris_data['visual_agent_summary']}")
+            self._w()
+            self._kv("full_forensic_log", "output/RIS_output.txt")
             return
 
         self._kv("llm_backend", ris_data.get("llm_used", "Unknown"))
         self._kv("category", ris_data.get("category", "Unknown"))
+        ooc_bool = ris_data.get("is_out_of_context", False)
+        self._kv("out_of_context_detected", "YES" if ooc_bool else "NO")
+        self._kv("confidence", ris_data.get("confidence", "Medium"))
         matches = ris_data.get("matches", [])
         self._kv("matches_found", f"[{len(matches)} visually identical image(s) found]")
         for i, match in enumerate(matches, 1):
             self._w(f"      {i}. Title  : {match.get('title', 'N/A')}")
             self._w(f"         Source : {match.get('source', 'N/A')}")
         self._w()
-        self._block("VISUAL AGENT SUMMARY", ris_data.get("visual_agent_summary", ""))
+        self._kv("full_forensic_log", "output/RIS_output.txt")
+        self._w()
+        if ris_data.get("judge_summary"):
+            self._block("EXECUTIVE EVIDENCE SUMMARY FOR JUDGE", ris_data.get("judge_summary", ""))
+        self._block("VISUAL AGENT FORENSIC SUMMARY", ris_data.get("visual_agent_summary", ""))
 
     def log_mad_output(self, mad_summary: str, agents_info: list[dict], runtime: float | None = None) -> None:
         self._section("5C", "MULTI-AGENT DEBATE (MAD)  —  OUTPUT")

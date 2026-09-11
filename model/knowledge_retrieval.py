@@ -29,7 +29,7 @@ USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 
 if USE_LOCAL_LLM:
     _API_URL = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
-    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "qwen2.5:7b")
+    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "llama3:8b")
     _HEADERS  = {"Content-Type": "application/json"}
 else:
     _API_URL = "https://openrouter.ai/api/v1/chat/completions"

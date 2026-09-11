@@ -10,6 +10,8 @@ import os
 import json
 import logging
 from typing import List, Dict
+from pathlib import Path
+from datetime import datetime
 import requests
 from io import BytesIO
 from PIL import Image
@@ -29,7 +31,7 @@ USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 
 if USE_LOCAL_LLM:
     _API_URL = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
-    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "qwen2.5:7b")
+    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "llama3:8b")
     _HEADERS  = {"Content-Type": "application/json"}
 else:
     _API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -74,12 +76,35 @@ class ReverseImageSearchPipeline:
 
     def execute(self, claim_text: str, image_url: str) -> dict:
         """
-        Orchestrates the RIS pipeline.
+        Orchestrates the RIS pipeline and logs every stage to output/RIS_output.txt.
         """
         print("\n" + "=" * 50)
         print("  REVERSE IMAGE SEARCH (RIS) PIPELINE")
         print("=" * 50)
         log.info(f"Starting Reverse Image Search for claim: '{claim_text}'")
+
+        # Describe image format for logging
+        if image_url.startswith("data:"):
+            header = image_url.split(",", 1)[0]
+            img_desc = f"Base64 Inline Image ({header}, length: {len(image_url):,} chars)"
+        else:
+            img_desc = image_url
+
+        backend_desc = f"Local LLM ({_MODEL_ID})" if USE_LOCAL_LLM else f"OpenRouter ({_MODEL_ID})"
+
+        log_data = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d  %H:%M:%S"),
+            "claim_text": claim_text,
+            "image_type_desc": img_desc,
+            "search_url": "Pending retrieval...",
+            "backend_llm": backend_desc,
+            "raw_matches": [],
+            "serpapi_status": "Not started",
+            "visual_filter": {"threshold": self.visual_threshold, "evaluated": [], "passed_count": 0, "status": "Pending"},
+            "semantic_filter": {"threshold": self.semantic_threshold, "evaluated": [], "passed_count": 0, "status": "Pending"},
+            "visual_agent": {"model": _MODEL_ID, "category": "Unknown", "summary": "", "context_sent": ""},
+            "final_result": {"status": "in_progress", "category": "Unknown", "matches_count": 0}
+        }
         
         result_info = {
             "status": "success",
@@ -89,49 +114,97 @@ class ReverseImageSearchPipeline:
             "llm_used": "Local LLM" if USE_LOCAL_LLM else "OpenRouter"
         }
         
-        self._init_models()
-        
-        print("  [Step 1/4] Fetching Reverse Image Search results...")
-        raw_results, search_url = self.fetch_results(image_url)
-        result_info["search_url"] = search_url
-        if not raw_results:
-            print("  [Step 1/4] [X] No results found.")
-            result_info["status"] = "failed"
-            result_info["visual_agent_summary"] = "No reverse image search results found."
-            return result_info
+        try:
+            self._init_models()
             
-        print(f"  [Step 2/4] Applying Visual Filter (threshold >= {self.visual_threshold})...")
-        visually_filtered = self.filter_visually(image_url, raw_results)
-        if not visually_filtered:
-            print("  [Step 2/4] [X] No images passed visual threshold.")
-            result_info["visual_agent_summary"] = "No visually similar images passed the threshold."
-            return result_info
+            print("  [Step 1/4] Fetching Reverse Image Search results...")
+            raw_results, search_url = self.fetch_results(image_url)
+            result_info["search_url"] = search_url
+            log_data["search_url"] = search_url
+            log_data["raw_matches"] = raw_results
+            log_data["serpapi_status"] = f"Retrieved {len(raw_results)} candidate matches via Google Lens." if raw_results else "No matches returned by Google Lens."
             
-        print(f"  [Step 3/4] Applying Semantic Filter (threshold >= {self.semantic_threshold})...")
-        semantically_filtered = self.filter_semantically(claim_text, visually_filtered)
-        if not semantically_filtered:
-            print("  [Step 3/4] [X] No contexts passed semantic threshold.")
-            result_info["visual_agent_summary"] = "No contextual text passed the semantic similarity threshold."
-            return result_info
+            if not raw_results:
+                print("  [Step 1/4] [X] No results found.")
+                result_info["status"] = "failed"
+                result_info["visual_agent_summary"] = "No reverse image search results found."
+                log_data["final_result"] = {"status": "failed", "category": "Unknown", "matches_count": 0}
+                self.save_ris_log(log_data)
+                return result_info
+                
+            print(f"  [Step 2/4] Applying Visual Filter (threshold >= {self.visual_threshold})...")
+            visually_filtered = self.filter_visually(image_url, raw_results)
+            log_data["visual_filter"] = {
+                "threshold": self.visual_threshold,
+                "evaluated": raw_results,
+                "passed_count": len(visually_filtered),
+                "status": f"{len(visually_filtered)} of {len(raw_results)} candidates passed visual threshold."
+            }
             
-        print(f"  [Step 4/4] Synthesizing context via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter'} Visual Agent...")
-        summary_data = self.analyze_with_visual_agent(claim_text, semantically_filtered)
-        
-        result_info["category"] = summary_data.get("category", "Unknown")
-        result_info["visual_agent_summary"] = summary_data.get("summary", "")
-        result_info["matches"] = semantically_filtered
-        
-        print("=" * 50)
-        print("  REVERSE IMAGE SEARCH COMPLETE")
-        print(f"  Category: {result_info['category']}")
-        print("=" * 50 + "\n")
-        
-        return result_info
+            if not visually_filtered:
+                print("  [Step 2/4] [X] No images passed visual threshold.")
+                result_info["visual_agent_summary"] = "No visually similar images passed the threshold."
+                log_data["final_result"] = {"status": "no_visual_matches", "category": "No Visual Match", "matches_count": 0}
+                self.save_ris_log(log_data)
+                return result_info
+                
+            print(f"  [Step 3/4] Applying Semantic Filter (threshold >= {self.semantic_threshold})...")
+            semantically_filtered = self.filter_semantically(claim_text, visually_filtered)
+            log_data["semantic_filter"] = {
+                "threshold": self.semantic_threshold,
+                "evaluated": visually_filtered,
+                "passed_count": len(semantically_filtered),
+                "status": f"{len(semantically_filtered)} of {len(visually_filtered)} candidates passed semantic threshold."
+            }
+            
+            if not semantically_filtered:
+                print("  [Step 3/4] [X] No contexts passed semantic threshold.")
+                result_info["visual_agent_summary"] = "No contextual text passed the semantic similarity threshold."
+                log_data["final_result"] = {"status": "no_semantic_matches", "category": "No Semantic Match", "matches_count": 0}
+                self.save_ris_log(log_data)
+                return result_info
+                
+            print(f"  [Step 4/4] Synthesizing context via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter'} Visual Agent...")
+            summary_data = self.analyze_with_visual_agent(claim_text, semantically_filtered)
+            log_data["visual_agent"] = summary_data
+            
+            result_info["category"] = summary_data.get("category", "Inconclusive / Insufficient Evidence")
+            result_info["is_out_of_context"] = summary_data.get("is_out_of_context", False)
+            result_info["confidence"] = summary_data.get("confidence", "Medium")
+            result_info["visual_agent_summary"] = summary_data.get("summary", "")
+            result_info["judge_summary"] = summary_data.get("judge_summary", "")
+            result_info["matches"] = semantically_filtered
+            
+            log_data["judge_summary"] = result_info["judge_summary"]
+            log_data["final_result"] = {
+                "status": "success",
+                "category": result_info["category"],
+                "is_out_of_context": result_info["is_out_of_context"],
+                "confidence": result_info["confidence"],
+                "matches_count": len(semantically_filtered)
+            }
+            
+            print("=" * 50)
+            print("  REVERSE IMAGE SEARCH COMPLETE")
+            print(f"  Category: {result_info['category']}")
+            print(f"  Decontextualized (OOC): {'YES' if result_info['is_out_of_context'] else 'NO'}")
+            print(f"  Confidence: {result_info['confidence']}")
+            print("=" * 50 + "\n")
+            
+            self.save_ris_log(log_data)
+            return result_info
 
-    def fetch_results(self, image_url: str) -> List[Dict]:
-        """
-        Uses SerpApi (Google Lens) to fetch visually similar images and context.
-        """
+        except Exception as exc:
+            log.error(f"Unhandled error in RIS execute: {exc}", exc_info=True)
+            result_info["status"] = "failed"
+            result_info["visual_agent_summary"] = f"RIS encountered an error: {exc}"
+            log_data["final_result"] = {"status": "error", "category": "Error", "matches_count": 0}
+            log_data["error_message"] = str(exc)
+            try:
+                self.save_ris_log(log_data)
+            except Exception as e:
+                log.error(f"Failed to write error log in RIS: {e}")
+            return result_info
     def _upload_for_ris(self, raw_bytes: bytes, file_ext: str) -> str | None:
         """Uploads image to a temporary public host to get a URL for SerpApi."""
         # 1. Try ImgBB (Most Reliable, if user provided API key)
@@ -282,6 +355,10 @@ class ReverseImageSearchPipeline:
         original_img = self._download_image(original_image_url)
         if original_img is None:
             log.error("Failed to download original image for visual filter.")
+            for res in results:
+                res["visual_similarity"] = None
+                res["visual_passed"] = False
+                res["visual_note"] = "Failed to download original target image"
             return []
             
         # Get original image embedding
@@ -293,10 +370,16 @@ class ReverseImageSearchPipeline:
         for res in results:
             thumb_url = res.get("thumbnail")
             if not thumb_url:
+                res["visual_similarity"] = None
+                res["visual_passed"] = False
+                res["visual_note"] = "No thumbnail URL provided"
                 continue
                 
             match_img = self._download_image(thumb_url)
             if match_img is None:
+                res["visual_similarity"] = None
+                res["visual_passed"] = False
+                res["visual_note"] = "Thumbnail download failed"
                 continue
                 
             match_inputs = self.clip_processor(images=match_img, return_tensors="pt")
@@ -304,12 +387,15 @@ class ReverseImageSearchPipeline:
                 match_out = self.clip_model.get_image_features(**match_inputs)
                 match_features = self._extract_tensor(match_out).detach().cpu().numpy()
                 
-            sim = cosine_similarity(orig_features, match_features)[0][0]
+            sim = float(cosine_similarity(orig_features, match_features)[0][0])
+            res["visual_similarity"] = sim
             log.debug(f"Visual similarity for {res.get('link')}: {sim:.4f}")
             
             if sim >= self.visual_threshold:
-                res["visual_similarity"] = float(sim)
+                res["visual_passed"] = True
                 filtered.append(res)
+            else:
+                res["visual_passed"] = False
                 
         log.info(f"Visual filtering: {len(filtered)} out of {len(results)} passed.")
         return filtered
@@ -324,41 +410,81 @@ class ReverseImageSearchPipeline:
         for res in visually_filtered:
             context = res.get("title", "")
             if not context:
+                res["semantic_similarity"] = None
+                res["semantic_passed"] = False
+                res["semantic_note"] = "No title context available"
                 continue
                 
             context_embedding = self.embedder.encode([context])
-            sim = cosine_similarity(claim_embedding, context_embedding)[0][0]
+            sim = float(cosine_similarity(claim_embedding, context_embedding)[0][0])
+            res["semantic_similarity"] = sim
             log.debug(f"Semantic similarity for '{context}': {sim:.4f}")
             
             if sim >= self.semantic_threshold:
-                res["semantic_similarity"] = float(sim)
+                res["semantic_passed"] = True
                 filtered.append(res)
+            else:
+                res["semantic_passed"] = False
                 
         log.info(f"Semantic filtering: {len(filtered)} out of {len(visually_filtered)} passed.")
         return filtered
         
     def analyze_with_visual_agent(self, claim_text: str, high_fidelity_results: List[Dict]) -> Dict:
         """
-        Calls OpenRouter LLM to categorize the context.
+        Calls OpenRouter LLM or Local LLM to categorize the context with nuanced 4-category classification.
         """
         if not USE_LOCAL_LLM and not self.openrouter_key:
-            return {"category": "Unknown", "summary": "OpenRouter API key missing."}
+            return {
+                "category": "Inconclusive / Insufficient Evidence",
+                "is_out_of_context": False,
+                "confidence": "Low",
+                "summary": "OpenRouter API key missing.",
+                "model": "None (Missing API Key)",
+                "context_sent": "",
+                "raw_response": ""
+            }
             
         context_str = "\n".join([f"- {r.get('title')} (Source: {r.get('source')})" for r in high_fidelity_results])
         
         system_prompt = (
-            "You are an expert fact-checker and visual analyst. Your task is to analyze the original textual claim "
-            "and compare it against the verified contextual data of visually identical images found online. "
-            "Determine if the image is being used in a misleading or decontextualized manner. "
-            "Categorize your finding STRICTLY as either 'Identical Source' (the claim matches the original context) "
-            "or 'Identical Image, Different Context' (the image is being used out-of-context). "
-            "Output your response in JSON format with two keys: 'category' and 'summary'."
+            "You are an expert fact-checker and visual forensic analyst specializing in reverse image search and media authenticity verification.\n"
+            "Your task is to determine whether an image found online is being used in an AUTHENTIC context or a DECONTEXTUALIZED (Out-of-Context / Misattributed) manner.\n\n"
+            "CRITICAL JOURNALISTIC & FACT-CHECKING RULES:\n"
+            "1. REAL-WORLD PHOTOJOURNALISM STANDARDS:\n"
+            "   - News articles frequently pair broad event headlines (e.g. 'Wildfire emissions surge in Indonesia') with authentic on-the-ground photos of that event (e.g. 'Firefighters douse flames in Sumatra', 'Peatland smoke over Borneo'). This is AUTHENTIC editorial coverage of the event, NOT out-of-context deception!\n"
+            "   - Syndication & Rephrasing: Outlets (Reuters, SCMP, CNN, AP, local news) routinely rephrase headlines or license the same wire photo from agencies (Reuters Connect, Getty Images, AFP). This represents the SAME authentic event.\n"
+            "   - Do NOT be pedantic about phrasing differences. If the image depicts the same incident, disaster, subject matter, or news event described in the claim, it is MATCHING.\n\n"
+            "2. TRUE OUT-OF-CONTEXT (DECONTEXTUALIZED) CRITERIA:\n"
+            "   - Mark as 'Out-of-Context (Misattributed / Recycled)' ONLY if the image is demonstrably recycled from a COMPLETELY DIFFERENT event, a DIFFERENT historical year/time period (e.g. using a 2015 or 2017 fire photo to represent a 2026 event), or an entirely DIFFERENT geographic location/incident (e.g. showing California fires and claiming it is Indonesia).\n\n"
+            "3. CATEGORIES (Choose EXACTLY ONE):\n"
+            "   - 'Authentic Context / Matching Event': The image depicts the actual event, disaster, location, or subject matter discussed in the claim, including syndicated reporting, photo agency catalog listings, and on-the-ground photojournalism of that event.\n"
+            "   - 'Out-of-Context (Misattributed / Recycled)': The image is recycled from a different historical time, different event, or unrelated location to fabricate or distort the current claim.\n"
+            "   - 'Generic / Illustrative Imagery': The image is a generic stock photo, symbolic graphic, or general illustration (e.g. generic forest, flame silhouette) with no deceptive intent about a specific historical event.\n"
+            "   - 'Inconclusive / Insufficient Evidence': The retrieved image matches provide insufficient contextual details to definitively determine provenance.\n\n"
+            "Output your response strictly in valid JSON format with keys:\n"
+            "{\n"
+            "  \"category\": \"<One of the 4 exact category names above>\",\n"
+            "  \"is_out_of_context\": <true or false>,\n"
+            "  \"confidence\": \"<High / Medium / Low>\",\n"
+            "  \"summary\": \"<Detailed, objective forensic explanation of why the imagery matches or does not match the claim's context>\",\n"
+            "  \"judge_summary\": \"<Concise 2-4 sentence executive evidence summary formulated specifically for the Judge module, outlining: (1) what the image depicts and its verified origin, (2) whether it matches the claim's event/time, and (3) explicit judicial recommendation on whether it should be treated as authentic evidence or decontextualized deception.>\"\n"
+            "}"
         )
         
-        user_prompt = (
-            f"Original Claim: {claim_text}\n\n"
-            f"Context of identical images found online:\n{context_str}\n\n"
-            "Respond ONLY in valid JSON format: {\"category\": \"...\", \"summary\": \"...\"}"
+        # Extract headline and concise excerpt to prevent overwhelming the LLM with thousands of chars of body text
+        lines = [line.strip() for line in claim_text.strip().splitlines() if line.strip()]
+        headline = lines[0] if lines else claim_text[:150]
+        body_snippet = "\n".join(lines[1:]) if len(lines) > 1 else ""
+        if len(body_snippet) > 800:
+            body_snippet = body_snippet[:800] + "..."
+            
+        user_prompt = f"Headline / Primary Claim:\n{headline}\n\n"
+        if body_snippet:
+            user_prompt += f"Article Body Excerpt:\n{body_snippet}\n\n"
+        user_prompt += (
+            f"Context of identical images found online via Google Lens:\n{context_str}\n\n"
+            "Determine whether the online matches corroborate that the image depicts this authentic news event, or whether it is recycled from an unrelated event/time.\n"
+            "Respond ONLY in valid JSON format matching the requested schema."
         )
         
         headers = _HEADERS
@@ -397,9 +523,73 @@ class ReverseImageSearchPipeline:
                     # Try to parse JSON from response
                     try:
                         parsed = json.loads(content)
-                        return parsed
+                        raw_cat = parsed.get("category", "")
+                        cat_lower = str(raw_cat).lower()
+                        
+                        if "authentic" in cat_lower or "matching" in cat_lower or "identical source" in cat_lower:
+                            category = "Authentic Context / Matching Event"
+                            is_ooc = False
+                        elif "out-of-context" in cat_lower or "recycled" in cat_lower or "misattributed" in cat_lower or "different context" in cat_lower:
+                            category = "Out-of-Context (Misattributed / Recycled)"
+                            is_ooc = True
+                        elif "generic" in cat_lower or "illustrative" in cat_lower:
+                            category = "Generic / Illustrative Imagery"
+                            is_ooc = False
+                        else:
+                            category = "Inconclusive / Insufficient Evidence"
+                            is_ooc = False
+                            
+                        if "is_out_of_context" in parsed and isinstance(parsed["is_out_of_context"], bool):
+                            is_ooc = parsed["is_out_of_context"]
+                            
+                        confidence = parsed.get("confidence", "High" if "authentic" in cat_lower or is_ooc else "Medium")
+                        summary = parsed.get("summary", content.strip())
+                        
+                        judge_summary = parsed.get("judge_summary")
+                        if not judge_summary:
+                            ooc_label = "Decontextualized / Misattributed" if is_ooc else "Authentic / Contextually Aligned"
+                            judge_summary = (
+                                f"Visual Assessment: {category} ({ooc_label}). Confidence: {confidence}.\n"
+                                f"{summary}"
+                            )
+                        
+                        return {
+                            "category": category,
+                            "is_out_of_context": is_ooc,
+                            "confidence": confidence,
+                            "summary": summary,
+                            "judge_summary": judge_summary,
+                            "model": model,
+                            "context_sent": context_str,
+                            "raw_response": content
+                        }
                     except json.JSONDecodeError:
-                        return {"category": "Unknown", "summary": content.strip()}
+                        cat_lower = content.lower()
+                        if "authentic" in cat_lower or "matching" in cat_lower or "identical source" in cat_lower:
+                            category = "Authentic Context / Matching Event"
+                            is_ooc = False
+                        elif "out-of-context" in cat_lower or "recycled" in cat_lower or "misattributed" in cat_lower or "different context" in cat_lower:
+                            category = "Out-of-Context (Misattributed / Recycled)"
+                            is_ooc = True
+                        elif "generic" in cat_lower or "illustrative" in cat_lower:
+                            category = "Generic / Illustrative Imagery"
+                            is_ooc = False
+                        else:
+                            category = "Inconclusive / Insufficient Evidence"
+                            is_ooc = False
+                            
+                        ooc_label = "Decontextualized / Misattributed" if is_ooc else "Authentic / Contextually Aligned"
+                        judge_summary = f"Visual Assessment: {category} ({ooc_label}). Confidence: Medium.\n{content.strip()}"
+                        return {
+                            "category": category,
+                            "is_out_of_context": is_ooc,
+                            "confidence": "Medium",
+                            "summary": content.strip(),
+                            "judge_summary": judge_summary,
+                            "model": model,
+                            "context_sent": context_str,
+                            "raw_response": content
+                        }
                 else:
                     err_msg = data.get("error", {}).get("message", str(data))
                     log.warning(f"Visual Agent model {model} missing choices: {err_msg}")
@@ -410,4 +600,204 @@ class ReverseImageSearchPipeline:
                 last_err = str(e)
                 
         log.error(f"All Visual Agent models failed. Last error: {last_err}")
-        return {"category": "Unknown", "summary": f"Visual Agent Error: {last_err}"}
+        return {
+            "category": "Inconclusive / Insufficient Evidence",
+            "is_out_of_context": False,
+            "confidence": "Low",
+            "summary": f"Visual Agent Error: {last_err}",
+            "judge_summary": f"Reverse Image Search analysis unavailable due to an error: {last_err}. Evaluation will proceed using textual facts.",
+            "model": "None (Failed)",
+            "context_sent": context_str,
+            "raw_response": str(last_err)
+        }
+
+    def save_ris_log(self, log_data: dict, output_path=None) -> Path:
+        """
+        Log all Reverse Image Search forensic stages, Google Lens matches,
+        CLIP visual scores, MiniLM semantic scores, and Visual Agent analysis
+        into RIS_output.txt inside the output/ folder.
+        """
+        if output_path is None:
+            project_root = Path(__file__).resolve().parent.parent
+            output_dir = project_root / "output"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = output_dir / "RIS_output.txt"
+        else:
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        now_str = log_data.get("timestamp") or datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        lines = []
+        sep_major = "=" * 80
+        sep_minor = "-" * 60
+
+        lines.append(sep_major)
+        lines.append(f"  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  {now_str}")
+        lines.append(sep_major)
+        lines.append("")
+
+        lines.append("[1]  INPUT CLAIM & VISUAL TARGET")
+        lines.append(sep_minor)
+        lines.append(f"    Original Claim     : {log_data.get('claim_text', 'N/A')}")
+        lines.append(f"    Target Image Source: {log_data.get('image_type_desc', 'N/A')}")
+        lines.append(f"    Public Search URL  : {log_data.get('search_url', 'N/A')}")
+        lines.append(f"    Execution Backend  : {log_data.get('backend_llm', 'N/A')}")
+        if "error_message" in log_data:
+            lines.append(f"    Pipeline Error     : {log_data['error_message']}")
+        lines.append("")
+
+        lines.append("[2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)")
+        lines.append(sep_minor)
+        raw_matches = log_data.get("raw_matches", [])
+        lines.append(f"    Search Engine Query: Google Lens (via SerpApi)")
+        lines.append(f"    Total Retrieved    : {len(raw_matches)} candidate matches")
+        lines.append(f"    Search Status      : {log_data.get('serpapi_status', 'N/A')}")
+        if raw_matches:
+            lines.append("")
+            for idx, m in enumerate(raw_matches, 1):
+                lines.append(f"      Match #{idx}:")
+                lines.append(f"        Title    : {m.get('title', 'N/A')}")
+                lines.append(f"        Source   : {m.get('source', 'N/A')}")
+                lines.append(f"        Link     : {m.get('link', 'N/A')}")
+                lines.append(f"        Thumbnail: {m.get('thumbnail', 'N/A')}")
+        lines.append("")
+
+        lines.append("[3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)")
+        lines.append(sep_minor)
+        vis_data = log_data.get("visual_filter", {})
+        vis_thresh = vis_data.get("threshold", self.visual_threshold)
+        lines.append(f"    Filter Criterion   : Visual embedding cosine similarity >= {vis_thresh:.2f}")
+        vis_eval = vis_data.get("evaluated", [])
+        if vis_eval:
+            lines.append(f"    Evaluated Candidates ({len(vis_eval)}):")
+            for idx, cand in enumerate(vis_eval, 1):
+                passed = cand.get("visual_passed", False)
+                verdict = "PASSED" if passed else "FAILED"
+                sim_val = cand.get("visual_similarity")
+                sim_str = f"{sim_val:.4f}" if sim_val is not None else "N/A"
+                lines.append(f"      {idx}. [{verdict}] Visual Similarity: {sim_str} (Threshold: >={vis_thresh:.2f})")
+                lines.append(f"         Title  : {cand.get('title', 'N/A')}")
+                lines.append(f"         Source : {cand.get('source', 'N/A')}")
+                lines.append(f"         Link   : {cand.get('link', 'N/A')}")
+                if "visual_note" in cand:
+                    lines.append(f"         Note   : {cand['visual_note']}")
+            lines.append("")
+            lines.append(f"    Outcome: {vis_data.get('passed_count', 0)} of {len(vis_eval)} candidates passed visual filter.")
+        else:
+            lines.append(f"    Status : {vis_data.get('status', 'Visual filtering skipped or no candidates.')}")
+        lines.append("")
+
+        lines.append("[4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)")
+        lines.append(sep_minor)
+        sem_data = log_data.get("semantic_filter", {})
+        sem_thresh = sem_data.get("threshold", self.semantic_threshold)
+        lines.append(f"    Filter Criterion   : Contextual semantic embedding similarity >= {sem_thresh:.2f}")
+        sem_eval = sem_data.get("evaluated", [])
+        if sem_eval:
+            lines.append(f"    Evaluated Contexts ({len(sem_eval)}):")
+            for idx, cand in enumerate(sem_eval, 1):
+                passed = cand.get("semantic_passed", False)
+                verdict = "PASSED" if passed else "FAILED"
+                sim_val = cand.get("semantic_similarity")
+                sim_str = f"{sim_val:.4f}" if sim_val is not None else "N/A"
+                lines.append(f"      {idx}. [{verdict}] Semantic Similarity: {sim_str} (Threshold: >={sem_thresh:.2f})")
+                lines.append(f"         Title  : {cand.get('title', 'N/A')}")
+                lines.append(f"         Source : {cand.get('source', 'N/A')}")
+                lines.append(f"         Link   : {cand.get('link', 'N/A')}")
+                if "semantic_note" in cand:
+                    lines.append(f"         Note   : {cand['semantic_note']}")
+            lines.append("")
+            lines.append(f"    Outcome: {sem_data.get('passed_count', 0)} of {len(sem_eval)} candidates passed semantic filter.")
+        else:
+            lines.append(f"    Status : {sem_data.get('status', 'Semantic filtering skipped or no candidates.')}")
+        lines.append("")
+
+        lines.append("[5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS")
+        lines.append(sep_minor)
+        va_data = log_data.get("visual_agent", {})
+        lines.append(f"    Model Employed     : {va_data.get('model', 'N/A')}")
+        lines.append(f"    Assigned Category  : {va_data.get('category', 'Unknown')}")
+        ooc_va = "YES (Decontextualized / Misattributed)" if va_data.get("is_out_of_context") else "NO (Authentic Context / Non-Deceptive)"
+        lines.append(f"    Out-of-Context (OOC): {ooc_va}")
+        lines.append(f"    Confidence Level   : {va_data.get('confidence', 'Medium')}")
+        lines.append("")
+        lines.append("    Context Sent to Visual Agent:")
+        ctx_sent = va_data.get("context_sent", "")
+        if ctx_sent:
+            for c_line in str(ctx_sent).strip().splitlines():
+                lines.append(f"      {c_line}")
+        else:
+            lines.append("      (No context passed to Visual Agent)")
+        lines.append("")
+        lines.append("    Visual Agent Forensic Synthesis:")
+        summ = va_data.get("summary", "")
+        if summ:
+            for s_line in str(summ).strip().splitlines():
+                lines.append(f"      {s_line}")
+        else:
+            lines.append("      (No summary produced)")
+        lines.append("")
+
+        lines.append("[6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE")
+        lines.append(sep_minor)
+        j_summ = log_data.get("judge_summary") or va_data.get("judge_summary") or va_data.get("summary", "")
+        cat_str = va_data.get("category", "Unknown")
+        ooc_eval = "YES (Decontextualized / Misattributed)" if va_data.get("is_out_of_context") else "NO (Authentic Context / Non-Deceptive)"
+        conf_eval = va_data.get("confidence", "Medium")
+        lines.append(f"    Assigned Category          : {cat_str}")
+        lines.append(f"    Out-of-Context Flag (OOC)  : {ooc_eval}")
+        lines.append(f"    Judicial Confidence Weight : {conf_eval}")
+        lines.append("")
+        lines.append("    Executive Visual Evidence Summary for Judge:")
+        if j_summ:
+            for j_line in str(j_summ).strip().splitlines():
+                lines.append(f"      {j_line}")
+        else:
+            lines.append("      (No visual evidence summary generated)")
+        lines.append("")
+
+        lines.append("[7]  FINAL VERDICT & PIPELINE SUMMARY")
+        lines.append(sep_minor)
+        fin = log_data.get("final_result", {})
+        lines.append(f"    Pipeline Status       : {fin.get('status', 'Unknown')}")
+        lines.append(f"    Forensic Category     : {fin.get('category', 'Unknown')}")
+        fin_ooc = "YES (Decontextualized / Misattributed)" if fin.get("is_out_of_context") else "NO (Authentic Context / Non-Deceptive)"
+        lines.append(f"    Out-of-Context (OOC)   : {fin_ooc}")
+        lines.append(f"    Confidence Level      : {fin.get('confidence', 'Medium')}")
+        lines.append(f"    High-Fidelity Matches : {fin.get('matches_count', 0)}")
+        lines.append(f"    Forwarded to Judge    : {'YES' if fin.get('status') == 'success' else 'NO'}")
+        lines.append("")
+
+        lines.append(sep_major)
+        lines.append("  END OF REVERSE IMAGE SEARCH FORENSIC LOG")
+        lines.append(sep_major)
+        lines.append("")
+
+        content = "\n".join(lines)
+        output_path.write_text(content, encoding="utf-8")
+        print(f"  [RIS] Reverse image search log written -> {output_path}")
+        return output_path
+
+    def log_skipped(self, claim_text: str, reason: str = "No image provided with news query.", output_path=None):
+        """Logs a skipped RIS run when no image is provided."""
+        log_data = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d  %H:%M:%S"),
+            "claim_text": claim_text,
+            "image_type_desc": "None (Text-only input)",
+            "search_url": "N/A",
+            "backend_llm": f"Local LLM ({_MODEL_ID})" if USE_LOCAL_LLM else f"OpenRouter ({_MODEL_ID})",
+            "serpapi_status": f"Skipped — {reason}",
+            "raw_matches": [],
+            "visual_filter": {"status": f"Skipped — {reason}"},
+            "semantic_filter": {"status": f"Skipped — {reason}"},
+            "visual_agent": {
+                "model": "N/A", 
+                "category": "Skipped", 
+                "is_out_of_context": False,
+                "confidence": "N/A",
+                "summary": f"Reverse Image Search was not performed because {reason.lower()}."
+            },
+            "judge_summary": f"No Reverse Image Search evidence available ({reason.lower()}). Evaluation will rely entirely on textual and factual evidence.",
+            "final_result": {"status": "skipped", "category": "N/A", "is_out_of_context": False, "confidence": "N/A", "matches_count": 0}
+        }
+        return self.save_ris_log(log_data, output_path=output_path)
