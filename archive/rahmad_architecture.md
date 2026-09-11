@@ -59,7 +59,7 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
 The MAD module is activated when the Early Predictor is uncertain. It instantiates a structured, parliamentary-style debate focusing strictly on the factual veracity and authenticity of the news claim.
 
 **Architecture & Flow:**
-1. **Context Summarization:** The orchestrator synthesizes the raw article and external knowledge into a focused factual summary.
+1. **Context Summarization:** The orchestrator retrieves the raw article and synthesizes external knowledge into a focused factual summary.
 2. **Profile Generation:** Based on the context, the LLM generates specific expert profiles (e.g., Investigative Journalist, Forensic Data Analyst) to ensure diverse perspectives.
 3. **Structured Debate:** A 3-vs-3 debate takes place (Real News vs. Fake News). 
    - **First Speakers:** Introduce the case and present core arguments and evidence.

@@ -79,13 +79,19 @@ Topic Summary: {topic_summary}"""
         lines.append(sep_major)
         lines.append("")
 
-        lines.append("[1]  TOPIC & CONTEXT SUMMARY")
+        lines.append("[1]  ORIGINAL NEWS ARTICLE")
+        lines.append(sep_minor)
+        for a_line in shared_memory.article.strip().splitlines():
+            lines.append(f"    {a_line}")
+        lines.append("")
+
+        lines.append("[2]  TOPIC & CONTEXT SUMMARY")
         lines.append(sep_minor)
         for c_line in context_summary.strip().splitlines():
             lines.append(f"    {c_line}")
         lines.append("")
 
-        lines.append("[2]  DEBATE TEAMS & PROFILES")
+        lines.append("[3]  DEBATE TEAMS & PROFILES")
         lines.append(sep_minor)
         lines.append("    REAL NEWS SIDE (Argues news claim is authentic, factually true, and accurate):")
         for a in agents:
@@ -98,7 +104,7 @@ Topic Summary: {topic_summary}"""
                 lines.append(f"      • {a.name} ({a.profile})")
         lines.append("")
 
-        lines.append("[3]  FULL DEBATE ARGUMENTS BY STAGE")
+        lines.append("[4]  FULL DEBATE ARGUMENTS BY STAGE")
         lines.append(sep_minor)
         stages = ["Round 1: First Speakers", "Round 2: Second Speakers", "Round 3: Third Speakers"]
         for stage in stages:
@@ -115,7 +121,7 @@ Topic Summary: {topic_summary}"""
                     lines.append(f"      {arg_line}")
                 lines.append("")
 
-        lines.append("[4]  CONSOLIDATED DISCOURSE SYNTHESIS")
+        lines.append("[5]  CONSOLIDATED DISCOURSE SYNTHESIS")
         lines.append(sep_minor)
         for s_line in consolidated.strip().splitlines():
             lines.append(f"    {s_line}")
@@ -139,7 +145,7 @@ Topic Summary: {topic_summary}"""
         print("  [MAD] Summarizing context and assigning profiles...")
         
         context_summary = self.summarize_context(article, external_knowledge)
-        shared_memory = SharedMemoryBank(context_summary)
+        shared_memory = SharedMemoryBank(article, context_summary)
         
         profiles = self.assign_profiles(context_summary)
         

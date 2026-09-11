@@ -58,6 +58,11 @@ class DebaterAgent:
                 "- Conclusion"
             )
 
+        if not (self.speaker_role == "First Speaker" and self.side == "Real News"):
+            rebuttal_instruction = "5. VIGOROUSLY DEFEND AND REBUT: You must fiercely defend your case and aggressively rebut the opposing side's arguments. Use the 'even if' debate tactic: 'Even if we agreed to your premise/definition (which we don't), your arguments are still wrong because...'. You MUST attack their arguments directly in any event."
+        else:
+            rebuttal_instruction = "5. VIGOROUSLY DEFEND: You must fiercely present and defend your case."
+
         system_prompt = f"""You are a {self.profile} participating in a simulated academic debate on the FACTUAL VERACITY of a news article.
 Your assigned stance: [{self.side}]. Your Role: [{self.speaker_role}].
 
@@ -70,7 +75,8 @@ CRITICAL RULES:
 1. FOCUS STRICTLY ON FACTUAL VERACITY: Debate whether the reported event, statement, or quote ACTUALLY HAPPENED in reality as reported vs whether it is fabricated, distorted, or deceptive misinformation.
 2. DO NOT DEBATE POLICY FEASIBILITY OR MERIT: Do NOT debate whether the policy, proposal, political action, or promise described in the news is achievable, economically viable, logical, or morally good/bad. That is completely irrelevant to fact-checking. You are fact-checking whether the news report itself is true/authentic (Real News) vs false/misleading (Fake News).
 3. Use your domain expertise as a {self.profile} to evaluate claims, evidence, and context from the debate history.
-4. Keep your argument concise, focused, sharp, and strictly in character. Do not refuse to argue your side."""
+4. Keep your argument concise, focused, sharp, and strictly in character. Do not refuse to argue your side.
+{rebuttal_instruction}"""
 
         prompt = f"""Debate Stage: {stage}
 

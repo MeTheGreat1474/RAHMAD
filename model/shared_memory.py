@@ -1,5 +1,6 @@
 class SharedMemoryBank:
-    def __init__(self, context_summary):
+    def __init__(self, article, context_summary):
+        self.article = article
         self.context_summary = context_summary
         self.argument_history = {
             "Round 1: First Speakers": [],
@@ -17,7 +18,8 @@ class SharedMemoryBank:
             })
 
     def get_formatted_history(self, up_to_stage=None):
-        formatted = f"Context & Fact-Checking Summary:\n{self.context_summary}\n\n"
+        formatted = f"Original News Article:\n{self.article}\n\n"
+        formatted += f"Context & Fact-Checking Summary (from Orchestrator):\n{self.context_summary}\n\n"
         
         stages_to_include = ["Round 1: First Speakers", "Round 2: Second Speakers", "Round 3: Third Speakers"]
         
