@@ -18,8 +18,9 @@ class OrchestratorAgent:
             f"Analyze the following article and external verified knowledge for a fact-checking debate on news veracity.\n"
             f"Extract and summarize:\n"
             f"1. The specific core factual claims made in the article (who said what, what events allegedly happened).\n"
-            f"2. The verified external facts that corroborate or contradict these claims.\n\n"
-            f"Focus strictly on the factual veracity of the claims (did the reported events/statements actually occur in reality?).\n\n"
+            f"2. The verified external facts that corroborate or contradict these claims.\n"
+            f"3. Analysis of the current political/social climate and any potential biases or agendas the article might be propagating.\n\n"
+            f"Focus strictly on the factual veracity of the claims (did the reported events/statements actually occur in reality?) and how the political framing affects this authenticity.\n\n"
             f"Article:\n{article}\n\n"
             f"External Knowledge:\n{external_knowledge}"
         )
@@ -201,13 +202,14 @@ Topic Summary: {topic_summary}"""
     def consolidate_discourse(self, shared_memory):
         history = shared_memory.get_formatted_history()
         prompt = (
-            f"Synthesize and summarize the following multi-agent fact-checking debate on the FACTUAL VERACITY of the news claims.\n"
-            f"Highlight the strongest arguments and evidence regarding whether the news article is Real News (factually authentic, accurately reported, verified) "
-            f"or Fake News (fabricated, manipulated, misleading context, or deceptive).\n"
-            f"Provide a clear, balanced synthesis assessing the overall veracity based on the debate.\n\n"
-            f"Debate History:\n{history}"
+            f"You are an objective academic research analyst reviewing a completed academic debate on media verification.\n"
+            f"Provide a neutral, structured analytical synthesis of the debate arguments recorded below:\n"
+            f"1. Key arguments and evidence presented in favor of factual authenticity (Real News side).\n"
+            f"2. Key arguments and evidence presented questioning authenticity or highlighting discrepancies/bias (Fake News side).\n"
+            f"3. Assessment of clash points and evidential weight between both sides.\n\n"
+            f"Debate Transcript:\n{history}"
         )
-        system_prompt = "You are an objective orchestrator synthesizing a news veracity fact-checking debate."
+        system_prompt = "You are an objective scholarly evaluator synthesizing arguments from a media analysis debate."
         
         consolidated = self.llm.generate(prompt=prompt, system_prompt=system_prompt)
         return consolidated
