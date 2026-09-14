@@ -8,7 +8,10 @@ Provides verified, external supporting knowledge to the Judge module.
 import json
 import logging
 import os
+import subprocess
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import List, Dict
 
 import requests
@@ -42,9 +45,10 @@ else:
     }
 
 class KnowledgeRetriever:
-    def __init__(self, similarity_threshold: float = 0.35, max_age_years: int = 3):
+    def __init__(self, similarity_threshold: float = 0.35, max_age_years: int = 3, max_articles: int = 5):
         self.similarity_threshold = similarity_threshold
         self.max_age_years = max_age_years
+        self.max_articles = max_articles
         
         # Load the embedding model for semantic verification
         # Using a small, efficient model suitable for this task
@@ -212,7 +216,7 @@ class KnowledgeRetriever:
             log.warning(f"DuckDuckGo HTML search error: {e}")
 
         # 2. Secondary: DDGS package fallback
-        if len(urls) < 3:
+        if len(urls) < 5:
             try:
                 ddgs = DDGS()
                 try:
@@ -238,78 +242,133 @@ class KnowledgeRetriever:
 
     def metadata_filter(self, urls: List[str]) -> List[Dict]:
         """
-        Extracts metadata (title, text, date), removes non-English sources, 
+        Extracts metadata (title, text, date) via a Scrapy subprocess spider,
         filters out outdated articles, and deduplicates by title.
         """
+        if not urls:
+            return []
+
         articles = []
         seen_titles = set()
         current_year = datetime.now().year
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        
-        for url in urls:
+
+        project_root = Path(__file__).resolve().parent.parent
+        output_dir = project_root / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        target_urls_file = output_dir / "kr_target_urls.json"
+        results_file = output_dir / "kr_results.json"
+        spider_file = project_root / "backend" / "news_spider.py"
+
+        # 1. Write target URLs to JSON file
+        try:
+            with open(target_urls_file, "w", encoding="utf-8") as f:
+                json.dump(urls, f, indent=2)
+        except Exception as e:
+            log.error(f"Failed to write target URLs to {target_urls_file}: {e}")
+            return []
+
+        # Remove previous results file if exists
+        if results_file.exists():
             try:
-                title, text, date = "", "", ""
-                
-                # Fetch page HTML directly
-                resp = requests.get(url, headers=headers, timeout=10)
-                if resp.status_code != 200:
-                    continue
-                    
-                html_content = resp.text
-                
-                # Attempt trafilatura extraction first
+                results_file.unlink()
+            except Exception:
+                pass
+
+        # 2. Execute Scrapy spider as an isolated subprocess
+        cmd = [
+            sys.executable, "-m", "scrapy", "runspider",
+            str(spider_file),
+            "-a", f"urls_file={target_urls_file}",
+            "-O", str(results_file),
+            "--nolog"
+        ]
+
+        log.info(f"Running Scrapy spider subprocess for {len(urls)} URLs...")
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
+            if res.returncode != 0:
+                log.warning(f"Scrapy subprocess exited with code {res.returncode}: {res.stderr}")
+        except subprocess.TimeoutExpired:
+            log.warning("Scrapy subprocess timed out after 25s.")
+        except Exception as e:
+            log.error(f"Error running Scrapy subprocess: {e}")
+
+        # 3. Read extracted results
+        raw_articles = []
+        if results_file.exists():
+            try:
+                with open(results_file, "r", encoding="utf-8") as f:
+                    raw_articles = json.load(f)
+            except Exception as e:
+                log.error(f"Failed to parse Scrapy results JSON: {e}")
+
+        # Fallback to direct extraction if Scrapy didn't return any items
+        if not raw_articles:
+            log.info("Scrapy returned 0 items. Attempting direct fallback extraction...")
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            for u in urls:
                 try:
-                    result = trafilatura.extract(html_content, output_format="json", include_comments=False)
-                    if result:
-                        data = json.loads(result)
-                        title = data.get("title", "")
-                        text = data.get("raw_text", "")
-                        date = data.get("date", "")
+                    resp = requests.get(u, headers=headers, timeout=8)
+                    if resp.status_code == 200:
+                        t, txt, dt = "", "", ""
+                        try:
+                            ext = trafilatura.extract(resp.text, output_format="json", include_comments=False)
+                            if ext:
+                                d = json.loads(ext)
+                                t = d.get("title", "") or ""
+                                txt = d.get("raw_text", "") or ""
+                                dt = d.get("date", "") or ""
+                        except Exception:
+                            pass
+                        if not t or not txt:
+                            s = BeautifulSoup(resp.text, "html.parser")
+                            if not t and s.title:
+                                t = s.title.text.strip()
+                            if not txt:
+                                paras = [p.text.strip() for p in s.find_all("p") if len(p.text.strip()) > 30]
+                                txt = "\n\n".join(paras)
+                        if t and txt and len(txt.strip()) >= 100:
+                            raw_articles.append({"url": u, "title": t, "text": txt, "date": dt})
+                except Exception as ex:
+                    log.debug(f"Direct fallback failed for {u}: {ex}")
+
+        # 4. Deduplication, age validation, and selection
+        for art in raw_articles:
+            title = art.get("title", "").strip()
+            text = art.get("text", "").strip()
+            date = art.get("date", "").strip()
+            url = art.get("url", "").strip()
+
+            if not text or not title or len(text) < 100:
+                continue
+
+            # Deduplication
+            title_lower = title.lower()
+            if title_lower in seen_titles:
+                continue
+            seen_titles.add(title_lower)
+
+            # Timestamp check (naive year check)
+            if date:
+                try:
+                    pub_year = int(date.split('-')[0])
+                    if (current_year - pub_year) > self.max_age_years:
+                        log.debug(f"Article '{title}' is outdated ({pub_year}). Skipping.")
+                        continue
                 except Exception:
                     pass
 
-                # Fallback to BeautifulSoup extraction if trafilatura missed text/title
-                if not text or not title:
-                    soup = BeautifulSoup(html_content, "html.parser")
-                    if not title and soup.title:
-                        title = soup.title.text.strip()
-                    if not text:
-                        paragraphs = [p.text.strip() for p in soup.find_all("p") if len(p.text.strip()) > 30]
-                        text = "\n\n".join(paragraphs)
+            articles.append({
+                "title": title,
+                "text": text,
+                "url": url,
+                "date": date
+            })
 
-                if not text or not title or len(text.strip()) < 100:
-                    continue
-                    
-                # Deduplication
-                title_lower = title.lower()
-                if title_lower in seen_titles:
-                    continue
-                seen_titles.add(title_lower)
-                
-                # Timestamp check (naive year check)
-                if date:
-                    try:
-                        pub_year = int(date.split('-')[0])
-                        if (current_year - pub_year) > self.max_age_years:
-                            log.debug(f"Article '{title}' is outdated ({pub_year}). Skipping.")
-                            continue
-                    except Exception:
-                        pass # Ignore parsing errors, keep article
-                        
-                articles.append({
-                    "title": title,
-                    "text": text,
-                    "url": url,
-                    "date": date
-                })
-                
-                # Stop if we have 3 valid articles for performance
-                if len(articles) >= 3:
-                    break
-                    
-            except Exception as e:
-                log.error(f"Error extracting metadata for {url}: {e}")
-                
+            if len(articles) >= self.max_articles:
+                break
+
         log.info(f"Metadata filtering: {len(articles)} articles survived.")
         return articles
 

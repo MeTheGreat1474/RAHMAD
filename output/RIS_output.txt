@@ -1,5 +1,5 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-14  20:24:33
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-14  21:00:45
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
@@ -182,7 +182,7 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
       - Hundreds of firefighters have been battling wildfires as ... (Source: Instagram)
 
     Visual Agent Forensic Synthesis:
-      The image is used in multiple sources to depict the surge in Indonesian wildfire emissions, which aligns with the claim. There are 4 sources directly supporting the use of the image in the context of the current event, and 1 source that uses it in a different context (Photos of the week - September 10, 2026 | Reuters), but this is a single instance and does not outweigh the majority. The image depicts the same event, location, and subject matter as the claim, and the majority of sources indicate it is used in an authentic context.
+      The image is used in multiple sources to depict the surge in Indonesian wildfire emissions, which aligns with the claim. There are 4 sources explicitly mentioning the context of Indonesian wildfires and emissions, and 1 source from Reuters, which is a reputable news agency, also using the image in a context that matches the claim. This provides strong evidence that the image is being used in an authentic context.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
@@ -191,7 +191,7 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
     Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      The image depicts Indonesian wildfires and emissions, which is consistent with the claim. Multiple reputable sources, including Reuters and South China Morning Post, use the image in the context of the current event. The recommendation is to treat this as authentic evidence of the wildfire emissions surge in Indonesia.
+      The image depicts Indonesian wildfires and emissions, which is consistent with the claim. Multiple reputable sources, including Reuters, use the image in contexts that match the event. It should be treated as authentic evidence of the surge in Indonesian wildfire emissions.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
