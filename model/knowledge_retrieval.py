@@ -84,66 +84,106 @@ class KnowledgeRetriever:
             "llm_used": "Local LLM" if USE_LOCAL_LLM else "OpenRouter"
         }
         
-        # 1. Link Retrieval
-        print("  [Step 1/5] Searching external news sources...")
-        urls = self.search_claim(claim)
-        if not urls:
-            print("  [Step 1/5] [X] No URLs found.")
-            print("=" * 50 + "\n")
-            result_info["summary"] = "No external URLs found for the claim."
-            return result_info
-        print(f"  [Step 1/5] [OK] Found {len(urls)} URLs.")
-            
-        # 2. Domain Filtering
-        print("  [Step 2/5] Applying strict domain whitelist filter...")
-        whitelisted_urls = self.filter_domains(urls)
-        if not whitelisted_urls:
-            print("  [Step 2/5] [X] No URLs passed domain whitelist.")
-            print("=" * 50 + "\n")
-            result_info["summary"] = "No URLs passed the domain whitelist filter."
-            return result_info
-        print(f"  [Step 2/5] [OK] {len(whitelisted_urls)} whitelisted URLs survived.")
-            
-        # 3. Metadata Extraction & Heuristic Filtering
-        print("  [Step 3/5] Scraping metadata & applying heuristics...")
-        articles = self.metadata_filter(whitelisted_urls)
-        if not articles:
-            print("  [Step 3/5] [X] No articles survived metadata filtering.")
-            print("=" * 50 + "\n")
-            result_info["summary"] = "No articles passed the metadata heuristic filter."
-            return result_info
-        print(f"  [Step 3/5] [OK] {len(articles)} verified article(s) extracted.")
-            
-        # Store headline and source for output logging
-        result_info["articles"] = [
-            {"headline": art.get("title", "No Title"), "source": art.get("url", ""), "date": art.get("date", "")}
-            for art in articles
-        ]
-        for i, art in enumerate(articles, 1):
-            title_str = art.get('title', 'No Title').encode('ascii', 'ignore').decode('ascii')
-            print(f"       {i}. {title_str} ({art.get('url', '')})")
-            
-        # 4. Semantic Verification
-        print(f"  [Step 4/5] Computing semantic similarity (Threshold >= {self.similarity_threshold})...")
-        snippets = self.semantic_filter(claim, articles)
-        if not snippets:
-            print("  [Step 4/5] [X] No snippets passed semantic threshold.")
-            print("=" * 50 + "\n")
-            result_info["summary"] = "No text snippets passed the semantic similarity threshold."
-            return result_info
-        print(f"  [Step 4/5] [OK] {len(snippets)} snippet(s) passed similarity check.")
-            
-        # 5. LLM Synthesis
-        print(f"  [Step 5/5] Synthesizing summary via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter LLM'}...")
-        summary = self.synthesize(claim, snippets)
-        result_info["summary"] = summary
+        log_data = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d  %H:%M:%S"),
+            "claim": claim,
+            "llm_used": result_info["llm_used"],
+            "urls_found_count": 0,
+            "raw_urls": [],
+            "urls_whitelisted_count": 0,
+            "whitelisted_urls": [],
+            "articles_extracted": [],
+            "semantic_snippets": [],
+            "summary": "",
+            "status": "in_progress"
+        }
         
-        summary_preview = summary[:120].encode('ascii', 'ignore').decode('ascii')
-        print("=" * 50)
-        print("  KNOWLEDGE RETRIEVAL COMPLETE")
-        print(f"  Summary Preview: {summary_preview}...")
-        print("=" * 50 + "\n")
-        return result_info
+        try:
+            # 1. Link Retrieval
+            print("  [Step 1/5] Searching external news sources...")
+            urls = self.search_claim(claim)
+            log_data["urls_found_count"] = len(urls)
+            log_data["raw_urls"] = urls
+            if not urls:
+                print("  [Step 1/5] [X] No URLs found.")
+                print("=" * 50 + "\n")
+                result_info["summary"] = "No external URLs found for the claim."
+                log_data["status"] = "failed - no urls"
+                self.save_kr_log(log_data)
+                return result_info
+            print(f"  [Step 1/5] [OK] Found {len(urls)} URLs.")
+                
+            # 2. Domain Filtering
+            print("  [Step 2/5] Applying strict domain whitelist filter...")
+            whitelisted_urls = self.filter_domains(urls)
+            log_data["urls_whitelisted_count"] = len(whitelisted_urls)
+            log_data["whitelisted_urls"] = whitelisted_urls
+            if not whitelisted_urls:
+                print("  [Step 2/5] [X] No URLs passed domain whitelist.")
+                print("=" * 50 + "\n")
+                result_info["summary"] = "No URLs passed the domain whitelist filter."
+                log_data["status"] = "failed - no whitelisted urls"
+                self.save_kr_log(log_data)
+                return result_info
+            print(f"  [Step 2/5] [OK] {len(whitelisted_urls)} whitelisted URLs survived.")
+                
+            # 3. Metadata Extraction & Heuristic Filtering
+            print("  [Step 3/5] Scraping metadata & applying heuristics...")
+            articles = self.metadata_filter(whitelisted_urls)
+            log_data["articles_extracted"] = articles
+            if not articles:
+                print("  [Step 3/5] [X] No articles survived metadata filtering.")
+                print("=" * 50 + "\n")
+                result_info["summary"] = "No articles passed the metadata heuristic filter."
+                log_data["status"] = "failed - no metadata"
+                self.save_kr_log(log_data)
+                return result_info
+            print(f"  [Step 3/5] [OK] {len(articles)} verified article(s) extracted.")
+                
+            # Store headline and source for output logging
+            result_info["articles"] = [
+                {"headline": art.get("title", "No Title"), "source": art.get("url", ""), "date": art.get("date", "")}
+                for art in articles
+            ]
+            for i, art in enumerate(articles, 1):
+                title_str = art.get('title', 'No Title').encode('ascii', 'ignore').decode('ascii')
+                print(f"       {i}. {title_str} ({art.get('url', '')})")
+                
+            # 4. Semantic Verification
+            print(f"  [Step 4/5] Computing semantic similarity (Threshold >= {self.similarity_threshold})...")
+            snippets = self.semantic_filter(claim, articles)
+            log_data["semantic_snippets"] = snippets
+            if not snippets:
+                print("  [Step 4/5] [X] No snippets passed semantic threshold.")
+                print("=" * 50 + "\n")
+                result_info["summary"] = "No text snippets passed the semantic similarity threshold."
+                log_data["status"] = "failed - no semantic snippets"
+                self.save_kr_log(log_data)
+                return result_info
+            print(f"  [Step 4/5] [OK] {len(snippets)} snippet(s) passed similarity check.")
+                
+            # 5. LLM Synthesis
+            print(f"  [Step 5/5] Synthesizing summary via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter LLM'}...")
+            summary = self.synthesize(claim, snippets)
+            result_info["summary"] = summary
+            log_data["summary"] = summary
+            log_data["status"] = "success"
+            
+            summary_preview = summary[:120].encode('ascii', 'ignore').decode('ascii')
+            print("=" * 50)
+            print("  KNOWLEDGE RETRIEVAL COMPLETE")
+            print(f"  Summary Preview: {summary_preview}...")
+            print("=" * 50 + "\n")
+            
+            self.save_kr_log(log_data)
+            return result_info
+            
+        except Exception as e:
+            log.error(f"Error in KR pipeline: {e}")
+            log_data["status"] = f"error: {e}"
+            self.save_kr_log(log_data)
+            result_info["summary"] = f"Knowledge Retrieval encountered an error: {e}"
+            return result_info
 
     def search_claim(self, claim: str, max_results: int = 10) -> List[str]:
         """
@@ -379,3 +419,97 @@ class KnowledgeRetriever:
                 log.warning(f"Error during LLM Synthesis with {model}: {e}")
 
         return "\n\n".join(snippets) # Fallback
+
+    def save_kr_log(self, log_data: dict, output_path=None):
+        """
+        Log all Knowledge Retrieval stages (Search, Filter, Extraction, Semantic, LLM)
+        into KR_output.txt inside the output/ folder.
+        """
+        from pathlib import Path
+        if output_path is None:
+            project_root = Path(__file__).resolve().parent.parent
+            output_dir = project_root / "output"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = output_dir / "KR_output.txt"
+        else:
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        now_str = log_data.get("timestamp") or datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        lines = []
+        sep_major = "=" * 80
+        sep_minor = "-" * 60
+
+        lines.append(sep_major)
+        lines.append(f"  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  {now_str}")
+        lines.append(sep_major)
+        lines.append("")
+
+        lines.append("[1]  INPUT CLAIM")
+        lines.append(sep_minor)
+        lines.append(f"    Original Claim     : {log_data.get('claim', 'N/A')}")
+        lines.append(f"    Execution Backend  : {log_data.get('llm_used', 'N/A')}")
+        lines.append("")
+
+        lines.append("[2]  LINK RETRIEVAL & DOMAIN FILTERING")
+        lines.append(sep_minor)
+        raw_urls = log_data.get("raw_urls", [])
+        whitelisted = log_data.get("whitelisted_urls", [])
+        lines.append(f"    Total URLs Retrieved (Pre-Filter) : {len(raw_urls)}")
+        if raw_urls:
+            lines.append("    All Retrieved URLs (Pre-Filter Status):")
+            for idx, u in enumerate(raw_urls, 1):
+                status_tag = "[WHITELISTED]" if u in whitelisted else "[FILTERED OUT]"
+                lines.append(f"      {idx:2d}. {status_tag:<15} {u}")
+        lines.append("")
+        lines.append(f"    URLs Passing Whitelist : {len(whitelisted)}")
+        if whitelisted:
+            for idx, u in enumerate(whitelisted, 1):
+                lines.append(f"      {idx}. {u}")
+        lines.append("")
+
+        lines.append("[3]  METADATA EXTRACTION")
+        lines.append(sep_minor)
+        articles = log_data.get("articles_extracted", [])
+        lines.append(f"    Articles Successfully Extracted : {len(articles)}")
+        for idx, art in enumerate(articles, 1):
+            lines.append(f"      {idx}. Title  : {art.get('title', 'N/A')}")
+            lines.append(f"         Source : {art.get('url', 'N/A')}")
+            lines.append(f"         Date   : {art.get('date', 'N/A')}")
+        lines.append("")
+
+        lines.append(f"[4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= {self.similarity_threshold}")
+        lines.append(sep_minor)
+        snippets = log_data.get("semantic_snippets", [])
+        lines.append(f"    Snippets Passed : {len(snippets)}")
+        for idx, snip in enumerate(snippets, 1):
+            lines.append(f"      Snippet #{idx}:")
+            for ln in str(snip).strip().splitlines():
+                lines.append(f"        {ln}")
+        lines.append("")
+
+        lines.append("[5]  LLM SYNTHESIS & CONDENSED SUMMARY")
+        lines.append(sep_minor)
+        summary = log_data.get("summary", "")
+        lines.append("    Generated Key-Facts Summary:")
+        if summary:
+            for s_line in str(summary).strip().splitlines():
+                lines.append(f"      {s_line}")
+        else:
+            lines.append("      (No summary produced)")
+        lines.append("")
+        
+        lines.append("[6]  FINAL PIPELINE STATUS")
+        lines.append(sep_minor)
+        lines.append(f"    Status : {log_data.get('status', 'Unknown')}")
+        lines.append("")
+
+        lines.append(sep_major)
+        lines.append("  END OF KNOWLEDGE RETRIEVAL FORENSIC LOG")
+        lines.append(sep_major)
+        lines.append("")
+
+        content = "\n".join(lines)
+        output_path.write_text(content, encoding="utf-8")
+        print(f"  [KR] Knowledge retrieval log written -> {output_path}")
+        return output_path

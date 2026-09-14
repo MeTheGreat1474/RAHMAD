@@ -84,6 +84,13 @@ VERIFIED_DOMAINS = {
     "politifact.com",
     "factcheck.org",
     "fullfact.org",
+    
+    # Extended Whitelist
+    "usnews.com",
+    "yahoo.com",
+    "bangkokpost.com",
+    "theedgemalaysia.com",
+    "asiaone.com",
 }
 
 def is_domain_whitelisted(url: str) -> bool:

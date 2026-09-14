@@ -47,7 +47,7 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
 **Architecture & Flow:**
 1. **Image Hosting Setup:** Uploads the user's image to temporary hosts (ImgBB prioritized, with aggressive fallbacks to Freeimage, tmpfiles, envs.sh, etc.) to obtain a public URL.
 2. **Visual Query:** Executes a Google Lens search via SerpAPI using the public image URL.
-3. **Visual Filter (CLIP):** Downloads thumbnail results and embeds them using `clip-vit-base-patch32`. Computes cosine similarity against the original image. Results below a visual threshold (e.g. 0.8) are discarded to ensure only identical/highly similar images are analyzed.
+3. **Visual Filter (CLIP):** Downloads thumbnail results and embeds them using `clip-vit-base-patch32`. Computes cosine similarity against the original image. Results below a visual threshold (e.g. 0.9) are discarded to ensure only identical/highly similar images are analyzed.
 4. **Semantic Filter (MiniLM):** Uses `all-MiniLM-L6-v2` to compute semantic similarity between the user's original claim and the headlines/snippets of the visually identical image matches.
 5. **Visual Agent LLM (Nuanced 4-Way Categorization):** Passes the semantic/visual findings to the Visual Agent LLM (local Ollama `llama3:8b` or OpenRouter). Instead of forcing a fragile binary choice that misflags syndicated news or wire catalog titles, the agent classifies findings into 4 distinct categories:
    - `Authentic Context / Matching Event`: Genuine coverage of the event/subject matter, including syndicated news (Reuters, SCMP, KSL) and photo licensing agencies (Reuters Connect).
@@ -55,7 +55,7 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
    - `Generic / Illustrative Imagery`: Standard stock photo or symbolic representation without deceptive intent.
    - `Inconclusive / Insufficient Evidence`: Insufficient metadata to confirm provenance.
 6. **Dedicated Forensic Logging (`output/RIS_output.txt`):**
-   - Automatically logs the full step-by-step forensic trail to `output/RIS_output.txt`: Google Lens query & candidate matches, candidate CLIP visual cosine similarities (with pass/fail verdicts against the `>= 0.80` threshold), MiniLM contextual semantic similarities (`>= 0.05`), the Visual Agent LLM prompts/responses, and the final classification with explicit `Out-of-Context` and confidence flags.
+   - Automatically logs the full step-by-step forensic trail to `output/RIS_output.txt`: Google Lens query & candidate matches, candidate CLIP visual cosine similarities (with pass/fail verdicts against the `>= 0.90` threshold), MiniLM contextual semantic similarities (`>= 0.05`), the Visual Agent LLM prompts/responses, and the final classification with explicit `Out-of-Context` and confidence flags.
 
 ---
 

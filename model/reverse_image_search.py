@@ -46,7 +46,7 @@ else:
 _CLIP_MODEL_ID  = "openai/clip-vit-base-patch32"
 
 class ReverseImageSearchPipeline:
-    def __init__(self, visual_threshold: float = 0.80, semantic_threshold: float = 0.05):
+    def __init__(self, visual_threshold: float = 0.90, semantic_threshold: float = 0.05):
         self.visual_threshold = visual_threshold
         self.semantic_threshold = semantic_threshold
         
@@ -456,7 +456,10 @@ class ReverseImageSearchPipeline:
             "   - Do NOT be pedantic about phrasing differences. If the image depicts the same incident, disaster, subject matter, or news event described in the claim, it is MATCHING.\n\n"
             "2. TRUE OUT-OF-CONTEXT (DECONTEXTUALIZED) CRITERIA:\n"
             "   - Mark as 'Out-of-Context (Misattributed / Recycled)' ONLY if the image is demonstrably recycled from a COMPLETELY DIFFERENT event, a DIFFERENT historical year/time period (e.g. using a 2015 or 2017 fire photo to represent a 2026 event), or an entirely DIFFERENT geographic location/incident (e.g. showing California fires and claiming it is Indonesia).\n\n"
-            "3. CATEGORIES (Choose EXACTLY ONE):\n"
+            "3. WEIGHING EVIDENCE (SOURCE COUNTING):\n"
+            "   - Explicitly count and evaluate the number of retrieved contexts that support the image being Authentic vs. those that suggest it is Out-Of-Context.\n"
+            "   - If the majority of sources align with the claim's event, heavily weight this toward 'Authentic Context', even if a minority of sources show it used elsewhere (which could be due to other outlets misusing it or loose search filtering).\n\n"
+            "4. CATEGORIES (Choose EXACTLY ONE):\n"
             "   - 'Authentic Context / Matching Event': The image depicts the actual event, disaster, location, or subject matter discussed in the claim, including syndicated reporting, photo agency catalog listings, and on-the-ground photojournalism of that event.\n"
             "   - 'Out-of-Context (Misattributed / Recycled)': The image is recycled from a different historical time, different event, or unrelated location to fabricate or distort the current claim.\n"
             "   - 'Generic / Illustrative Imagery': The image is a generic stock photo, symbolic graphic, or general illustration (e.g. generic forest, flame silhouette) with no deceptive intent about a specific historical event.\n"
@@ -466,7 +469,7 @@ class ReverseImageSearchPipeline:
             "  \"category\": \"<One of the 4 exact category names above>\",\n"
             "  \"is_out_of_context\": <true or false>,\n"
             "  \"confidence\": \"<High / Medium / Low>\",\n"
-            "  \"summary\": \"<Detailed, objective forensic explanation of why the imagery matches or does not match the claim's context>\",\n"
+            "  \"summary\": \"<Detailed, objective forensic explanation of why the imagery matches or does not match the claim's context. You MUST explicitly state the count of sources supporting Authentic vs Out-Of-Context.>\",\n"
             "  \"judge_summary\": \"<Concise 2-4 sentence executive evidence summary formulated specifically for the Judge module, outlining: (1) what the image depicts and its verified origin, (2) whether it matches the claim's event/time, and (3) explicit judicial recommendation on whether it should be treated as authentic evidence or decontextualized deception.>\"\n"
             "}"
         )

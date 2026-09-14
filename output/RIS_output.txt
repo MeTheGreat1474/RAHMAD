@@ -1,5 +1,5 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-11  21:44:46
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-14  20:24:33
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
@@ -33,7 +33,7 @@ Studies have shown that fires in Indonesia in 2015 produced more emissions per d
 
 Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in Jakarta; Editing by Kate Mayberry
     Target Image Source: Base64 Inline Image (data:image/jpeg;base64, length: 94,595 chars)
-    Public Search URL  : https://i.ibb.co/DP6zjCBm/f63d6a21ecc7.jpg
+    Public Search URL  : https://i.ibb.co/whtfpKt5/10633b14332b.jpg
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
@@ -53,97 +53,97 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
         Link     : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
         Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRd9cZxqk4ggnIH7WWD-njyfj8SdDo-UfU4LqxVLg3_J-aBQUZM
       Match #3:
-        Title    : Reuters World on X: "Indonesian wildfire emissions surge to ...
-        Source   : X
-        Link     : https://x.com/i/status/2097605958490890626
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSotwcTYvysf-szmd0VgKx4_ZwGcCCaPZWz9l5JwF4BdEfSTgXo
-      Match #4:
-        Title    : Licensable picture: A firefighter uses a tree branch to try ...
-        Source   : Reuters Connect
-        Link     : https://www.reutersconnect.com/item/a-firefighter-uses-a-tree-branch-to-try-and-douse-the-flames-amid-a-wildfire-in-palembang/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX1JDMjRGTkFJRzMzVA
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQpbyDn3_UA0UBuwzonexIdDIFDRwMSBnljtH0cLXjMKfEaoKEO
-      Match #5:
-        Title    : Photos of the week - September 10, 2026 | Reuters
-        Source   : Reuters
-        Link     : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQRWljfT23Hn4qNwWi2yzABYBu5pDTvRqwB9orqYj7-EMFzP3nq
-      Match #6:
         Title    : Indonesian wildfire emissions surge to world's highest, data ...
         Source   : KSL
         Link     : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
         Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRBHmX36YAFHhBg1hL0pFec-3N25mY7qxVWWmbk61vddshf3Ccc
+      Match #4:
+        Title    : Photos of the week - September 10, 2026 | Reuters
+        Source   : Reuters
+        Link     : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQRWljfT23Hn4qNwWi2yzABYBu5pDTvRqwB9orqYj7-EMFzP3nq
+      Match #5:
+        Title    : Can the destructive bootleg fire teach us to prevent ...
+        Source   : College of Social Sciences and Humanities - Northeastern ...
+        Link     : https://cssh.northeastern.edu/can-the-destructive-bootleg-fire-teach-us-to-prevent-wildfires-before-they-start/
+        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRgG6Z4K5bCYGAh7PhcggBjz3VG6mf0U8xgLPbM_kxj9wVLsyZ_
+      Match #6:
+        Title    : Indonesia forest fires surge, stoking global warming fears
+        Source   : Phys.org
+        Link     : https://phys.org/news/2019-09-indonesia-forest-surge-stoking-global.html
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSMBUioqeVdfs_sBJZykER_93X4i-gfTA6ZxL7RmYwhh1_nuRXC
       Match #7:
-        Title    : Indonesia forest fires rage, stoking global warming fears
-        Source   : Rappler
-        Link     : https://www.rappler.com/world/asia-pacific/239955-indonesia-forest-fires-rage-stoking-global-warming-fears/
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTCTGYyYILVRbSr6bEUxwtfVQXTe58h-18gzPHYp2ivTc9Zk_Bs
-      Match #8:
-        Title    : It's that time of year. An excellent opportunity to get your ...
+        Title    : Hundreds of firefighters have been battling wildfires as ...
         Source   : Instagram
-        Link     : https://www.instagram.com/p/DUBL9OAFO00/
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcScN7nnurhpoea7ULQyvqxEW2GKCTEgvy2h9OSyiky9gaix1AHp
+        Link     : https://www.instagram.com/p/Dadzl6Yk7OA/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCJHOXKDQF9rDx1_AeY86P1CRm3IKI1AYlPlTRpgrH6jY17HSU
+      Match #8:
+        Title    : 7 images that show why the Southern California wildfires are ...
+        Source   : CNN
+        Link     : https://www.cnn.com/interactive/2017/12/us/wildfire-los-angeles-images-big-picture/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRAIKeVCqFMOupDdpge6o8S0DsWvH6H81Zpv9SWJC7WC7ASJ8IB
       Match #9:
-        Title    : California wildfires: State sets record with 2 million acres ...
-        Source   : The Philadelphia Inquirer
-        Link     : https://www.inquirer.com/news/nation-world/california-wildfires-damage-update-record-2-million-acres-20200907.html
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcStg65490gVaqvo9L4f89ShFyhLuv_zpCJswOQgimM1JUj5-DkY
+        Title    : The West is on fire as Washington fans the flames | Daily ...
+        Source   : Daily Interlake
+        Link     : https://dailyinterlake.com/news/2025/aug/28/the-west-is-on-fire-as-washington-fans-the-flames/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx5dzx3-LzYHjnhEc0MOjyLa-npyWFwFtCXtN_U4Q5FvLyh0rs
       Match #10:
-        Title    : Where is the Canyon fire in California? Map, evacuation ...
-        Source   : Hindustan Times
-        Link     : https://www.hindustantimes.com/world-news/us-news/where-is-the-canyon-fire-in-california-map-evacuation-update-as-blaze-burns-in-los-angeles-and-ventura-counties-101754651188056.html
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSivZDF_xTVGzMVb56Bfkoea52VxHRY528Zvc2YTTdXpdUbqSiZ
+        Title    : Wind-driven California Kincade Fire grows to 10K acres
+        Source   : FireRescue1
+        Link     : https://www.firerescue1.com/wildfire/articles/wind-driven-california-kincade-fire-grows-to-10k-acres-9Ai2Y3BQUKI8kACe/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQeB8FqoDhMgVfWs68bPpRe-Q_Vl1EtxhqgwFdgsWXhysGY9vMK
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
-    Filter Criterion   : Visual embedding cosine similarity >= 0.80
+    Filter Criterion   : Visual embedding cosine similarity >= 0.90
     Evaluated Candidates (10):
-      1. [PASSED] Visual Similarity: 0.9278 (Threshold: >=0.80)
+      1. [PASSED] Visual Similarity: 0.9278 (Threshold: >=0.90)
          Title  : Indonesian wildfire emissions surge to world's highest, data ...
          Source : Reuters
          Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      2. [PASSED] Visual Similarity: 0.9303 (Threshold: >=0.80)
+      2. [PASSED] Visual Similarity: 0.9303 (Threshold: >=0.90)
          Title  : Indonesia's wildfire emissions surge to world's highest ...
          Source : South China Morning Post
          Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
-      3. [PASSED] Visual Similarity: 0.9026 (Threshold: >=0.80)
-         Title  : Reuters World on X: "Indonesian wildfire emissions surge to ...
-         Source : X
-         Link   : https://x.com/i/status/2097605958490890626
-      4. [PASSED] Visual Similarity: 0.8146 (Threshold: >=0.80)
-         Title  : Licensable picture: A firefighter uses a tree branch to try ...
-         Source : Reuters Connect
-         Link   : https://www.reutersconnect.com/item/a-firefighter-uses-a-tree-branch-to-try-and-douse-the-flames-amid-a-wildfire-in-palembang/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX1JDMjRGTkFJRzMzVA
-      5. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.80)
-         Title  : Photos of the week - September 10, 2026 | Reuters
-         Source : Reuters
-         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
-      6. [PASSED] Visual Similarity: 0.9258 (Threshold: >=0.80)
+      3. [PASSED] Visual Similarity: 0.9258 (Threshold: >=0.90)
          Title  : Indonesian wildfire emissions surge to world's highest, data ...
          Source : KSL
          Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      7. [PASSED] Visual Similarity: 0.8747 (Threshold: >=0.80)
-         Title  : Indonesia forest fires rage, stoking global warming fears
-         Source : Rappler
-         Link   : https://www.rappler.com/world/asia-pacific/239955-indonesia-forest-fires-rage-stoking-global-warming-fears/
-      8. [PASSED] Visual Similarity: 0.8799 (Threshold: >=0.80)
-         Title  : It's that time of year. An excellent opportunity to get your ...
+      4. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.90)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
+      5. [FAILED] Visual Similarity: 0.8876 (Threshold: >=0.90)
+         Title  : Can the destructive bootleg fire teach us to prevent ...
+         Source : College of Social Sciences and Humanities - Northeastern ...
+         Link   : https://cssh.northeastern.edu/can-the-destructive-bootleg-fire-teach-us-to-prevent-wildfires-before-they-start/
+      6. [FAILED] Visual Similarity: 0.8812 (Threshold: >=0.90)
+         Title  : Indonesia forest fires surge, stoking global warming fears
+         Source : Phys.org
+         Link   : https://phys.org/news/2019-09-indonesia-forest-surge-stoking-global.html
+      7. [PASSED] Visual Similarity: 0.9003 (Threshold: >=0.90)
+         Title  : Hundreds of firefighters have been battling wildfires as ...
          Source : Instagram
-         Link   : https://www.instagram.com/p/DUBL9OAFO00/
-      9. [PASSED] Visual Similarity: 0.8681 (Threshold: >=0.80)
-         Title  : California wildfires: State sets record with 2 million acres ...
-         Source : The Philadelphia Inquirer
-         Link   : https://www.inquirer.com/news/nation-world/california-wildfires-damage-update-record-2-million-acres-20200907.html
-      10. [PASSED] Visual Similarity: 0.8931 (Threshold: >=0.80)
-         Title  : Where is the Canyon fire in California? Map, evacuation ...
-         Source : Hindustan Times
-         Link   : https://www.hindustantimes.com/world-news/us-news/where-is-the-canyon-fire-in-california-map-evacuation-update-as-blaze-burns-in-los-angeles-and-ventura-counties-101754651188056.html
+         Link   : https://www.instagram.com/p/Dadzl6Yk7OA/
+      8. [FAILED] Visual Similarity: 0.8934 (Threshold: >=0.90)
+         Title  : 7 images that show why the Southern California wildfires are ...
+         Source : CNN
+         Link   : https://www.cnn.com/interactive/2017/12/us/wildfire-los-angeles-images-big-picture/
+      9. [FAILED] Visual Similarity: 0.8603 (Threshold: >=0.90)
+         Title  : The West is on fire as Washington fans the flames | Daily ...
+         Source : Daily Interlake
+         Link   : https://dailyinterlake.com/news/2025/aug/28/the-west-is-on-fire-as-washington-fans-the-flames/
+      10. [FAILED] Visual Similarity: 0.8653 (Threshold: >=0.90)
+         Title  : Wind-driven California Kincade Fire grows to 10K acres
+         Source : FireRescue1
+         Link   : https://www.firerescue1.com/wildfire/articles/wind-driven-california-kincade-fire-grows-to-10k-acres-9Ai2Y3BQUKI8kACe/
 
-    Outcome: 10 of 10 candidates passed visual filter.
+    Outcome: 5 of 10 candidates passed visual filter.
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
     Filter Criterion   : Contextual semantic embedding similarity >= 0.05
-    Evaluated Contexts (10):
+    Evaluated Contexts (5):
       1. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
          Title  : Indonesian wildfire emissions surge to world's highest, data ...
          Source : Reuters
@@ -152,79 +152,54 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
          Title  : Indonesia's wildfire emissions surge to world's highest ...
          Source : South China Morning Post
          Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
-      3. [PASSED] Semantic Similarity: 0.7255 (Threshold: >=0.05)
-         Title  : Reuters World on X: "Indonesian wildfire emissions surge to ...
-         Source : X
-         Link   : https://x.com/i/status/2097605958490890626
-      4. [PASSED] Semantic Similarity: 0.1557 (Threshold: >=0.05)
-         Title  : Licensable picture: A firefighter uses a tree branch to try ...
-         Source : Reuters Connect
-         Link   : https://www.reutersconnect.com/item/a-firefighter-uses-a-tree-branch-to-try-and-douse-the-flames-amid-a-wildfire-in-palembang/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX1JDMjRGTkFJRzMzVA
-      5. [PASSED] Semantic Similarity: 0.2075 (Threshold: >=0.05)
-         Title  : Photos of the week - September 10, 2026 | Reuters
-         Source : Reuters
-         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
-      6. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
+      3. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
          Title  : Indonesian wildfire emissions surge to world's highest, data ...
          Source : KSL
          Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      7. [PASSED] Semantic Similarity: 0.7548 (Threshold: >=0.05)
-         Title  : Indonesia forest fires rage, stoking global warming fears
-         Source : Rappler
-         Link   : https://www.rappler.com/world/asia-pacific/239955-indonesia-forest-fires-rage-stoking-global-warming-fears/
-      8. [PASSED] Semantic Similarity: 0.1250 (Threshold: >=0.05)
-         Title  : It's that time of year. An excellent opportunity to get your ...
+      4. [PASSED] Semantic Similarity: 0.2075 (Threshold: >=0.05)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA
+      5. [PASSED] Semantic Similarity: 0.4330 (Threshold: >=0.05)
+         Title  : Hundreds of firefighters have been battling wildfires as ...
          Source : Instagram
-         Link   : https://www.instagram.com/p/DUBL9OAFO00/
-      9. [PASSED] Semantic Similarity: 0.3483 (Threshold: >=0.05)
-         Title  : California wildfires: State sets record with 2 million acres ...
-         Source : The Philadelphia Inquirer
-         Link   : https://www.inquirer.com/news/nation-world/california-wildfires-damage-update-record-2-million-acres-20200907.html
-      10. [PASSED] Semantic Similarity: 0.2759 (Threshold: >=0.05)
-         Title  : Where is the Canyon fire in California? Map, evacuation ...
-         Source : Hindustan Times
-         Link   : https://www.hindustantimes.com/world-news/us-news/where-is-the-canyon-fire-in-california-map-evacuation-update-as-blaze-burns-in-los-angeles-and-ventura-counties-101754651188056.html
+         Link   : https://www.instagram.com/p/Dadzl6Yk7OA/
 
-    Outcome: 10 of 10 candidates passed semantic filter.
+    Outcome: 5 of 5 candidates passed semantic filter.
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
     Model Employed     : qwen2.5:7b
-    Assigned Category  : Out-of-Context (Misattributed / Recycled)
-    Out-of-Context (OOC): YES (Decontextualized / Misattributed)
+    Assigned Category  : Authentic Context / Matching Event
+    Out-of-Context (OOC): NO (Authentic Context / Non-Deceptive)
     Confidence Level   : High
 
     Context Sent to Visual Agent:
       - Indonesian wildfire emissions surge to world's highest, data ... (Source: Reuters)
       - Indonesia's wildfire emissions surge to world's highest ... (Source: South China Morning Post)
-      - Reuters World on X: "Indonesian wildfire emissions surge to ... (Source: X)
-      - Licensable picture: A firefighter uses a tree branch to try ... (Source: Reuters Connect)
-      - Photos of the week - September 10, 2026 | Reuters (Source: Reuters)
       - Indonesian wildfire emissions surge to world's highest, data ... (Source: KSL)
-      - Indonesia forest fires rage, stoking global warming fears (Source: Rappler)
-      - It's that time of year. An excellent opportunity to get your ... (Source: Instagram)
-      - California wildfires: State sets record with 2 million acres ... (Source: The Philadelphia Inquirer)
-      - Where is the Canyon fire in California? Map, evacuation ... (Source: Hindustan Times)
+      - Photos of the week - September 10, 2026 | Reuters (Source: Reuters)
+      - Hundreds of firefighters have been battling wildfires as ... (Source: Instagram)
 
     Visual Agent Forensic Synthesis:
-      The image of a firefighter using a tree branch to try to extinguish a fire is likely a generic stock photo. It is not specific to the Indonesian wildfires mentioned in the claim. The image appears in various sources, including Reuters Connect, which suggests it is a reusable stock photo rather than an on-the-ground photojournalism of the current event. The image does not match the specific context of the Indonesian wildfires, making it out-of-context.
+      The image is used in multiple sources to depict the surge in Indonesian wildfire emissions, which aligns with the claim. There are 4 sources directly supporting the use of the image in the context of the current event, and 1 source that uses it in a different context (Photos of the week - September 10, 2026 | Reuters), but this is a single instance and does not outweigh the majority. The image depicts the same event, location, and subject matter as the claim, and the majority of sources indicate it is used in an authentic context.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
-    Assigned Category          : Out-of-Context (Misattributed / Recycled)
-    Out-of-Context Flag (OOC)  : YES (Decontextualized / Misattributed)
+    Assigned Category          : Authentic Context / Matching Event
+    Out-of-Context Flag (OOC)  : NO (Authentic Context / Non-Deceptive)
     Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      The image depicts a firefighter using a tree branch to extinguish a fire, which is a generic stock photo. It is not specific to the Indonesian wildfires mentioned in the claim and appears in various sources, including Reuters Connect. This suggests the image is a reusable stock photo, making it out-of-context and not authentic evidence of the current event.
+      The image depicts Indonesian wildfires and emissions, which is consistent with the claim. Multiple reputable sources, including Reuters and South China Morning Post, use the image in the context of the current event. The recommendation is to treat this as authentic evidence of the wildfire emissions surge in Indonesia.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
     Pipeline Status       : success
-    Forensic Category     : Out-of-Context (Misattributed / Recycled)
-    Out-of-Context (OOC)   : YES (Decontextualized / Misattributed)
+    Forensic Category     : Authentic Context / Matching Event
+    Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
     Confidence Level      : High
-    High-Fidelity Matches : 10
+    High-Fidelity Matches : 5
     Forwarded to Judge    : YES
 
 ================================================================================
