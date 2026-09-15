@@ -10,6 +10,7 @@ import logging
 import os
 import subprocess
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
@@ -253,55 +254,50 @@ class KnowledgeRetriever:
         current_year = datetime.now().year
 
         project_root = Path(__file__).resolve().parent.parent
-        output_dir = project_root / "output"
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        target_urls_file = output_dir / "kr_target_urls.json"
-        results_file = output_dir / "kr_results.json"
         spider_file = project_root / "backend" / "news_spider.py"
 
-        # 1. Write target URLs to JSON file
-        try:
-            with open(target_urls_file, "w", encoding="utf-8") as f:
-                json.dump(urls, f, indent=2)
-        except Exception as e:
-            log.error(f"Failed to write target URLs to {target_urls_file}: {e}")
-            return []
-
-        # Remove previous results file if exists
-        if results_file.exists():
-            try:
-                results_file.unlink()
-            except Exception:
-                pass
-
-        # 2. Execute Scrapy spider as an isolated subprocess
-        cmd = [
-            sys.executable, "-m", "scrapy", "runspider",
-            str(spider_file),
-            "-a", f"urls_file={target_urls_file}",
-            "-O", str(results_file),
-            "--nolog"
-        ]
-
-        log.info(f"Running Scrapy spider subprocess for {len(urls)} URLs...")
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
-            if res.returncode != 0:
-                log.warning(f"Scrapy subprocess exited with code {res.returncode}: {res.stderr}")
-        except subprocess.TimeoutExpired:
-            log.warning("Scrapy subprocess timed out after 25s.")
-        except Exception as e:
-            log.error(f"Error running Scrapy subprocess: {e}")
-
-        # 3. Read extracted results
         raw_articles = []
-        if results_file.exists():
+
+        # Execute Scrapy spider inside an isolated temporary directory to keep output/ clean
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            target_urls_file = tmp_path / "kr_target_urls.json"
+            results_file = tmp_path / "kr_results.json"
+
+            # 1. Write target URLs to JSON file
             try:
-                with open(results_file, "r", encoding="utf-8") as f:
-                    raw_articles = json.load(f)
+                with open(target_urls_file, "w", encoding="utf-8") as f:
+                    json.dump(urls, f, indent=2)
             except Exception as e:
-                log.error(f"Failed to parse Scrapy results JSON: {e}")
+                log.error(f"Failed to write target URLs to {target_urls_file}: {e}")
+                return []
+
+            # 2. Execute Scrapy spider as an isolated subprocess
+            cmd = [
+                sys.executable, "-m", "scrapy", "runspider",
+                str(spider_file),
+                "-a", f"urls_file={target_urls_file}",
+                "-O", str(results_file),
+                "--nolog"
+            ]
+
+            log.info(f"Running Scrapy spider subprocess for {len(urls)} URLs...")
+            try:
+                res = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
+                if res.returncode != 0:
+                    log.warning(f"Scrapy subprocess exited with code {res.returncode}: {res.stderr}")
+            except subprocess.TimeoutExpired:
+                log.warning("Scrapy subprocess timed out after 25s.")
+            except Exception as e:
+                log.error(f"Error running Scrapy subprocess: {e}")
+
+            # 3. Read extracted results
+            if results_file.exists():
+                try:
+                    with open(results_file, "r", encoding="utf-8") as f:
+                        raw_articles = json.load(f)
+                except Exception as e:
+                    log.error(f"Failed to parse Scrapy results JSON: {e}")
 
         # Fallback to direct extraction if Scrapy didn't return any items
         if not raw_articles:
