@@ -10,6 +10,9 @@ fyp-env-win/
 
 # Model outputs
 output_log.txt
+KR_output.txt
+RIS_output.txt
+MAD_output.txt
 
 # Python/env clutter
 __pycache__/

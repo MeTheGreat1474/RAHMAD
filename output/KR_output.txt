@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-15  14:00:01
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-16  00:25:05
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -13,34 +13,34 @@
     All Retrieved URLs (Pre-Filter Status):
        1. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
        2. [WHITELISTED]   https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-       3. [WHITELISTED]   https://www.thestar.com.my/aseanplus/aseanplus-news/2026/09/09/indonesian-wildfire-emissions-surge-to-world039s-highest-data-shows
+       3. [WHITELISTED]   https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
        4. [FILTERED OUT]  https://kelo.com/2026/09/09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/
-       5. [WHITELISTED]   https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
-       6. [FILTERED OUT]  https://theprint.in/world/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/3037891/
-       7. [WHITELISTED]   https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-       8. [WHITELISTED]   https://theedgemalaysia.com/node/817411
-       9. [FILTERED OUT]  https://www.newsminimalist.com/articles/indonesias-wildfire-emissions-hit-record-high-data-shows-b9a84d05
-      10. [FILTERED OUT]  https://www.myparaluman.ph/latest-news-1/wildfire-emissions-in-indonesia-now-the-worlds-highest
+       5. [WHITELISTED]   https://www.asiaone.com/asia/indonesian-wildfire-emissions-surge-worlds-highest-data-shows
+       6. [FILTERED OUT]  https://www.gmanetwork.com/news/scitech/science/1001751/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/story/
+       7. [FILTERED OUT]  https://theprint.in/world/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/3037891/
+       8. [WHITELISTED]   https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+       9. [WHITELISTED]   https://ceomorningbrief.theedgemalaysia.com/article/2026/1215/World/25/817411
+      10. [FILTERED OUT]  https://sightmagazine.com.au/news/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/
 
     URLs Passing Whitelist : 6
       1. https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
       2. https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      3. https://www.thestar.com.my/aseanplus/aseanplus-news/2026/09/09/indonesian-wildfire-emissions-surge-to-world039s-highest-data-shows
-      4. https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
+      3. https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
+      4. https://www.asiaone.com/asia/indonesian-wildfire-emissions-surge-worlds-highest-data-shows
       5. https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      6. https://theedgemalaysia.com/node/817411
+      6. https://ceomorningbrief.theedgemalaysia.com/article/2026/1215/World/25/817411
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
     Articles Successfully Extracted : 4
-      1. Title  : Indonesian wildfire emissions surge to world's highest — data
-         Source : https://theedgemalaysia.com/node/817411
+      1. Title  : Indonesian wildfire emissions surge to world's highest — data | CEO Morning Brief
+         Source : https://ceomorningbrief.theedgemalaysia.com/article/2026/1215/World/25/817411
          Date   : 
-      2. Title  : Indonesian wildfire emissions surge to world's highest, data shows
+      2. Title  : Indonesian wildfire emissions surge to world's highest, data shows, Asia News - AsiaOne
+         Source : https://www.asiaone.com/asia/indonesian-wildfire-emissions-surge-worlds-highest-data-shows
+         Date   : 
+      3. Title  : Indonesian wildfire emissions surge to world's highest, data shows
          Source : https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
-         Date   : 
-      3. Title  : Indonesian wildfire emissions surge to world's highest, data shows | The Star
-         Source : https://www.thestar.com.my/aseanplus/aseanplus-news/2026/09/09/indonesian-wildfire-emissions-surge-to-world039s-highest-data-shows
          Date   : 
       4. Title  : Bangkok Post - Indonesian wildfire emissions surge to world's highest
          Source : https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
@@ -50,23 +50,23 @@
 ------------------------------------------------------------
     Snippets Passed : 12
       Snippet #1:
-        [Indonesian wildfire emissions surge to world's highest — data] SINGAPORE/JAKARTA (Sept 9): Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+        [Indonesian wildfire emissions surge to world's highest — data | CEO Morning Brief] SINGAPORE/JAKARTA (Sept 9): Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
       Snippet #2:
-        [Indonesian wildfire emissions surge to world's highest — data] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the European Union, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+        [Indonesian wildfire emissions surge to world's highest — data | CEO Morning Brief] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the European Union, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
       Snippet #3:
-        [Indonesian wildfire emissions surge to world's highest — data] From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
+        [Indonesian wildfire emissions surge to world's highest — data | CEO Morning Brief] From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
       Snippet #4:
-        [Indonesian wildfire emissions surge to world's highest, data shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+        [Indonesian wildfire emissions surge to world's highest, data shows, Asia News - AsiaOne] SINGAPORE/JAKARTA — Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday (Sept 9).
       Snippet #5:
-        [Indonesian wildfire emissions surge to world's highest, data shows] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+        [Indonesian wildfire emissions surge to world's highest, data shows, Asia News - AsiaOne] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
       Snippet #6:
-        [Indonesian wildfire emissions surge to world's highest, data shows] From September 1 to September 7, fire emission intensity exceeded 1,500 ‌kg/sq km, more than 10 times the Russian level, with ⁠the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
+        [Indonesian wildfire emissions surge to world's highest, data shows, Asia News - AsiaOne] From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
       Snippet #7:
-        [Indonesian wildfire emissions surge to world's highest, data shows | The Star] SINGAPORE/ JAKARTA: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday (Sept 9).
+        [Indonesian wildfire emissions surge to world's highest, data shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
       Snippet #8:
-        [Indonesian wildfire emissions surge to world's highest, data shows | The Star] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+        [Indonesian wildfire emissions surge to world's highest, data shows] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
       Snippet #9:
-        [Indonesian wildfire emissions surge to world's highest, data shows | The Star] From September 1 to September 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
+        [Indonesian wildfire emissions surge to world's highest, data shows] From September 1 to September 7, fire emission intensity exceeded 1,500 ‌kg/sq km, more than 10 times the Russian level, with ⁠the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
       Snippet #10:
         [Bangkok Post - Indonesian wildfire emissions surge to world's highest] SINGAPORE/JAKARTA — Indonesia is facing a surge ​in emissions from wildfires burning through parched stretches of forest and peatland ‌on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
       Snippet #11:
@@ -77,56 +77,42 @@
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      ### Comprehensive Key-Fact Outline
+      ### Key-Fact Outline
       
       #### 1. Key Entities, Names, and Roles Involved
-      - **Indonesia**: Country experiencing the surge in wildfire emissions.
-      - **Borneo and Sumatra**: Islands where the wildfires are burning.
+      - **Indonesia**: Country experiencing a surge in wildfire emissions.
+      - **Borneo and Sumatra**: Islands where wildfires are burning.
       - **Kalimantan**: Region in Indonesia's part of Borneo.
-      - **Peatland**: Type of land where the wildfires are occurring.
-      - **Carbon Dioxide Readings**: Measurement of emissions.
-      - **Copernicus**: Data source for emission intensity.
+      - **Peatland**: Areas where wildfires are occurring.
+      - **Carbon Dioxide Readings**: Currently the highest in the world.
+      - **Russian Level**: Emission intensity is more than 10 times the Russian level.
+      - **Copernicus Data**: Data source for emission intensity.
       - **European Union (EU)**: Used as a comparison for emission levels.
-      - **Singapore**: Location where the news was reported.
-      - **Reuters**: News agency reporting the story.
-      - **The Star**: News agency reporting the story.
-      - **Bangkok Post**: News agency reporting the story.
+      - **Excess Deaths**: More than 100,000 excess deaths in Indonesia, Malaysia, and Singapore in 2015.
+      - **Reuters**: News source for the initial report.
+      - **Asia News - AsiaOne**: News source for additional details.
+      - **Bangkok Post**: News source for additional details.
       
       #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **Not specified**: No monetary amounts, legal rulings, or official outcomes are mentioned in the snippets.
+      - **Not Specified**: No monetary amounts, legal rulings, or official outcomes are mentioned in the snippets.
       
       #### 3. Timeline of Events and Corroborating Evidence
-      1. **Date of the Report**: September 9 (Wednesday)
-         - **Snippet 1**: "SINGAPORE/JAKARTA (Sept 9):"
-         - **Snippet 4**: "SINGAPORE/JAKARTA, Sept 9:"
-         - **Snippet 7**: "SINGAPORE/ JAKARTA: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday (Sept 9)."
-         - **Snippet 10**: "SINGAPORE/JAKARTA — Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday."
+      - **Date of Report**: September 9, 2023 (Date not specified in the snippets, but implied by the context).
+      - **Surge in Wildfire Emissions**: 
+        - **From September 1 to September 7, 2023**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level.
+        - **Highest Concentrations**: In Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
+        - **Carbon Dioxide Readings**: Currently the highest in the world.
+        - **Comparison to 2015**: Fires in Indonesia in 2015 produced more emissions per day than the whole of the EU and caused more than 100,000 excess deaths in Indonesia, Malaysia, and Singapore.
       
-      2. **Surge in Wildfire Emissions**
-         - **Snippet 1**: "Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world."
-         - **Snippet 4**: "Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday."
-         - **Snippet 7**: "Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday (Sept 9)."
+      ### Summary of Evidence
+      - **Indonesia is experiencing a significant surge in wildfire emissions**.
+      - **The emissions are currently the highest in the world**.
+      - **The emission intensity from September 1 to September 7, 2023, exceeded 1,500 kg/sq km, more than 10 times the Russian level**.
+      - **The highest concentrations of emissions are in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra**.
+      - **In 2015, fires in Indonesia produced more emissions per day than the entire European Union**.
+      - **The 2015 fires caused more than 100,000 excess deaths in Indonesia, Malaysia, and Singapore**.
       
-      3. **Emission Intensity**
-         - **Snippet 3**: "From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday."
-         - **Snippet 9**: "From September 1 to September 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday."
-      
-      4. **Comparison with European Union**
-         - **Snippet 2**: "Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the European Union, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
-         - **Snippet 5**: "Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
-         - **Snippet 8**: "Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
-      
-      5. **Excess Deaths**
-         - **Snippet 2**: "Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the European Union, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
-      
-      6. **Comparison with Russia**
-         - **Snippet 3**: "From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday."
-      
-      7. **Duration of the Report**
-         - **Snippet 3**: "From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday."
-      
-      ### Summary
-      The snippets provide evidence of a significant surge in wildfire emissions in Indonesia, with carbon dioxide readings currently the highest in the world. The emissions are particularly intense in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra. The emissions are more than 10 times the
+      This outline captures all the key facts, entities, and timelines provided in the verified news snippets without adding any inferred or external information.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

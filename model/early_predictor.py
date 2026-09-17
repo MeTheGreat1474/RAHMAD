@@ -44,7 +44,10 @@ log = logging.getLogger(__name__)
 # Paths  (resolved relative to this file → project root stays portable)
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT  = Path(__file__).resolve().parent.parent   # RAHMAD/
-_ARTIFACTS_DIR = _PROJECT_ROOT / "data_processing" / "early_predictor_output"
+_PRIMARY_DIR   = _PROJECT_ROOT / "data_processing" / "early_predictor_output"
+_ARCHIVE_DIR   = _PROJECT_ROOT / "archive" / "data_processing" / "early_predictor_output"
+
+_ARTIFACTS_DIR = _PRIMARY_DIR if _PRIMARY_DIR.exists() else _ARCHIVE_DIR
 
 LORA_ADAPTER_PATH = _ARTIFACTS_DIR / "lora_adapter"
 MLP_HEAD_PATH     = _ARTIFACTS_DIR / "mlp_head.pt"
