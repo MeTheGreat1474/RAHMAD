@@ -26,16 +26,47 @@ The Early Predictor (EP) serves as a fast, lightweight first pass. It attempts t
 ---
 
 ### 2. Knowledge Retrieval Module
-**Location:** `model/knowledge_retrieval.py`
+**Location:** `model/knowledge_retrieval.py`, `backend/news_spider.py`, `backend/domain_whitelist.py`
 
-The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and synthesizing external, verified news to provide corroborating evidence (or debunking context) to the Judge module.
+The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and synthesizing external, verified news to provide corroborating evidence (or debunking context) to both the Multi-Agent Debate (MAD) orchestrator and the Judge module.
 
-**Architecture & Flow:**
-1. **Search & Retrieval:** Queries DuckDuckGo HTML (with DDGS fallback) to retrieve raw news URLs related to the claim.
-2. **Domain Whitelisting:** URLs are strictly filtered against a predefined list of trusted news outlets (`backend/domain_whitelist.py`) to prevent citing unreliable sources.
-3. **Extraction & Heuristics:** Uses `trafilatura` (fallback to `BeautifulSoup`) to scrape article metadata. It filters out non-English content, excessively short articles, and outdated content (>3 years old).
-4. **Semantic Verification:** Uses `sentence-transformers/all-MiniLM-L6-v2` to embed the claim and the article chunks. Cosine similarity is calculated to drop irrelevant snippets (similarity < threshold).
-5. **LLM Synthesis:** Surviving snippets are fed into a local LLM (e.g., Ollama `llama3:8b` when `USE_LOCAL_LLM=true`) or a fast OpenRouter LLM (e.g., `nemotron-3-ultra-550b-a55b` as fallback). The LLM is instructed to construct a comprehensive outline of key facts, entities, and timelines, avoiding vague overviews.
+#### Model & Execution Engine:
+- **Semantic Verification Embedder:** `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense semantic embeddings).
+- **Inference Engine & LLM Summarizer:** 
+  - **Local Mode (`USE_LOCAL_LLM=true`):** Connects to the local Ollama OpenAI-compatible endpoint (`LOCAL_LLM_URL`, default `http://localhost:11434/v1/chat/completions`). The active model is specified by `LOCAL_LLM_MODEL` in `.env` (currently **`qwen2.5:7b`**, with code default fallback **`llama3:8b`**).
+  - **Cloud Fallback (`USE_LOCAL_LLM=false`):** Queries OpenRouter API using `nvidia/nemotron-3-ultra-550b-a55b:free` with a resilient multi-model fallback chain (`nemotron-3-nano-omni-30b-a3b-reasoning`, `inclusionai/ling-3.0-flash`, `poolside/laguna-m.1`).
+
+#### Architecture & Flow:
+1. **Search & Multi-Source Retrieval:**
+   - **Primary Endpoint:** Queries the DuckDuckGo HTML endpoint (`https://html.duckduckgo.com/html/`) to retrieve direct article URLs without search API rate limits.
+   - **Secondary Fallback:** If fewer than 5 candidate URLs are found, queries `duckduckgo_search` (`DDGS.news()`) for additional coverage.
+2. **Strict Domain Whitelisting:**
+   - URLs are immediately checked against an authoritative list of verified, reputable international and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT).
+   - Unverified blogs, opinion sites, and tabloids are filtered out prior to scraping.
+3. **Concurrent Scrapy Spider & Heuristic Extraction:**
+   - **Isolated Scrapy Subprocess:** Spawns an asynchronous Scrapy spider (`backend/news_spider.py`) inside an ephemeral temporary directory (`tempfile.TemporaryDirectory`) with 8 concurrent connections and a 25-second timeout.
+   - **Structured Parsing:** Extracts clean body text, title, and published timestamp using `trafilatura` (with `BeautifulSoup` fallback).
+   - **Direct Extraction Fallback:** If the spider yields 0 items, executes an in-process HTTP request using `requests` + `trafilatura`/`BeautifulSoup`.
+   - **Heuristic Filtering:** Performs title deduplication (case-insensitive set), drops text shorter than 100 characters, and validates article recency against `max_age_years` (default <= 3 years old). Caps surviving articles to `max_articles` (default 5).
+4. **Dense Semantic Verification (MiniLM Embedding & Paragraph Chunking):**
+   - Splits surviving article text into paragraph chunks (>50 characters).
+   - Uses `all-MiniLM-L6-v2` to compute cosine similarity between the claim embedding and each chunk embedding.
+   - Retains the top 3 matching chunks per article that meet or exceed the semantic threshold (`similarity_threshold >= 0.35`), stripping irrelevant boilerplate or tangential reporting.
+5. **Structured Fact-Outline LLM Synthesis:**
+   - Passes verified snippets into the local Ollama `qwen2.5:7b` or `llama3:8b` at low temperature (`0.2`) to prevent hallucination.
+   - Prompts the LLM under strict forensic rules to generate a structured 3-part key-fact outline:
+     1. *Key Entities, Names, and Roles involved*
+     2. *Monetary Amounts, Legal Rulings, or Official Outcomes*
+     3. *Timeline of Events and Corroborating Evidence*
+   - Negative constraints strictly prohibit inferring or extrapolating dates, locations, or unstated facts (mandating `"Date not specified"` if a year/date is absent). Gracefully falls back to raw snippets if LLM generation fails.
+6. **Dedicated Forensic Logging (`output/KR_output.txt`):**
+   - Automatically writes an end-to-end, timestamped forensic audit report to `output/KR_output.txt` logging:
+     - **[1] Input Claim & Execution Backend** (Local LLM vs. OpenRouter).
+     - **[2] Link Retrieval & Whitelist Audit:** Full list of candidate URLs tagged `[WHITELISTED]` or `[FILTERED OUT]`.
+     - **[3] Extracted Article Metadata:** Article titles, verified URLs, and dates.
+     - **[4] Semantic Verification Snippets:** All surviving chunks tagged with their source headlines and similarity pass status.
+     - **[5] LLM Synthesis Output:** The verbatim generated key-facts outline.
+     - **[6] Final Pipeline Status:** Explicit execution status (`success`, `failed - no urls`, etc.).
 
 ---
 
@@ -49,13 +80,17 @@ The RIS module is a visual forensic agent designed to catch "False Connection" (
 2. **Visual Query:** Executes a Google Lens search via SerpAPI using the public image URL.
 3. **Visual Filter (CLIP):** Downloads thumbnail results and embeds them using `clip-vit-base-patch32`. Computes cosine similarity against the original image. Results below a visual threshold (e.g. 0.9) are discarded to ensure only identical/highly similar images are analyzed.
 4. **Semantic Filter (MiniLM):** Uses `all-MiniLM-L6-v2` to compute semantic similarity between the user's original claim and the headlines/snippets of the visually identical image matches.
-5. **Visual Agent LLM (Nuanced 4-Way Categorization):** Passes the semantic/visual findings to the Visual Agent LLM (local Ollama `llama3:8b` or OpenRouter). Instead of forcing a fragile binary choice that misflags syndicated news or wire catalog titles, the agent classifies findings into 4 distinct categories:
+5. **Visual Agent LLM (Nuanced 4-Way Categorization):** Passes the semantic/visual findings to the Visual Agent LLM (local Ollama `qwen2.5:7b` or `llama3:8b` or OpenRouter). The agent classifies findings into 4 distinct categories:
    - `Authentic Context / Matching Event`: Genuine coverage of the event/subject matter, including syndicated news (Reuters, SCMP, KSL) and photo licensing agencies (Reuters Connect).
    - `Out-of-Context (Misattributed / Recycled)`: Imagery provably recycled from a different historical year, different disaster, or unrelated geographic location.
    - `Generic / Illustrative Imagery`: Standard stock photo or symbolic representation without deceptive intent.
    - `Inconclusive / Insufficient Evidence`: Insufficient metadata to confirm provenance.
 6. **Dedicated Forensic Logging (`output/RIS_output.txt`):**
-   - Automatically logs the full step-by-step forensic trail to `output/RIS_output.txt`: Google Lens query & candidate matches, candidate CLIP visual cosine similarities (with pass/fail verdicts against the `>= 0.90` threshold), MiniLM contextual semantic similarities (`>= 0.05`), the Visual Agent LLM prompts/responses, and the final classification with explicit `Out-of-Context` and confidence flags.
+   - Automatically logs the full step-by-step forensic trail to `output/RIS_output.txt`: 
+      - **[1]** Google Lens query & candidate matches
+      - **[2]** candidate CLIP visual cosine similarities (with pass/fail verdicts against the `>= 0.90` threshold), MiniLM contextual semantic similarities (`>= 0.05`)
+      - **[3]** the Visual Agent LLM prompts/responses
+      - **[4]** and the final classification with explicit `Out-of-Context` and confidence flags.
 
 ---
 
