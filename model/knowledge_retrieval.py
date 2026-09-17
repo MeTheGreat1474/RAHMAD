@@ -31,13 +31,21 @@ log = logging.getLogger(__name__)
 
 USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 
+_FALLBACK_MODEL_RAW = os.environ.get("LOCAL_LLM_MODEL_FALLBACK", "llama3:8b")
+_LOCAL_FALLBACKS = [m.strip() for m in _FALLBACK_MODEL_RAW.split(",") if m.strip()]
+_FALLBACK_MODEL = _LOCAL_FALLBACKS[0] if _LOCAL_FALLBACKS else "llama3:8b"
+
+_FALLBACK_OPENROUTER_RAW = os.environ.get("OPENROUTER_MODEL_FALLBACK", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
+_OPENROUTER_FALLBACKS = [m.strip() for m in _FALLBACK_OPENROUTER_RAW.split(",") if m.strip()]
+_FALLBACK_OPENROUTER = _OPENROUTER_FALLBACKS[0] if _OPENROUTER_FALLBACKS else "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+
 if USE_LOCAL_LLM:
     _API_URL = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
-    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", "llama3:8b")
+    _MODEL_ID = os.environ.get("LOCAL_LLM_MODEL", _FALLBACK_MODEL)
     _HEADERS  = {"Content-Type": "application/json"}
 else:
     _API_URL = "https://openrouter.ai/api/v1/chat/completions"
-    _MODEL_ID = "nvidia/nemotron-3-ultra-550b-a55b:free"
+    _MODEL_ID = os.environ.get("OPENROUTER_MODEL", _FALLBACK_OPENROUTER)
     _HEADERS  = {
         "Authorization": f"Bearer {os.environ.get('OPENROUTER_API_KEY', '')}",
         "Content-Type": "application/json",
@@ -440,13 +448,14 @@ class KnowledgeRetriever:
         
         if USE_LOCAL_LLM:
             models_to_try = [_MODEL_ID]
+            for m in _LOCAL_FALLBACKS:
+                if m not in models_to_try:
+                    models_to_try.append(m)
         else:
-            models_to_try = [
-                _MODEL_ID,
-                "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-                "inclusionai/ling-3.0-flash:free",
-                "poolside/laguna-m.1:free",
-            ]
+            models_to_try = [_MODEL_ID]
+            for m in _OPENROUTER_FALLBACKS:
+                if m not in models_to_try:
+                    models_to_try.append(m)
 
         for model in models_to_try:
             payload = {

@@ -58,13 +58,22 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # OpenRouter config
 # ---------------------------------------------------------------------------
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL_ID       = "deepseek/deepseek-v4-flash-0731"
+
+_DEFAULT_FALLBACKS = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free,inclusionai/ling-3.0-flash:free,poolside/laguna-m.1:free"
+_JUDGE_FALLBACK_RAW = os.environ.get("JUDGE_MODEL_FALLBACK", _DEFAULT_FALLBACKS)
+_JUDGE_FALLBACKS = [m.strip() for m in _JUDGE_FALLBACK_RAW.split(",") if m.strip()]
+
+_MODEL_ID = os.environ.get("JUDGE_MODEL", "deepseek/deepseek-v4-flash-0731")
 
 # ---------------------------------------------------------------------------
 # Enhanced System Prompt
@@ -353,12 +362,15 @@ class Judge:
     def __init__(
         self,
         api_key: str | None = None,
+        model_name: str | None = None,
         temperature: float = 0.2,
         max_tokens: int = 4096,
     ):
         self.api_key     = api_key or os.environ.get("OPENROUTER_API_KEY", "")
+        self.model_name  = model_name or _MODEL_ID
         self.temperature = temperature
         self.max_tokens  = max_tokens
+        self.fallback_models = _JUDGE_FALLBACKS
 
         # Set by _build_user_message / _call_api — readable after analyze()
         self.last_user_message: str = ""
@@ -371,7 +383,7 @@ class Judge:
                 "or pass api_key= when constructing Judge()."
             )
 
-        log.info(f"[Judge] Initialised — model: {_MODEL_ID}")
+        log.info(f"[Judge] Initialised — model: {self.model_name}")
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -400,12 +412,10 @@ class Judge:
             "X-Title":       "RAHMAD Fake News Detector",
         }
         
-        models_to_try = [
-            _MODEL_ID,
-            "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-            "inclusionai/ling-3.0-flash:free",
-            "poolside/laguna-m.1:free",
-        ]
+        models_to_try = [self.model_name]
+        for m in self.fallback_models:
+            if m not in models_to_try:
+                models_to_try.append(m)
 
         last_err = None
         for model in models_to_try:

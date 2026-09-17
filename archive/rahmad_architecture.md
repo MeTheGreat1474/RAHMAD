@@ -5,6 +5,8 @@ The RAHMAD framework is a modular, AI-driven pipeline designed for comprehensive
 
 Below is the detailed architectural breakdown of each core module in the system.
 
+Note: The LLM local model and OpenRouter model use in this system can be changed in the env file. 
+
 ---
 
 ### 1. Early Predictor Module
@@ -101,7 +103,7 @@ The Multi-Agent Debate (MAD) module is a structured, multi-agent parliamentary d
 
 #### Model & Execution Engine:
 - **Inference Engine:** Powered locally via **Ollama** using the `LLMClient` (`model/llm_client.py`).
-- **Models Used:** Default local LLM is **`llama3:8b`** (and compatible with **`qwen2.5:7b`** as configured in `LOCAL_LLM_MODEL`).
+- **Models Used:** Default local LLM is **`qwen2.5:7b`** (and compatible with **`llama3:8b`** as configured in `LOCAL_LLM_MODEL`).
 - **Design Rationale:** Running the debate agents locally on Ollama guarantees zero API cost and removes cloud rate-limiting across 7+ sequential LLM generation steps (1 context summary + 6 speaker rounds + 1 synthesis). It also maintains data privacy and avoids cloud content-moderation safety refusals when debating sensitive geopolitical or controversial topics.
 
 #### How It Was Created & Core Architecture:
@@ -132,7 +134,12 @@ The Multi-Agent Debate (MAD) module is a structured, multi-agent parliamentary d
 ### 5. Judge Module (Reasoning Layer)
 **Location:** `model/judge.py`
 
-The Judge module is the final arbiter. It consumes the raw article text, the Early Predictor signal, the synthesized Knowledge Retrieval facts, and the Reverse Image Search forensic analysis.
+The Judge module is the final arbiter. It consumes the raw article text, the Early Predictor signal, the synthesized Knowledge Retrieval facts, the Reverse Image Search forensic analysis, and the Multi-Agent Debate synthesis.
+
+#### Model & Execution Engine:
+- **Inference Provider:** Powered via OpenRouter API.
+- **Models Used:** Dynamically loaded from `.env` via `JUDGE_MODEL` (defaulting to **`deepseek/deepseek-v4-flash-0731`**), with resilient multi-model fallback configured in `JUDGE_MODEL_FALLBACK` (e.g. `nvidia/nemotron-3-nano-omni-30b`, `ling-3.0-flash`, `poolside/laguna-m.1`).
+- **Prompt Framework:** Constitutional AI + Step-Back Analysis + Chain-of-Thought (CoT) + Self-Refine critique.
 
 **Architecture & Flow:**
 1. **Context Aggregation:** Compiles all inputs into a massive system prompt context.
