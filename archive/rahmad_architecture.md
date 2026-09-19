@@ -12,7 +12,7 @@ Note: The LLM local model and OpenRouter model use in this system can be changed
 ### 1. Early Predictor Module
 **Location:** `model/early_predictor.py`
 
-The Early Predictor (EP) serves as a fast, lightweight first pass. It attempts to classify the article using a fine-tuned multimodal model. If the model is uncertain, the article is escalated to the Multi-Agent Debate pipeline.
+The Early Predictor (EP) serves as a fast, lightweight multimodal initial estimate. It classifies the article using a fine-tuned multimodal model and provides grounding context to downstream modules. It acts strictly as an evidentiary signal and does not gate or skip downstream modules (such as Multi-Agent Debate).
 
 **Architecture & Flow:**
 1. **Input Preprocessing:** Text is cleaned (HTML tags, URLs, Emojis removed) to match the training distribution. Images are processed via `CLIPProcessor`.
@@ -20,10 +20,11 @@ The Early Predictor (EP) serves as a fast, lightweight first pass. It attempts t
 3. **LoRA Adapters:** Parameter-Efficient Fine-Tuning (PEFT) LoRA adapters are applied to the CLIP attention layers.
 4. **Fusion:** The text embeddings `[512]` and image embeddings `[512]` are concatenated into a single fused tensor `[1024]`.
 5. **Classification (MLP Head):** The fused tensor is passed through a single-layer Multi-Layer Perceptron (Linear `1024 -> 1` + Sigmoid activation) to output a scalar probability between `0` (Real) and `1` (Fake).
-6. **Thresholding:**
-   - **p >= 0.60:** High-confidence Fake.
-   - **p <= 0.40:** High-confidence Real.
-   - **0.40 < p < 0.60:** Uncertain. The `pass_to_agents` flag is set to `True`, triggering the full agent pipeline.
+6. **Thresholding & Signal Pass-Through:**
+   - **p >= 0.60:** Preliminary Fake.
+   - **p <= 0.40:** Preliminary Real.
+   - **0.40 < p < 0.60:** Uncertain.
+   - All news items unconditionally proceed through the full Knowledge Retrieval, Reverse Image Search, and Multi-Agent Debate pipelines regardless of EP probability.
 
 ---
 
@@ -40,8 +41,9 @@ The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and 
 
 #### Architecture & Flow:
 1. **Search & Multi-Source Retrieval:**
-   - **Primary Endpoint:** Queries the DuckDuckGo HTML endpoint (`https://html.duckduckgo.com/html/`) to retrieve direct article URLs without search API rate limits.
-   - **Secondary Fallback:** If fewer than 5 candidate URLs are found, queries `duckduckgo_search` (`DDGS.news()`) for additional coverage.
+   - **Query Sanitization:** Automatically extracts the concise headline/claim from the input text, stripping news wire prefixes and datelines (e.g. `SINGAPORE/JAKARTA, Sept 9 (Reuters) -`) so search engines receive clean, high-precision search keywords.
+   - **Primary Endpoint:** Queries the DuckDuckGo HTML endpoint (`https://html.duckduckgo.com/html/`) and `duckduckgo_search` (`DDGS.news()`).
+   - **Tertiary Fallback (SerpAPI Google Search):** If DuckDuckGo hits a rate limit (`403 Ratelimit`) or returns fewer than 3 URLs, automatically falls back to querying Google Search via SerpAPI using `SERPAPI_API_KEY`, ensuring uninterrupted retrieval.
 2. **Strict Domain Whitelisting:**
    - URLs are immediately checked against an authoritative list of verified, reputable international and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT).
    - Unverified blogs, opinion sites, and tabloids are filtered out prior to scraping.
@@ -131,27 +133,95 @@ The Multi-Agent Debate (MAD) module is a structured, multi-agent parliamentary d
 
 ---
 
-### 5. Judge Module (Reasoning Layer)
-**Location:** `model/judge.py`
+### 5. Judge Module (Reasoning & Judicial Synthesis Layer)
+**Location:** `model/judge.py`, `backend/analyzer.py`
 
-The Judge module is the final arbiter. It consumes the raw article text, the Early Predictor signal, the synthesized Knowledge Retrieval facts, the Reverse Image Search forensic analysis, and the Multi-Agent Debate synthesis.
+The Judge module serves as the final judicial authority within RAHMAD. It consumes the raw article text, the Early Predictor (EP) multimodal signal, the synthesized Knowledge Retrieval (KR) facts, the Reverse Image Search (RIS) visual provenance, and the Multi-Agent Debate (MAD) discourse. 
+
+To support rigorous empirical evaluation and ablation studies, the Judge module implements three configurable architectural modes controlled via the `JUDGE_MODE` environment variable in `.env`:
+1. **`single` (Baseline):** Standard Single-Pass Constitutional Chain-of-Thought reasoning.
+2. **`self_consistency`:** Stochastic majority-vote aggregation across $N=3$ parallel reasoning paths.
+3. **`panel` (Revamped Multi-Judge Architecture):** A concurrent committee of 3 domain specialists that runs in parallel (Fact-Checker, Linguist, Logician) and is synthesized by a Chief Judicial Magistrate.
 
 #### Model & Execution Engine:
-- **Inference Provider:** Powered via OpenRouter API.
-- **Models Used:** Dynamically loaded from `.env` via `JUDGE_MODEL` (defaulting to **`deepseek/deepseek-v4-flash-0731`**), with resilient multi-model fallback configured in `JUDGE_MODEL_FALLBACK` (e.g. `nvidia/nemotron-3-nano-omni-30b`, `ling-3.0-flash`, `poolside/laguna-m.1`).
-- **Prompt Framework:** Constitutional AI + Step-Back Analysis + Chain-of-Thought (CoT) + Self-Refine critique.
+- **Inference Provider:** OpenRouter Cloud API.
+- **Models Used:** Dynamically loaded via `JUDGE_MODEL` (defaulting to **`deepseek/deepseek-v4-flash-0731`**), backed by a fault-tolerant fallback chain configured in `JUDGE_MODEL_FALLBACK` (`nvidia/nemotron-3-nano-omni-30b`, `inclusionai/ling-3.0-flash`, `poolside/laguna-m.1`).
+- **Prompt Frameworks:** Constitutional AI, Step-Back Domain Orientation, Persona Specialization, Chain-of-Thought (CoT), and Judicial Synthesis.
 
-**Architecture & Flow:**
-1. **Context Aggregation:** Compiles all inputs into a massive system prompt context.
-2. **7-Step Reasoning Protocol:** The cloud LLM executes a mandatory Chain-of-Thought protocol:
-   - **Step 1 - Domain Orientation:** Step-back analysis to determine context (Politics, Health, Satire).
-   - **Step 2 - Claim Extraction:** Identifying the core falsifiable claims.
-   - **Step 3 - Source & Context Verification:** Cross-referencing claims against KR and RIS data.
-   - **Step 4 - Linguistic & Visual Tone Analysis:** Identifying hyperbole, emotionally manipulative language, or satirical cues.
-   - **Step 5 - Deception & Logical Fallacy Check:** Looking for misleading phrasing.
-   - **Step 6 - Classification Alignment:** Mapping the evidence to one of the 8 predefined taxonomy categories.
-   - **Step 7 - Self-Critique:** A self-refine step challenging the current assumption (e.g., "Am I misinterpreting satire as fabricated news?").
-3. **JSON Output Formulation:** The LLM produces a strict JSON structure containing the `verdict`, `color_class`, `confidence`, a markdown-bolded `justification`, `key_facts`, and the raw `reasoning` trace.
+---
+
+#### Architectural Pipelines:
+
+##### Pipeline A: Standard Single-Pass Mode (`JUDGE_MODE=single`)
+- **Execution Cost:** 1x API cost | **Latency:** Fastest (single LLM pass).
+- **Architecture:** A single generalist LLM processes all multimodal and agentic evidence concurrently through a mandatory 7-step Chain-of-Thought protocol:
+  1. **Step 1 — Domain Orientation:** Step-back analysis determining publication domain (Politics, Health, Satire, Finance).
+  2. **Step 2 — Claim Extraction:** Isolating 3–5 core verifiable claims.
+  3. **Step 3 — Internal Consistency Audit:** Auditing headline-to-body coherence, quote alignment, and numerical data.
+  4. **Step 4 — Framing and Style Analysis:** Detecting emotional manipulation, sensationalism, and urgency cues.
+  5. **Step 5 — Source and Attribution Analysis:** Scrutinizing source authenticity and imposter markers.
+  6. **Step 6 — Multimodal & Multi-Agent Evidence Integration:** Corroborating claims against KR, checking RIS visual provenance (Authentic vs. Recycled/Out-of-Context), weighing MAD debater clash points, and calibrating against EP.
+  7. **Step 7 — Self-Critique (Self-Refine):** Counterfactual reasoning challenging initial assumptions before committing to a verdict.
+
+##### Pipeline B: Self-Consistency Majority Vote (`JUDGE_MODE=self_consistency`)
+- **Execution Cost:** 3x API cost | **Latency:** Parallelized across $N=3$ threads.
+- **Architecture:** Dispatches 3 parallel API queries of the 7-step protocol using a higher sampling temperature (`temperature=0.7`) to promote diverse reasoning paths.
+- **Aggregation Protocol:**
+  - Performs majority voting across candidate verdicts to filter out stochastic generation anomalies.
+  - Averages confidence percentages across runs that agree on the majority verdict.
+  - Selects the reasoning trace and justification from the highest-confidence majority run, merging unique key facts.
+
+##### Pipeline C: Multi-Judge Specialized Panel (`JUDGE_MODE=panel`)
+- **Execution Cost:** ~4x API cost | **Latency:** 2-stage pipelined execution (3 parallel specialists + 1 sequential chief synthesizer).
+- **Architecture:** Rather than placing the entire cognitive load onto a single generalist prompt (which suffers from "lost in the middle" degradation), this architecture divides evaluation across three specialized, independent domain personas running concurrently via `ThreadPoolExecutor(max_workers=3)`:
+  1. **The Senior Fact-Checker (`_FACT_CHECKER_PROMPT`):**
+     - **Focus:** Factual veracity, external evidence corroboration, and visual/discourse provenance.
+     - **Inputs Evaluated:** KR ground-truth news, RIS Google Lens findings (Out-of-Context vs. Authentic), and MAD arguments.
+     - **Outputs:** Qualitative claim-by-claim corroboration summary and a **Factual Risk Score (1–10)**.
+  2. **The Senior Linguist (`_LINGUIST_PROMPT`):**
+     - **Focus:** Stylometrics, emotional manipulation, semantic coherence, and rhetorical framing.
+     - **Inputs Evaluated:** Article text, headline-to-body alignment, sensationalism cues, loaded language, and satirical tropes.
+     - **Outputs:** Stylistic markers, emotional manipulation rating (Low/Medium/High), and a **Linguistic Risk Score (1–10)**.
+  3. **The Senior Logician (`_LOGICIAN_PROMPT`):**
+     - **Focus:** Internal contradictions, logical fallacies, source attribution plausibility, and communicative intent.
+     - **Inputs Evaluated:** Article structure, statistical consistency, imposter/attribution cues, and intent categorization (Informational, Satirical, Deceptive, Imposter, or Sensationalist).
+     - **Outputs:** Logical audit trail and a **Logical Risk Score (1–10)**.
+
+  4. **Chief Judicial Magistrate (`_CHIEF_JUDGE_PROMPT`):**
+     - **Role:** Presiding judge and final synthesis arbiter.
+     - **Mechanism:** Receives the original text, EP signal, and the structured assessments + risk scores from all 3 specialists.
+     - **Judicial Synthesis Principles:**
+       - *Factual Dominance:* Strong refutation by the Fact-Checker or recycled imagery from RIS leads to `FABRICATED CONTENT`, `FALSE CONNECTION`, or `MISLEADING CONTENT`.
+       - *Satire Resolution:* If the Linguist and Logician identify satirical tropes and humor intent, the article is classified as `SATIRE OR PARODY` even if facts are literal inventions.
+       - *Imposter Detection:* If the Logician detects impersonation of official institutions or journalists, classified as `IMPOSTER CONTENT`.
+       - *Credibility Threshold:* Low risk scores (1–3) across all three specialists corroborate `CREDIBLE`.
+
+---
+
+#### Output Format & Contract:
+Regardless of the active mode, the Judge module guarantees an identical JSON schema to the frontend contract:
+```json
+{
+  "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
+  "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
+  "confidence": "92.0%",
+  "justification": "2–3 sentence executive explanation with **markdown bolded** evidence and entities.",
+  "reasoning": "Full step-by-step or panel judicial deliberation scratchpad.",
+  "key_facts": ["Observation 1", "Observation 2", "Observation 3"],
+  "links": [{"source": "REUTERS", "title": "...", "url": "..."}],
+  "ep_signal": { ... },
+}
+```
+
+#### Dedicated Forensic Logging (`output/JUDGE_output.txt`):
+Automatically logs the end-to-end judicial reasoning session to `output/JUDGE_output.txt`:
+- **[1] Configuration & Context Audit:** Active mode (`single`, `panel`, `self_consistency`), active model IDs, EP multimodal metrics, and external evidence ingestion status.
+- **[2] Original News Article:** Verbatim text analyzed.
+- **[3] Mode-Specific Intermediates:**
+  - `panel`: Detailed reports from the Senior Fact-Checker, Senior Linguist, and Senior Logician along with their domain risk scores (1-10) and the Chief Judge synthesis scratchpad.
+  - `self_consistency`: Majority vote tallies across the $N=3$ parallel reasoning paths and selected run reasoning.
+  - `single`: Full 7-step Constitutional Chain-of-Thought deliberation.
+- **[4] Final Judicial Verdict:** The final classified verdict, confidence rating, color class, executive justification, key facts, and verified links.
 
 ---
 

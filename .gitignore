@@ -1,4 +1,4 @@
-﻿# Model checkpoints and outputs
+# Model checkpoints and outputs
 early_predictor_output/
 *.pt
 *.safetensors
@@ -13,6 +13,7 @@ output_log.txt
 KR_output.txt
 RIS_output.txt
 MAD_output.txt
+JUDGE_output.txt
 
 # Python/env clutter
 __pycache__/

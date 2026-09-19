@@ -8,6 +8,7 @@ Provides verified, external supporting knowledge to the Judge module.
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -200,18 +201,33 @@ class KnowledgeRetriever:
 
     def search_claim(self, claim: str, max_results: int = 10) -> List[str]:
         """
-        Queries DuckDuckGo HTML endpoint and DDGS for news articles matching the claim.
+        Queries search providers (DuckDuckGo HTML, DDGS, and SerpAPI Google Search fallback)
+        for news articles matching the claim.
         Returns a list of direct article URLs.
         """
-        log.info(f"Searching news sources for: '{claim}'")
+        # 1. Clean and isolate concise search query (prefer headline, strip datelines/wire prefixes)
+        lines = [l.strip() for l in claim.strip().splitlines() if l.strip()]
+        search_query = lines[0] if lines else claim[:120].strip()
+        # Remove common news wire datelines like "SINGAPORE/JAKARTA, Sept 9 (Reuters) -"
+        search_query = re.sub(r"^[A-Z\s/]+,\s*[A-Za-z]+\s*\d+\s*\([A-Za-z]+\)\s*[-–—]\s*", "", search_query).strip()
+        # If still over 140 chars, truncate to first complete sentence or 140 chars
+        if len(search_query) > 140:
+            first_sent = search_query.split(".")[0].strip()
+            if len(first_sent) > 20:
+                search_query = first_sent
+            else:
+                search_query = search_query[:140].strip()
+
+        log.info(f"Searching news sources for query: '{search_query}' (original claim length: {len(claim)})")
+        print(f"       Search Query: '{search_query}'")
         urls = []
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
         
-        # 1. Primary: DuckDuckGo HTML endpoint (Zero rate limits, direct URLs)
+        # 1. Primary: DuckDuckGo HTML endpoint
         try:
             resp = requests.post(
                 "https://html.duckduckgo.com/html/",
-                data={"q": claim},
+                data={"q": search_query},
                 headers=headers,
                 timeout=10
             )
@@ -229,7 +245,7 @@ class KnowledgeRetriever:
             try:
                 ddgs = DDGS()
                 try:
-                    results = list(ddgs.news(claim, max_results=max_results))
+                    results = list(ddgs.news(search_query, max_results=max_results))
                     for res in results:
                         if 'url' in res and res['url'] not in urls:
                             urls.append(res['url'])
@@ -237,6 +253,32 @@ class KnowledgeRetriever:
                     log.warning(f"DDGS news search error: {ne}")
             except Exception as e:
                 log.error(f"DDGS search error: {e}")
+
+        # 3. Tertiary: SerpAPI Google Search fallback (resilient to bot-blocking and rate limits)
+        if len(urls) < 3:
+            serpapi_key = os.environ.get("SERPAPI_API_KEY")
+            if serpapi_key:
+                try:
+                    from serpapi import GoogleSearch
+                    log.info(f"Using SerpAPI Google Search fallback for query: '{search_query}'")
+                    print(f"       [SerpAPI Fallback] Querying Google Search via SerpAPI for news...")
+                    search = GoogleSearch({
+                        "q": search_query,
+                        "api_key": serpapi_key,
+                        "num": max_results,
+                    })
+                    res_dict = search.get_dict()
+                    for item in res_dict.get("organic_results", []):
+                        link = item.get("link")
+                        if link and link.startswith("http") and link not in urls:
+                            urls.append(link)
+                    for item in res_dict.get("news_results", []):
+                        link = item.get("link")
+                        if link and link.startswith("http") and link not in urls:
+                            urls.append(link)
+                    log.info(f"SerpAPI retrieved {len(urls)} URLs so far.")
+                except Exception as se:
+                    log.warning(f"SerpAPI search fallback error: {se}")
                 
         log.info(f"Retrieved {len(urls)} URLs across sources.")
         return urls

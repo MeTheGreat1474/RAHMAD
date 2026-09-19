@@ -29,6 +29,7 @@ No-image fallback
 import base64
 import io
 import logging
+import os
 import urllib.request
 
 from PIL import Image
@@ -263,7 +264,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     kr_articles = []
     try:
         retriever = _get_retriever()
-        claim_query = processed["lead_text"] if (has_clip and "lead_text" in processed) else input_text[:300]
+        # Use input_text[:800] to preserve headline on line 1 for search,
+        # and provide substantive claim context for semantic verification
+        claim_query = input_text[:800].strip()
         kr_data = retriever.retrieve_detailed(claim_query)
         external_knowledge = kr_data["summary"]
         kr_articles = kr_data.get("articles", [])
@@ -324,33 +327,36 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     t_mad_start = time.perf_counter()
     mad_summary = ""
     agents_info = []
-    # Only run MAD if EP says pass to agents (or if no image and EP skipped)
-    if ep_result.get("pass_to_agents", True):
-        try:
-            print("  [Step 4.7] Initializing Multi-Agent Debate (MAD) locally...")
-            orchestrator = _get_mad_orchestrator()
-            mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
-            mad_runtime = time.perf_counter() - t_mad_start
-            print(f"  [Step 4.7] Multi-Agent Debate completed in {mad_runtime:.2f}s")
-        except Exception as exc:
-            mad_runtime = time.perf_counter() - t_mad_start
-            log.error(f"[analyzer] MAD failed: {exc}", exc_info=True)
-            mad_summary = f"MAD encountered an error: {exc}"
-            print(f"  [X] MAD Pipeline Error in {mad_runtime:.2f}s: {exc}")
-    else:
+    try:
+        print("  [Step 4.7] Initializing Multi-Agent Debate (MAD) locally...")
+        orchestrator = _get_mad_orchestrator()
+        mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
         mad_runtime = time.perf_counter() - t_mad_start
-        mad_summary = "No Multi-Agent Debate needed. Early Predictor is highly confident."
-        print(f"  [Step 4.7] Multi-Agent Debate skipped based on EP confidence (Runtime: {mad_runtime:.2f}s)")
+        print(f"  [Step 4.7] Multi-Agent Debate completed in {mad_runtime:.2f}s")
+    except Exception as exc:
+        mad_runtime = time.perf_counter() - t_mad_start
+        log.error(f"[analyzer] MAD failed: {exc}", exc_info=True)
+        mad_summary = f"MAD encountered an error: {exc}"
+        print(f"  [X] MAD Pipeline Error in {mad_runtime:.2f}s: {exc}")
         
     plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
 
     # ── 5. Judge Module ───────────────────────────────────────────────────
     t_judge_start = time.perf_counter()
     try:
-        from model.judge import _SYSTEM_PROMPT   # module-level constant
+        from model.judge import _SYSTEM_PROMPT, _CHIEF_JUDGE_PROMPT   # module-level constants
+
+        judge_mode = os.environ.get("JUDGE_MODE", "single").strip().lower()
+        mode_labels = {
+            "panel":            "Multi-Judge Panel (Specialized Personas + Chief Synthesizer)",
+            "self_consistency": "Self-Consistency Majority Vote (n=3)",
+            "single":           "Standard Single-Pass Reasoning",
+        }
+        mode_label = mode_labels.get(judge_mode, f"Custom Mode ({judge_mode})")
 
         print("\n" + "=" * 50)
         print("  JUDGE MODULE (CLOUD LLM REASONING LAYER)")
+        print(f"  Architecture Pipeline : {mode_label}")
         print("=" * 50)
         if external_knowledge or ris_summary or mad_summary:
             print("  [OK] Forwarding synthesized KR, RIS, and MAD context to Judge.")
@@ -359,14 +365,35 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             
         print(f"  Sending request to OpenRouter Cloud LLM... Please wait...")
         
-        judge  = _get_judge()
-        result = judge.analyze(
-            llm_text, 
-            ep_result, 
-            external_knowledge=external_knowledge.strip(),
-            ris_summary=ris_summary.strip(),
-            mad_summary=mad_summary.strip()
-        )
+        judge = _get_judge()
+        if judge_mode == "panel":
+            result = judge.panel_analyze(
+                llm_text,
+                ep_result,
+                external_knowledge=external_knowledge.strip(),
+                ris_summary=ris_summary.strip(),
+                mad_summary=mad_summary.strip()
+            )
+            logged_system_prompt = _CHIEF_JUDGE_PROMPT
+        elif judge_mode == "self_consistency":
+            result = judge.self_consistency_analyze(
+                llm_text,
+                ep_result,
+                n=3,
+                external_knowledge=external_knowledge.strip(),
+                ris_summary=ris_summary.strip(),
+                mad_summary=mad_summary.strip()
+            )
+            logged_system_prompt = _SYSTEM_PROMPT
+        else:
+            result = judge.analyze(
+                llm_text, 
+                ep_result, 
+                external_knowledge=external_knowledge.strip(),
+                ris_summary=ris_summary.strip(),
+                mad_summary=mad_summary.strip()
+            )
+            logged_system_prompt = _SYSTEM_PROMPT
         
         # Populate frontend links from Knowledge Retrieval articles
         if kr_articles:
@@ -386,8 +413,23 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         judge_runtime = time.perf_counter() - t_judge_start
 
         # Log Judge input (prompt) and output (raw response + parsed)
-        plog.log_judge_input(_SYSTEM_PROMPT, judge.last_user_message)
+        plog.log_judge_input(logged_system_prompt, judge.last_user_message)
         plog.log_judge_output(judge.last_raw_response, result, runtime=judge_runtime)
+
+        # Write dedicated forensic log to output/JUDGE_output.txt
+        try:
+            judge.save_judge_log(
+                result=result,
+                mode=judge_mode,
+                llm_text=llm_text,
+                ep_result=ep_result,
+                external_knowledge=external_knowledge.strip(),
+                ris_summary=ris_summary.strip(),
+                mad_summary=mad_summary.strip(),
+                runtime=judge_runtime,
+            )
+        except Exception as log_err:
+            log.warning(f"[analyzer] Could not write JUDGE_output.txt: {log_err}")
 
         log.info(
             f"[analyzer] Judge → {result['verdict']} ({result['confidence']})"

@@ -55,6 +55,8 @@ import os
 import re
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+from pathlib import Path
 
 import requests
 
@@ -324,6 +326,109 @@ as a JSON object.\
 # Maximum characters of article text sent to the LLM
 _MAX_TEXT_CHARS = 6000
 
+# ---------------------------------------------------------------------------
+# Multi-Judge Panel Prompts (Specialized Personas & Chief Synthesizer)
+# ---------------------------------------------------------------------------
+
+_FACT_CHECKER_PROMPT = """\
+You are the Senior Fact-Checker and Evidence Verifier on the RAHMAD judicial panel.
+Your sole mission is to assess the FACTUAL ACCURACY, PROVENANCE, and EXTERNAL CORROBORATION of the claims made in the news article.
+
+Evidence available to you:
+1. Knowledge Retrieval Evidence (ground-truth external reports from reputable news sources)
+2. Reverse Image Search Evidence (visual provenance, authenticity vs. out-of-context recycling)
+3. Multi-Agent Debate Summary (critical arguments from Real News and Fake News domain debaters)
+
+Evaluation Protocol:
+- Identify the core verifiable factual claims (dates, events, people, actions, outcomes).
+- Cross-reference claims against external Knowledge Retrieval: Are they corroborated, refuted, or unmentioned?
+- Analyze Reverse Image Search findings: Is the image authentic to the event, or misattributed/recycled?
+- Evaluate Multi-Agent Debate arguments: Which side presents stronger factual documentation?
+- Assign a Factual Risk Score from 1 to 10 (1 = completely verified and corroborated, 10 = completely fabricated, contradictory, or debunked).
+
+Output Format:
+You must output a single, valid JSON object:
+{
+  "factual_analysis": "<concise 3-5 sentence analysis of claim corroboration, image authenticity, and external evidence alignment>",
+  "corroborated_claims": ["<claim 1>", "<claim 2>"],
+  "refuted_or_unsubstantiated_claims": ["<claim 1>", "<claim 2>"],
+  "factual_risk_score": <integer from 1 to 10>
+}
+"""
+
+_LINGUIST_PROMPT = """\
+You are the Senior Linguist and Stylometrics Analyst on the RAHMAD judicial panel.
+Your sole mission is to assess the LINGUISTIC PATTERNS, EMOTIONAL MANIPULATION, TONE, and RHETORICAL FRAMING of the news article.
+Do NOT attempt to fact-check external claims; focus strictly on HOW the text is written.
+
+Evaluation Protocol:
+- Emotional manipulation: Does the article deploy sensationalism, rage-bait, panic, excessive exclamation, or loaded adjectives?
+- Headline vs. Body alignment: Does the headline make exaggerated, clickbait, or unsupported claims compared to the body text?
+- Genre & Stylistic consistency: Does the text adhere to objective journalistic standards, or does it exhibit hallmarks of satire, parody, partisan agitprop, or conspiratorial writing?
+- Semantic coherence: Is the language logically coherent, or does it rely on vague innuendo and rhetorical sleight-of-hand?
+- Assign a Linguistic Risk Score from 1 to 10 (1 = highly objective, neutral, professional journalistic tone; 10 = extreme clickbait, inflammatory propaganda, deceptive framing, or obvious satire).
+
+Output Format:
+You must output a single, valid JSON object:
+{
+  "stylistic_analysis": "<concise 3-5 sentence analysis of tone, emotional cues, headline framing, and rhetorical markers>",
+  "detected_devices": ["<e.g. Sensationalism, Loaded Language, Fear Appeal, Irony/Satirical Tropes>"],
+  "emotional_manipulation_level": "Low" | "Medium" | "High",
+  "linguistic_risk_score": <integer from 1 to 10>
+}
+"""
+
+_LOGICIAN_PROMPT = """\
+You are the Senior Logician and Intent Analyst on the RAHMAD judicial panel.
+Your sole mission is to assess the INTERNAL CONSISTENCY, ARGUMENT COHERENCE, SOURCE ATTRIBUTION, and COMMUNICATIVE INTENT of the news article.
+
+Evaluation Protocol:
+- Internal consistency: Do the statements within the article contradict one another? Do reported numbers/statistics add up?
+- Source attribution plausibility: Are quoted authorities, institutions, or witnesses credible and specific, or are they suspiciously anonymous, fabricated, or misattributed? Check for signs of imposter content (impersonating known media or officials).
+- Communicative intent: What is the primary purpose of the piece? (To inform objectively, to satirize current events, to generate clickbait ad revenue, to deceive/defame, or to spread propaganda?)
+- Logical fallacies: Detect false dichotomies, non-sequiturs, strawman arguments, or guilt-by-association.
+- Assign a Logical Risk Score from 1 to 10 (1 = rigorous internal logic, transparent sourcing, authentic informational intent; 10 = severe contradictions, fabricated sources, imposter attribution, or deliberate deception).
+
+Output Format:
+You must output a single, valid JSON object:
+{
+  "logical_analysis": "<concise 3-5 sentence analysis of internal consistency, sourcing plausibility, and underlying intent>",
+  "perceived_intent": "Informational" | "Satirical" | "Deceptive" | "Imposter" | "Sensationalist",
+  "fallacies_or_contradictions": ["<specific issue 1>", "<specific issue 2>"],
+  "logical_risk_score": <integer from 1 to 10>
+}
+"""
+
+_CHIEF_JUDGE_PROMPT = """\
+You are the Chief Judicial Magistrate and Synthesis Arbiter for RAHMAD (Reliable Automated Hybrid Multi-Agent Detection).
+You preside over a panel of three specialized investigative judges who have analyzed the news article:
+1. The Fact-Checker (External Evidence, Reverse Image Search provenance, and Multi-Agent Debate verification)
+2. The Linguist (Writing style, emotional manipulation, sensationalism, and rhetoric)
+3. The Logician (Internal consistency, source attribution plausibility, and communicative intent)
+
+You also receive the Early Predictor multimodal signal and the original article text.
+
+Judicial Synthesis Principles:
+- Factual Priority: If the Fact-Checker proves core claims are refuted or the image is out-of-context (recycled), strong presumption toward FABRICATED CONTENT, FALSE CONNECTION, or MISLEADING CONTENT.
+- Satire/Parody Recognition: If the Linguist and Logician detect satirical markers, irony, and humorous intent, classify as SATIRE OR PARODY even if the claims are factually untrue.
+- Imposter Detection: If the Logician detects false impersonation of an established institution or journalist, classify as IMPOSTER CONTENT.
+- Credibility Standard: When all three specialists report low risk scores (1-3) and confirm corroboration and internal consistency, classify as CREDIBLE.
+- Inconclusive Standard: Use INCONCLUSIVE only when signals remain irreconcilably divided without sufficient evidence.
+
+Your output MUST be a single, valid JSON object formatted exactly as follows:
+Important: Use markdown bolding (e.g. **key finding** or **critical claim**) to emphasize important phrases across "justification", "reasoning", and "key_facts".
+Important: When referring to the Early Predictor or Reverse Image Search, always use their full names instead of shortforms like EP or RIS.
+
+{
+  "reasoning": "<synthesized judicial deliberation detailing how the specialist findings were weighed, written as 8–12 concise sentences, using **bold** for key concepts>",
+  "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
+  "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
+  "confidence": "<number>%",
+  "justification": "<2–3 sentence explanation of your final verdict, using **bold** for critical signals and key entities>",
+  "key_facts": ["<observation 1 with **key points** bolded>", "<observation 2>", "<observation 3>"]
+}
+"""
+
 
 # ===========================================================================
 # Judge
@@ -403,7 +508,12 @@ class Judge:
         self.last_user_message = msg
         return msg
 
-    def _call_api(self, user_message: str, temperature: float | None = None) -> str:
+    def _call_api(
+        self,
+        user_message: str,
+        temperature: float | None = None,
+        system_prompt: str | None = None,
+    ) -> str:
         """POST to OpenRouter and return the raw content string with multi-model fallback."""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -417,13 +527,15 @@ class Judge:
             if m not in models_to_try:
                 models_to_try.append(m)
 
+        sys_prompt = system_prompt if system_prompt is not None else _SYSTEM_PROMPT
+
         last_err = None
         for model in models_to_try:
             print(f"  [Judge] Querying OpenRouter model '{model}'...")
             payload = {
                 "model": model,
                 "messages": [
-                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "system", "content": sys_prompt},
                     {"role": "user",   "content": user_message},
                 ],
                 "temperature": temperature if temperature is not None else self.temperature,
@@ -791,6 +903,276 @@ class Judge:
         aggregated = self._aggregate_verdicts(results)
         aggregated["ep_signal"] = ep_result
         return aggregated
+
+    def panel_analyze(
+        self,
+        llm_text: str,
+        ep_result: dict,
+        external_knowledge: str = "",
+        ris_summary: str = "",
+        mad_summary: str = "",
+    ) -> dict:
+        """
+        Multi-Judge Panel analysis:
+        Executes 3 specialized judicial agents concurrently:
+          1. Fact-Checker  (External KR evidence, Reverse Image Search provenance, Multi-Agent Debate)
+          2. Linguist      (Stylometrics, emotional manipulation, sensationalism, rhetoric)
+          3. Logician      (Internal consistency, source attribution plausibility, communicative intent)
+        Then feeds their qualitative reports and risk scores to the Chief Judicial Magistrate
+        for final synthesis.
+
+        Parameters
+        ----------
+        llm_text : str
+            Cleaned full article text.
+        ep_result : dict
+            Output of EarlyPredictor.predict(). Pass {} if EP was skipped.
+        external_knowledge : str
+            Verified external knowledge retrieved for the claim.
+        ris_summary : str
+            Reverse Image Search visual provenance summary.
+        mad_summary : str
+            Multi-Agent Debate argument summary.
+
+        Returns
+        -------
+        dict
+            Synthesized verdict matching frontend schema, plus 'panel_details'
+            containing assessments from all 3 specialists.
+        """
+        self.last_raw_response = ""
+        self.last_user_message = ""
+        user_message = self._build_user_message(
+            llm_text, ep_result, external_knowledge, ris_summary, mad_summary
+        )
+
+        log.info("[Judge][Panel] Starting Multi-Judge Panel analysis with 3 specialists…")
+        print("  [Judge Panel] Dispatching to 3 Specialized Judges concurrently...")
+
+        specialist_tasks = {
+            "fact_checker": (_FACT_CHECKER_PROMPT, "Senior Fact-Checker"),
+            "linguist":     (_LINGUIST_PROMPT, "Senior Linguist"),
+            "logician":     (_LOGICIAN_PROMPT, "Senior Logician"),
+        }
+
+        specialist_results = {}
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            future_to_role = {
+                executor.submit(self._call_api, user_message, 0.2, prompt): (role, label)
+                for role, (prompt, label) in specialist_tasks.items()
+            }
+            for future in as_completed(future_to_role):
+                role, label = future_to_role[future]
+                try:
+                    raw_text = future.result()
+                    try:
+                        clean_raw = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+                        clean_raw = re.sub(r"```(?:json)?\s*", "", clean_raw).strip().rstrip("`").strip()
+                        parsed = json.loads(clean_raw)
+                        specialist_results[role] = parsed
+                    except Exception:
+                        specialist_results[role] = {"summary": raw_text.strip()}
+                    print(f"  [Judge Panel] [OK] {label} completed assessment.")
+                except Exception as exc:
+                    log.warning(f"[Judge Panel] Specialist {label} failed: {exc}")
+                    print(f"  [Judge Panel] [!] Specialist {label} failed: {exc}")
+                    specialist_results[role] = {"error": str(exc), "risk_score": 5}
+
+        chief_user_message = (
+            "=== SPECIALIST JUDGE PANEL FINDINGS ===\n\n"
+            f"--- 1. FACT-CHECKER ASSESSMENT (Evidence, KR, RIS, MAD) ---\n"
+            f"{json.dumps(specialist_results.get('fact_checker', {}), indent=2)}\n\n"
+            f"--- 2. LINGUIST ASSESSMENT (Stylometrics, Emotion, Manipulation) ---\n"
+            f"{json.dumps(specialist_results.get('linguist', {}), indent=2)}\n\n"
+            f"--- 3. LOGICIAN ASSESSMENT (Internal Logic, Sourcing, Intent) ---\n"
+            f"{json.dumps(specialist_results.get('logician', {}), indent=2)}\n\n"
+            f"=== ORIGINAL CONTEXT & ARTICLE ===\n"
+            f"{user_message}\n\n"
+            "Now synthesize all specialist evaluations, resolve any conflicts, "
+            "and deliver your final judicial verdict as JSON."
+        )
+
+        print("  [Judge Panel] Chief Judicial Magistrate synthesizing panel findings...")
+        log.info("[Judge][Panel] Querying Chief Judge for final synthesis…")
+
+        try:
+            chief_raw = self._call_api(
+                chief_user_message,
+                temperature=0.2,
+                system_prompt=_CHIEF_JUDGE_PROMPT,
+            )
+            result = self._parse_response(chief_raw)
+            result["ep_signal"] = ep_result
+            result["panel_details"] = specialist_results
+            self.last_user_message = chief_user_message
+            self.last_raw_response = chief_raw
+            log.info(f"[Judge][Panel] Final verdict: {result['verdict']} ({result['confidence']})")
+            return result
+        except Exception as exc:
+            log.error(f"[Judge][Panel] Chief Judge synthesis failed: {exc}", exc_info=True)
+            result = self._fallback_response(f"Chief Judge failed: {exc}")
+            result["ep_signal"] = ep_result
+            result["panel_details"] = specialist_results
+            return result
+
+    def save_judge_log(
+        self,
+        result: dict,
+        mode: str,
+        llm_text: str,
+        ep_result: dict,
+        external_knowledge: str = "",
+        ris_summary: str = "",
+        mad_summary: str = "",
+        runtime: float | None = None,
+        output_path: str | Path | None = None,
+    ) -> Path:
+        """
+        Log complete judicial findings, mode, reasoning, specialist assessments,
+        and verdict into JUDGE_output.txt inside the output/ folder.
+        """
+        if output_path is None:
+            project_root = Path(__file__).resolve().parent.parent
+            output_dir = project_root / "output"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = output_dir / "JUDGE_output.txt"
+        else:
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        now_str = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        lines = []
+        sep_major = "=" * 80
+        sep_minor = "-" * 60
+
+        lines.append(sep_major)
+        lines.append(f"  JUDGE MODULE (CLOUD LLM REASONING LAYER) FORENSIC LOG  —  {now_str}")
+        lines.append(sep_major)
+        lines.append("")
+
+        lines.append("[1]  CONFIGURATION & CONTEXT AUDIT")
+        lines.append(sep_minor)
+        lines.append(f"    Active Architecture Pipeline : {mode.upper()}")
+        lines.append(f"    Primary LLM Model            : {self.model_name}")
+        lines.append(f"    Fallback Model Chain         : {', '.join(self.fallback_models)}")
+        if runtime is not None:
+            lines.append(f"    Execution Runtime            : {runtime:.2f}s")
+        lines.append("")
+        lines.append("    Early Predictor Multimodal Context:")
+        lines.append(f"      Label       : {ep_result.get('label', 'N/A')}")
+        lines.append(f"      Probability : {ep_result.get('probability', 'N/A')}")
+        lines.append(f"      Confidence  : {ep_result.get('confidence', 'N/A')}")
+        lines.append("")
+        lines.append("    External Context Ingestion Status:")
+        lines.append(f"      Knowledge Retrieval (KR) : {'YES' if external_knowledge else 'NO'}")
+        lines.append(f"      Reverse Image Search (RIS): {'YES' if ris_summary else 'NO'}")
+        lines.append(f"      Multi-Agent Debate (MAD) : {'YES' if mad_summary else 'NO'}")
+        lines.append("")
+
+        lines.append("[2]  ORIGINAL NEWS ARTICLE (ANALYZED TEXT)")
+        lines.append(sep_minor)
+        for a_line in llm_text.strip().splitlines():
+            lines.append(f"    {a_line}")
+        lines.append("")
+
+        # Mode-specific sections
+        if mode == "panel" and "panel_details" in result:
+            lines.append("[3]  MULTI-JUDGE SPECIALIZED PANEL REPORTS")
+            lines.append(sep_minor)
+            details = result.get("panel_details", {})
+            
+            lines.append("  (A) SENIOR FACT-CHECKER ASSESSMENT (KR, RIS, MAD Provenance):")
+            fact_data = details.get("fact_checker", {})
+            if isinstance(fact_data, dict):
+                lines.append(f"      Factual Risk Score : {fact_data.get('factual_risk_score', 'N/A')} / 10")
+                lines.append(f"      Analysis           : {fact_data.get('factual_analysis', '')}")
+                if fact_data.get("corroborated_claims"):
+                    lines.append(f"      Corroborated Claims: {', '.join(str(c) for c in fact_data['corroborated_claims'])}")
+                if fact_data.get("refuted_or_unsubstantiated_claims"):
+                    lines.append(f"      Refuted/Unsubst.   : {', '.join(str(c) for c in fact_data['refuted_or_unsubstantiated_claims'])}")
+            else:
+                lines.append(f"      {fact_data}")
+            lines.append("")
+
+            lines.append("  (B) SENIOR LINGUIST ASSESSMENT (Stylometrics & Emotional Framing):")
+            ling_data = details.get("linguist", {})
+            if isinstance(ling_data, dict):
+                lines.append(f"      Linguistic Risk Score        : {ling_data.get('linguistic_risk_score', 'N/A')} / 10")
+                lines.append(f"      Emotional Manipulation Level : {ling_data.get('emotional_manipulation_level', 'N/A')}")
+                lines.append(f"      Stylistic Analysis           : {ling_data.get('stylistic_analysis', '')}")
+                if ling_data.get("detected_devices"):
+                    lines.append(f"      Detected Devices             : {', '.join(str(d) for d in ling_data['detected_devices'])}")
+            else:
+                lines.append(f"      {ling_data}")
+            lines.append("")
+
+            lines.append("  (C) SENIOR LOGICIAN ASSESSMENT (Internal Consistency & Intent):")
+            logic_data = details.get("logician", {})
+            if isinstance(logic_data, dict):
+                lines.append(f"      Logical Risk Score : {logic_data.get('logical_risk_score', 'N/A')} / 10")
+                lines.append(f"      Perceived Intent   : {logic_data.get('perceived_intent', 'N/A')}")
+                lines.append(f"      Logical Analysis   : {logic_data.get('logical_analysis', '')}")
+                if logic_data.get("fallacies_or_contradictions"):
+                    lines.append(f"      Fallacies/Contrad. : {', '.join(str(f) for f in logic_data['fallacies_or_contradictions'])}")
+            else:
+                lines.append(f"      {logic_data}")
+            lines.append("")
+
+            lines.append("[4]  CHIEF JUDICIAL MAGISTRATE SYNTHESIS DELIBERATION")
+            lines.append(sep_minor)
+            for r_line in result.get("reasoning", "").strip().splitlines():
+                lines.append(f"    {r_line}")
+            lines.append("")
+
+        elif mode == "self_consistency" and "sc_votes" in result:
+            lines.append("[3]  SELF-CONSISTENCY PARALLEL RUN BREAKDOWN")
+            lines.append(sep_minor)
+            lines.append(f"    Majority Vote Tally : {result.get('sc_votes', {})}")
+            lines.append("")
+            lines.append("[4]  SELECTED RUN REASONING PROTOCOL (CO-T)")
+            lines.append(sep_minor)
+            for r_line in result.get("reasoning", "").strip().splitlines():
+                lines.append(f"    {r_line}")
+            lines.append("")
+
+        else:
+            lines.append("[3]  7-STEP CONSTITUTIONAL CHAIN-OF-THOUGHT REASONING PROTOCOL")
+            lines.append(sep_minor)
+            for r_line in result.get("reasoning", "").strip().splitlines():
+                lines.append(f"    {r_line}")
+            lines.append("")
+
+        lines.append("[FINAL JUDICIAL VERDICT]")
+        lines.append(sep_minor)
+        lines.append(f"    Verdict       : {result.get('verdict', 'INCONCLUSIVE')}")
+        lines.append(f"    Confidence    : {result.get('confidence', 'N/A')}")
+        lines.append(f"    Taxonomy Class: {result.get('color_class', 'N/A')}")
+        lines.append("")
+        lines.append("    Executive Justification:")
+        for j_line in result.get("justification", "").strip().splitlines():
+            lines.append(f"      {j_line}")
+        lines.append("")
+        lines.append("    Key Observations:")
+        for fact in result.get("key_facts", []):
+            lines.append(f"      • {fact}")
+        lines.append("")
+        if result.get("links"):
+            lines.append("    Verified Supporting References:")
+            for link in result.get("links", []):
+                lines.append(f"      • [{link.get('source', 'EXTERNAL')}] {link.get('title', '')} ({link.get('url', '')})")
+            lines.append("")
+
+        lines.append(sep_major)
+        lines.append("  END OF JUDICIAL VERDICT REPORT")
+        lines.append(sep_major)
+        lines.append("")
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+
+        log.info(f"[Judge] Forensic log written -> {output_path}")
+        print(f"  [Judge] Forensic log written -> {output_path}")
+        return output_path
 
 
 # ---------------------------------------------------------------------------

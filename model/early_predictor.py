@@ -313,15 +313,15 @@ class EarlyPredictor:
         if probability >= fake_thr:
             label       = "FAKE"
             color_class = "manipulated"
-            pass_to_agents = False
         elif probability <= real_thr:
             label       = "REAL"
             color_class = "real"
-            pass_to_agents = False
         else:
             label       = "UNCERTAIN"
             color_class = "inconclusive"
-            pass_to_agents = True   # escalate to Multi-Agent Debate
+
+        # EP is a preliminary signal and must never dictate skipping downstream agents
+        pass_to_agents = True
 
         return {
             "probability":    probability,
