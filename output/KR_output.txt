@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-19  15:50:12
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-26  20:39:01
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -15,36 +15,94 @@ In
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 8
+    Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-       2. [FILTERED OUT]  https://www.facebook.com/gmanews/posts/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/1687035556801428/
-       3. [FILTERED OUT]  https://www.internazionale.it/ultime-notizie-reuters/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows
-       4. [FILTERED OUT]  https://www.threads.com/@channelnewsasia/post/DdD3Ddnm13x/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows-utm-medium/
-       5. [FILTERED OUT]  https://www.dawn.com/news/2028791
-       6. [FILTERED OUT]  https://www.tradingview.com/news/reuters.com,2026:newsml_L4N4500C7:0-indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/
-       7. [FILTERED OUT]  https://www.thejakartapost.com/world/2026/09/09/indonesian-wildfire-emissions-surge-to-worlds-highest
-       8. [FILTERED OUT]  https://x.com/ReutersAsia/status/2097637424427860172
+       1. [FILTERED OUT]  https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
+       2. [FILTERED OUT]  https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
+       3. [FILTERED OUT]  https://ilkha.com/english/world/indonesia-battles-worsening-wildfires-as-el-niño-fuels-heat-and-drought-561937
+       4. [WHITELISTED]   https://www.reuters.com/video/watch/idRW138209092026RP1/
+       5. [FILTERED OUT]  https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
+       6. [FILTERED OUT]  https://www.carbonbrief.org/el-nino-indonesia-fire-emissions-in-2026-on-track-to-match-record-for-this-century
+       7. [FILTERED OUT]  https://www.msn.com/en-us/news/other/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/ar-AA2cuxda
+       8. [WHITELISTED]   https://www.reuters.com/business/environment/how-severe-are-indonesias-wildfires-2026-08-31/
+       9. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      10. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
 
-    URLs Passing Whitelist : 1
-      1. https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+    URLs Passing Whitelist : 4
+      1. https://www.reuters.com/video/watch/idRW138209092026RP1/
+      2. https://www.reuters.com/business/environment/how-severe-are-indonesias-wildfires-2026-08-31/
+      3. https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      4. https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 0
+    Articles Successfully Extracted : 2
+      1. Title  : Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
+         Source : https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+         Date   : 
+      2. Title  : Explainer-How Severe Are Indonesia's Wildfires?
+         Source : https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
+         Date   : 
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 0
+    Snippets Passed : 6
+      Snippet #1:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions ⁠from wildfires ⁠burning through parched stretches of forest and peatland on ⁠the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      Snippet #2:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
+      Snippet #3:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Fire ​emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire ‌Emissions Watch, a portal developed by the European ‌Union's Copernicus climate monitoring service.
+      Snippet #4:
+        [Explainer-How Severe Are Indonesia's Wildfires?] According to Copernicus' Fire Emissions Watch, carbon emissions from Indonesian fires in the last seven days reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia.
+      Snippet #5:
+        [Explainer-How Severe Are Indonesia's Wildfires?] In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU, and later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+      Snippet #6:
+        [Explainer-How Severe Are Indonesia's Wildfires?] Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia, ⁠the data showed.
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      (No summary produced)
+      ### Comprehensive Key-Fact Outline
+      
+      #### 1. Key Entities, Names, and Roles Involved
+      - **Indonesia**: The country experiencing a surge in wildfire emissions.
+      - **Borneo and Sumatra**: Islands in Indonesia where the wildfires are occurring.
+      - **European Union's Copernicus Climate Monitoring Service**: Developed the Fire Emissions Watch portal.
+      - **Fire Emissions Watch**: A portal developed by the Copernicus Climate Monitoring Service to track wildfire emissions.
+      
+      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      - **Not specified**: No monetary amounts, legal rulings, or official outcomes are mentioned in the provided snippets.
+      
+      #### 3. Timeline of Events and Corroborating Evidence
+      - **Date not specified**: The exact date of the emissions data is not specified, but the snippet mentions "Wednesday" as the date the data was shown.
+      - **September 1 to September 7, 2023**: Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
+        - **Corroborating Evidence**: 
+          - Snippet 3: "Fire emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union's Copernicus climate monitoring service."
+          - Snippet 4: "According to Copernicus' Fire Emissions Watch, carbon emissions from Indonesian fires in the last seven days reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia."
+      
+      - **September 1 to September 7, 2023**: Emissions from Indonesia were 429% higher than the seasonal mean.
+        - **Corroborating Evidence**: 
+          - Snippet 4: "According to Copernicus' Fire Emissions Watch, carbon emissions from Indonesian fires in the last seven days reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia."
+      
+      - **September 1 to September 7, 2023**: Fire emission intensity in Indonesia was 1,302 kg/sq km, compared to 185 kg/sq km in Russia.
+        - **Corroborating Evidence**: 
+          - Snippet 6: "Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia, the data showed."
+      
+      - **2015**: Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU.
+        - **Corroborating Evidence**: 
+          - Snippet 5: "In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU, and later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
+      
+      - **2015**: Later studies estimated that wildfire pollution caused more than 100,000 excess deaths in Indonesia, Malaysia, and Singapore.
+        - **Corroborating Evidence**: 
+          - Snippet 5: "In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU, and later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore."
+      
+      ### Summary
+      The provided snippets highlight a significant surge in wildfire emissions in Indonesia, with emissions reaching 19.7 million metric tons from September 1 to September 7, overtaking Russia and accounting for more than a third of the global total. The emission intensity was notably higher, at 1,302 kg/sq km, compared to 185 kg/sq km in Russia. This surge in emissions is not a new phenomenon, as in 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the entire European Union, and later studies estimated that these wildfires caused over 100,000 excess deaths in Indonesia, Malaysia, and Singapore.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------
-    Status : failed - no metadata
+    Status : success
 
 ================================================================================
   END OF KNOWLEDGE RETRIEVAL FORENSIC LOG

@@ -45,6 +45,12 @@ VERIFIED_DOMAINS = {
     "dw.com",
     "france24.com",
     "euronews.com",
+    "thejakartapost.com",
+    "kompas.com",
+    "tempo.co",
+    "antaranews.com",
+    "dawn.com",
+    "gmanetwork.com",
     
     # Malaysian News Outlets
     "freemalaysiatoday.com",
@@ -78,6 +84,7 @@ VERIFIED_DOMAINS = {
     "politico.com",
     "usatoday.com",
     "latimes.com",
+    "msn.com",
     
     # Fact-checking organizations
     "snopes.com",

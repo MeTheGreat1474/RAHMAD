@@ -25,10 +25,28 @@ from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 load_dotenv()
 
+import urllib.parse
 from bs4 import BeautifulSoup
 from backend.domain_whitelist import is_domain_whitelisted
 
 log = logging.getLogger(__name__)
+
+# Social media / non-article domains to exclude from search results
+SOCIAL_MEDIA_DOMAINS = {
+    "facebook.com", "threads.net", "threads.com", "twitter.com", "x.com",
+    "instagram.com", "tiktok.com", "reddit.com", "youtube.com", "linkedin.com",
+    "pinterest.com", "weibo.com"
+}
+
+def is_social_media_url(url: str) -> bool:
+    """Returns True if the URL points to a social media or user-generated platform."""
+    if not url:
+        return False
+    try:
+        netloc = urllib.parse.urlparse(url).netloc.lower()
+        return any(soc == netloc or netloc.endswith("." + soc) for soc in SOCIAL_MEDIA_DOMAINS)
+    except Exception:
+        return False
 
 USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 
@@ -201,7 +219,7 @@ class KnowledgeRetriever:
 
     def search_claim(self, claim: str, max_results: int = 10) -> List[str]:
         """
-        Queries search providers (DuckDuckGo HTML, DDGS, and SerpAPI Google Search fallback)
+        Queries search providers (DuckDuckGo HTML, DDGS, Google News RSS, and SerpAPI Google News fallback)
         for news articles matching the claim.
         Returns a list of direct article URLs.
         """
@@ -221,7 +239,7 @@ class KnowledgeRetriever:
         log.info(f"Searching news sources for query: '{search_query}' (original claim length: {len(claim)})")
         print(f"       Search Query: '{search_query}'")
         urls = []
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
         
         # 1. Primary: DuckDuckGo HTML endpoint
         try:
@@ -235,7 +253,7 @@ class KnowledgeRetriever:
                 soup = BeautifulSoup(resp.text, "html.parser")
                 for a in soup.find_all("a", class_="result__url"):
                     href = a.get("href", "")
-                    if href and href.startswith("http") and href not in urls:
+                    if href and href.startswith("http") and not is_social_media_url(href) and href not in urls:
                         urls.append(href)
         except Exception as e:
             log.warning(f"DuckDuckGo HTML search error: {e}")
@@ -247,39 +265,83 @@ class KnowledgeRetriever:
                 try:
                     results = list(ddgs.news(search_query, max_results=max_results))
                     for res in results:
-                        if 'url' in res and res['url'] not in urls:
-                            urls.append(res['url'])
+                        u = res.get('url', '')
+                        if u and u.startswith("http") and not is_social_media_url(u) and u not in urls:
+                            urls.append(u)
                 except Exception as ne:
                     log.warning(f"DDGS news search error: {ne}")
             except Exception as e:
                 log.error(f"DDGS search error: {e}")
 
-        # 3. Tertiary: SerpAPI Google Search fallback (resilient to bot-blocking and rate limits)
+        # 3. Tertiary: Google News RSS fallback (resilient, no API key required, bypasses IP bans)
+        if len(urls) < 5:
+            try:
+                log.info(f"Using Google News RSS fallback for query: '{search_query}'")
+                print(f"       [Google News RSS Fallback] Querying Google News RSS feed...")
+                import xml.etree.ElementTree as ET
+                try:
+                    from googlenewsdecoder import gnewsdecoder
+                except ImportError:
+                    gnewsdecoder = None
+
+                q_encoded = urllib.parse.quote(search_query)
+                rss_url = f"https://news.google.com/rss/search?q={q_encoded}&hl=en-US&gl=US&ceid=US:en"
+                rss_resp = requests.get(rss_url, headers=headers, timeout=10)
+                if rss_resp.status_code == 200:
+                    root = ET.fromstring(rss_resp.content)
+                    items = root.findall(".//item")
+                    for item in items[:max_results]:
+                        link_elem = item.find("link")
+                        if link_elem is not None and link_elem.text:
+                            raw_link = link_elem.text.strip()
+                            resolved_url = raw_link
+                            if gnewsdecoder:
+                                try:
+                                    decoded = gnewsdecoder(raw_link)
+                                    if decoded.get("status") and decoded.get("decoded_url"):
+                                        resolved_url = decoded["decoded_url"]
+                                except Exception as de:
+                                    log.debug(f"Google News RSS decode error: {de}")
+                            
+                            if (resolved_url.startswith("http") 
+                                    and not is_social_media_url(resolved_url) 
+                                    and resolved_url not in urls):
+                                urls.append(resolved_url)
+                log.info(f"Google News RSS retrieved {len(urls)} URLs so far.")
+            except Exception as rss_err:
+                log.warning(f"Google News RSS fallback error: {rss_err}")
+
+        # 4. Quaternary: SerpAPI Google News fallback (resilient to bot-blocking and rate limits)
         if len(urls) < 3:
             serpapi_key = os.environ.get("SERPAPI_API_KEY")
             if serpapi_key:
                 try:
                     from serpapi import GoogleSearch
-                    log.info(f"Using SerpAPI Google Search fallback for query: '{search_query}'")
-                    print(f"       [SerpAPI Fallback] Querying Google Search via SerpAPI for news...")
+                    log.info(f"Using SerpAPI Google News fallback for query: '{search_query}'")
+                    print(f"       [SerpAPI Fallback] Querying Google News via SerpAPI...")
+                    clean_query = f"{search_query} -site:facebook.com -site:twitter.com -site:x.com -site:threads.net -site:threads.com -site:instagram.com"
                     search = GoogleSearch({
-                        "q": search_query,
+                        "engine": "google",
+                        "q": clean_query,
+                        "tbm": "nws",
                         "api_key": serpapi_key,
                         "num": max_results,
                     })
                     res_dict = search.get_dict()
-                    for item in res_dict.get("organic_results", []):
-                        link = item.get("link")
-                        if link and link.startswith("http") and link not in urls:
-                            urls.append(link)
                     for item in res_dict.get("news_results", []):
                         link = item.get("link")
-                        if link and link.startswith("http") and link not in urls:
+                        if link and link.startswith("http") and not is_social_media_url(link) and link not in urls:
+                            urls.append(link)
+                    for item in res_dict.get("organic_results", []):
+                        link = item.get("link")
+                        if link and link.startswith("http") and not is_social_media_url(link) and link not in urls:
                             urls.append(link)
                     log.info(f"SerpAPI retrieved {len(urls)} URLs so far.")
                 except Exception as se:
                     log.warning(f"SerpAPI search fallback error: {se}")
                 
+        # Final safety filter: remove any social media or non-news links
+        urls = [u for u in urls if not is_social_media_url(u)]
         log.info(f"Retrieved {len(urls)} URLs across sources.")
         return urls
 

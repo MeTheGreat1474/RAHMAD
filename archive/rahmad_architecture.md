@@ -42,10 +42,14 @@ The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and 
 #### Architecture & Flow:
 1. **Search & Multi-Source Retrieval:**
    - **Query Sanitization:** Automatically extracts the concise headline/claim from the input text, stripping news wire prefixes and datelines (e.g. `SINGAPORE/JAKARTA, Sept 9 (Reuters) -`) so search engines receive clean, high-precision search keywords.
-   - **Primary Endpoint:** Queries the DuckDuckGo HTML endpoint (`https://html.duckduckgo.com/html/`) and `duckduckgo_search` (`DDGS.news()`).
-   - **Tertiary Fallback (SerpAPI Google Search):** If DuckDuckGo hits a rate limit (`403 Ratelimit`) or returns fewer than 3 URLs, automatically falls back to querying Google Search via SerpAPI using `SERPAPI_API_KEY`, ensuring uninterrupted retrieval.
+   - **4-Tier Retrieval Pipeline:**
+     1. *Primary (DuckDuckGo HTML):* Queries `https://html.duckduckgo.com/html/` for immediate news links.
+     2. *Secondary (DDGS News Package):* Falls back to DuckDuckGo's news API (`DDGS.news()`) if fewer than 5 URLs are retrieved.
+     3. *Tertiary (Google News RSS):* If DuckDuckGo triggers bot-detection (HTTP 202) or IP rate limits (`403 Ratelimit`), queries the Google News RSS feed (`https://news.google.com/rss/search?q=...`) without API keys or IP blocks. Decodes Google News redirect tokens to direct canonical publisher URLs using `googlenewsdecoder`.
+     4. *Quaternary Fallback (SerpAPI Google News):* If surviving URLs remain below 3, queries Google News via SerpAPI with `"tbm": "nws"` and query exclusions (`-site:facebook.com -site:twitter.com -site:x.com -site:threads.net -site:instagram.com`).
+   - **Active Social Media Exclusion:** Automatically intercepts and removes URLs from social media and user-generated content platforms (`facebook.com`, `threads.net`, `x.com`/`twitter.com`, `instagram.com`, `tiktok.com`, `reddit.com`, `youtube.com`, `linkedin.com`, `pinterest.com`, `weibo.com`) across all search stages to prevent unextractable posts from polluting downstream scraping.
 2. **Strict Domain Whitelisting:**
-   - URLs are immediately checked against an authoritative list of verified, reputable international and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT).
+   - URLs are checked against an authoritative list of verified, reputable international, regional, and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT, The Jakarta Post, Kompas, Tempo, Dawn, GMA Network).
    - Unverified blogs, opinion sites, and tabloids are filtered out prior to scraping.
 3. **Concurrent Scrapy Spider & Heuristic Extraction:**
    - **Isolated Scrapy Subprocess:** Spawns an asynchronous Scrapy spider (`backend/news_spider.py`) inside an ephemeral temporary directory (`tempfile.TemporaryDirectory`) with 8 concurrent connections and a 25-second timeout.

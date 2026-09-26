@@ -17,6 +17,7 @@ python-dotenv>=1.0.0        # load OPENROUTER_API_KEY from .env file
 
 # Knowledge Retrieval Pipeline
 duckduckgo-search>=5.0.0
+googlenewsdecoder>=0.1.7
 trafilatura>=1.8.0
 sentence-transformers>=2.2.0
 scikit-learn>=1.0.0
