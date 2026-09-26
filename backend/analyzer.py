@@ -399,7 +399,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         if kr_articles:
             formatted_links = []
             from urllib.parse import urlparse
-            for a in kr_articles[:5]:
+            for a in kr_articles[:6]:
                 url = a.get("source") or a.get("url", "#")
                 headline = a.get("headline") or a.get("title", url)
                 domain = urlparse(url).netloc.replace("www.", "").upper() if url and url.startswith("http") else "EXTERNAL SOURCE"

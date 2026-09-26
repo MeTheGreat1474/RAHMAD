@@ -299,16 +299,39 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    const linkHtml = `
-                        <div class="link-item" onclick="if('${urlStr}' !== '#') window.open('${urlStr}', '_blank', 'noopener,noreferrer');">
-                            <div class="link-number">${numStr}</div>
-                            <div class="link-details">
-                                <span class="link-source">${sourceStr}</span>
-                                <a href="${urlStr}" target="_blank" rel="noopener noreferrer" class="link-title" onclick="event.stopPropagation();">${titleStr}</a>
-                            </div>
-                        </div>
-                    `;
-                    linksList.innerHTML += linkHtml;
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'link-item';
+                    if (urlStr && urlStr !== '#') {
+                        linkItem.addEventListener('click', () => {
+                            window.open(urlStr, '_blank', 'noopener,noreferrer');
+                        });
+                    }
+
+                    const numDiv = document.createElement('div');
+                    numDiv.className = 'link-number';
+                    numDiv.textContent = numStr;
+
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'link-details';
+
+                    const sourceSpan = document.createElement('span');
+                    sourceSpan.className = 'link-source';
+                    sourceSpan.textContent = sourceStr;
+
+                    const titleLink = document.createElement('a');
+                    titleLink.href = urlStr;
+                    titleLink.target = '_blank';
+                    titleLink.rel = 'noopener noreferrer';
+                    titleLink.className = 'link-title';
+                    titleLink.textContent = titleStr;
+                    titleLink.addEventListener('click', (e) => e.stopPropagation());
+
+                    detailsDiv.appendChild(sourceSpan);
+                    detailsDiv.appendChild(titleLink);
+                    linkItem.appendChild(numDiv);
+                    linkItem.appendChild(detailsDiv);
+
+                    linksList.appendChild(linkItem);
                 });
             }
 

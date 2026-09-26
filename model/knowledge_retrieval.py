@@ -87,10 +87,53 @@ class KnowledgeRetriever:
             log.error(f"Failed to load sentence-transformers: {e}")
             self.embedder = None
             
+        # Store article titles found during search or fallback extraction
+        self.search_titles: Dict[str, str] = {}
+
         # Check API key if not using local LLM
         self.api_key = os.environ.get("OPENROUTER_API_KEY", "")
         if not USE_LOCAL_LLM and not self.api_key:
             log.warning("OPENROUTER_API_KEY not found in environment. LLM Synthesis will fail.")
+
+    def extract_title_from_url_slug(self, url: str, claim_text: str = "") -> str:
+        """
+        Derives a clean, readable news headline from a URL path slug.
+        Used as a robust fallback for unextractable whitelisted links (e.g. Reuters).
+        """
+        try:
+            parsed = urllib.parse.urlparse(url)
+            domain = parsed.netloc.replace('www.', '').split('.')[0].upper()
+            path = parsed.path.strip('/')
+            segments = [s for s in path.split('/') if s]
+            if not segments:
+                return f"{domain} News Report"
+
+            slug = segments[-1]
+            slug = re.sub(r'\.(html|htm|php|asp|aspx|amp)$', '', slug, flags=re.I)
+            slug = re.sub(r'[-_]\d{4}[-_]\d{1,2}[-_]\d{1,2}', '', slug)
+            slug = re.sub(r'[-_]\d{8,}', '', slug)
+
+            # If slug is just an ID (e.g. idRW138209092026RP1), check video/watch or preceding segments
+            if re.match(r'^(id)?[a-z0-9_-]{5,}$', slug, re.I) and not any(c in slug for c in '-_ '):
+                if any(v in [s.lower() for s in segments] for v in ('video', 'watch', 'multimedia')):
+                    first_line = claim_text.strip().splitlines()[0] if claim_text else ""
+                    clean_claim = re.sub(r'^[A-Z\s/]+,\s*[A-Za-z]+\s*\d+\s*\([A-Za-z]+\)\s*[-–—]\s*', '', first_line).strip()
+                    if clean_claim and len(clean_claim) > 10:
+                        return f"{clean_claim} (Video)"
+                    return f"{domain} Video Report"
+                meaningful = [s for s in segments[:-1] if s.lower() not in ('article', 'articles', 'news', 'watch', 'video', 'story', 'post', 'posts', 'view')]
+                if meaningful:
+                    slug = f"{meaningful[-1]} {slug}"
+                else:
+                    return f"{domain} News Coverage"
+
+            words = re.split(r'[-_]+', slug)
+            words = [w.capitalize() for w in words if w]
+            title = ' '.join(words)
+            return title if len(title) > 3 else f"{domain} News Report"
+        except Exception:
+            return "Verified News Article"
+
 
     def retrieve(self, claim: str) -> str:
         """
@@ -161,29 +204,90 @@ class KnowledgeRetriever:
                 
             # 3. Metadata Extraction & Heuristic Filtering
             print("  [Step 3/5] Scraping metadata & applying heuristics...")
-            articles = self.metadata_filter(whitelisted_urls)
-            log_data["articles_extracted"] = articles
-            if not articles:
-                print("  [Step 3/5] [X] No articles survived metadata filtering.")
-                print("=" * 50 + "\n")
-                result_info["summary"] = "No articles passed the metadata heuristic filter."
-                log_data["status"] = "failed - no metadata"
-                self.save_kr_log(log_data)
-                return result_info
-            print(f"  [Step 3/5] [OK] {len(articles)} verified article(s) extracted.")
-                
-            # Store headline and source for output logging
-            result_info["articles"] = [
-                {"headline": art.get("title", "No Title"), "source": art.get("url", ""), "date": art.get("date", "")}
-                for art in articles
-            ]
-            for i, art in enumerate(articles, 1):
-                title_str = art.get('title', 'No Title').encode('ascii', 'ignore').decode('ascii')
-                print(f"       {i}. {title_str} ({art.get('url', '')})")
-                
+            extracted_articles = self.metadata_filter(whitelisted_urls)
+            log_data["articles_extracted"] = extracted_articles
+
+            # Build unified list of all whitelisted articles for supporting references (both extracted and unextractable)
+            extracted_by_url = {art["url"]: art for art in extracted_articles}
+            all_whitelisted_articles = []
+            unextractable_whitelisted = []
+            seen_urls = set()
+            seen_titles = set()
+
+            for u in whitelisted_urls:
+                if u in seen_urls:
+                    continue
+                seen_urls.add(u)
+
+                if u in extracted_by_url:
+                    art = extracted_by_url[u]
+                    title = art.get("title", "")
+                    date_val = art.get("date", "")
+                    is_extracted = True
+                else:
+                    # Unextractable article (e.g. Reuters 401 anti-bot, paywall, video page)
+                    is_extracted = False
+                    date_val = ""
+                    # Try to get title from search engine metadata or direct scrape
+                    title = self.search_titles.get(u, "")
+                    if not title:
+                        title = self.extract_title_from_url_slug(u, claim)
+                    else:
+                        title = re.sub(
+                            r'\s*[-–—|]\s*(Reuters|The Associated Press|AP News|US News|BBC News|CNN|Bloomberg|Financial Times|The Guardian).*$',
+                            '', title, flags=re.I
+                        ).strip()
+
+                title_norm = title.lower().strip()
+                if title_norm in seen_titles and is_extracted is False:
+                    continue
+                seen_titles.add(title_norm)
+
+                item = {
+                    "headline": title if title else "Verified News Report",
+                    "source": u,
+                    "date": date_val,
+                    "extracted": is_extracted
+                }
+                all_whitelisted_articles.append(item)
+                if not is_extracted:
+                    unextractable_whitelisted.append(item)
+
+            log_data["unextractable_whitelisted"] = unextractable_whitelisted
+            result_info["articles"] = all_whitelisted_articles
+
+            if not extracted_articles:
+                if all_whitelisted_articles:
+                    print(f"  [Step 3/5] [!] Text extraction restricted by publisher policies for {len(all_whitelisted_articles)} article(s). Preserving supporting links.")
+                    for i, art in enumerate(all_whitelisted_articles, 1):
+                        title_str = art.get('headline', 'No Title').encode('ascii', 'ignore').decode('ascii')
+                        print(f"       {i}. {title_str} [Supporting Link - Scraping Restricted] ({art.get('source', '')})")
+                    result_info["summary"] = (
+                        "Verified news articles from whitelisted reporting outlets were identified for this claim, "
+                        "but full textual extraction was restricted by publisher anti-scraping protections (e.g. Reuters). "
+                        "Please refer to the verified supporting links for primary reporting."
+                    )
+                    log_data["status"] = "completed - supporting links preserved"
+                    self.save_kr_log(log_data)
+                    return result_info
+                else:
+                    print("  [Step 3/5] [X] No articles survived metadata filtering.")
+                    print("=" * 50 + "\n")
+                    result_info["summary"] = "No articles passed the metadata heuristic filter."
+                    log_data["status"] = "failed - no metadata"
+                    self.save_kr_log(log_data)
+                    return result_info
+
+            print(f"  [Step 3/5] [OK] {len(extracted_articles)} article(s) text-extracted, {len(all_whitelisted_articles)} supporting reference(s) preserved.")
+            for i, art in enumerate(all_whitelisted_articles, 1):
+                title_str = art.get('headline', 'No Title').encode('ascii', 'ignore').decode('ascii')
+                status_note = "[Verified]" if art.get("extracted") else "[Supporting Link]"
+                print(f"       {i}. {title_str} {status_note} ({art.get('source', '')})")
+
             # 4. Semantic Verification
             print(f"  [Step 4/5] Computing semantic similarity (Threshold >= {self.similarity_threshold})...")
-            snippets = self.semantic_filter(claim, articles)
+            snippets = self.semantic_filter(claim, extracted_articles)
+
             log_data["semantic_snippets"] = snippets
             if not snippets:
                 print("  [Step 4/5] [X] No snippets passed semantic threshold.")
@@ -239,6 +343,7 @@ class KnowledgeRetriever:
         log.info(f"Searching news sources for query: '{search_query}' (original claim length: {len(claim)})")
         print(f"       Search Query: '{search_query}'")
         urls = []
+        self.search_titles = {}
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
         
         # 1. Primary: DuckDuckGo HTML endpoint
@@ -251,8 +356,36 @@ class KnowledgeRetriever:
             )
             if resp.status_code == 200:
                 soup = BeautifulSoup(resp.text, "html.parser")
+                for res_div in soup.find_all("div", class_="result"):
+                    a_link = res_div.find("a", class_="result__url")
+                    a_title = res_div.find("a", class_="result__a")
+                    href = ""
+                    if a_link and a_link.get("href"):
+                        href = a_link.get("href", "").strip()
+                    elif a_title and a_title.get("href"):
+                        href = a_title.get("href", "").strip()
+                    if "uddg=" in href:
+                        try:
+                            pq = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
+                            if "uddg" in pq:
+                                href = pq["uddg"][0]
+                        except Exception:
+                            pass
+                    if href and href.startswith("http") and not is_social_media_url(href):
+                        if href not in urls:
+                            urls.append(href)
+                        if a_title and a_title.text.strip():
+                            self.search_titles[href] = a_title.text.strip()
+                # Fallback URL parsing if div.result wasn't matched
                 for a in soup.find_all("a", class_="result__url"):
-                    href = a.get("href", "")
+                    href = a.get("href", "").strip()
+                    if "uddg=" in href:
+                        try:
+                            pq = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
+                            if "uddg" in pq:
+                                href = pq["uddg"][0]
+                        except Exception:
+                            pass
                     if href and href.startswith("http") and not is_social_media_url(href) and href not in urls:
                         urls.append(href)
         except Exception as e:
@@ -266,8 +399,12 @@ class KnowledgeRetriever:
                     results = list(ddgs.news(search_query, max_results=max_results))
                     for res in results:
                         u = res.get('url', '')
-                        if u and u.startswith("http") and not is_social_media_url(u) and u not in urls:
-                            urls.append(u)
+                        title = res.get('title', '')
+                        if u and u.startswith("http") and not is_social_media_url(u):
+                            if u not in urls:
+                                urls.append(u)
+                            if title:
+                                self.search_titles[u] = title.strip()
                 except Exception as ne:
                     log.warning(f"DDGS news search error: {ne}")
             except Exception as e:
@@ -292,6 +429,8 @@ class KnowledgeRetriever:
                     items = root.findall(".//item")
                     for item in items[:max_results]:
                         link_elem = item.find("link")
+                        title_elem = item.find("title")
+                        item_title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
                         if link_elem is not None and link_elem.text:
                             raw_link = link_elem.text.strip()
                             resolved_url = raw_link
@@ -304,9 +443,11 @@ class KnowledgeRetriever:
                                     log.debug(f"Google News RSS decode error: {de}")
                             
                             if (resolved_url.startswith("http") 
-                                    and not is_social_media_url(resolved_url) 
-                                    and resolved_url not in urls):
-                                urls.append(resolved_url)
+                                    and not is_social_media_url(resolved_url)):
+                                if resolved_url not in urls:
+                                    urls.append(resolved_url)
+                                if item_title:
+                                    self.search_titles[resolved_url] = item_title
                 log.info(f"Google News RSS retrieved {len(urls)} URLs so far.")
             except Exception as rss_err:
                 log.warning(f"Google News RSS fallback error: {rss_err}")
@@ -330,12 +471,20 @@ class KnowledgeRetriever:
                     res_dict = search.get_dict()
                     for item in res_dict.get("news_results", []):
                         link = item.get("link")
-                        if link and link.startswith("http") and not is_social_media_url(link) and link not in urls:
-                            urls.append(link)
+                        title = item.get("title", "")
+                        if link and link.startswith("http") and not is_social_media_url(link):
+                            if link not in urls:
+                                urls.append(link)
+                            if title:
+                                self.search_titles[link] = title.strip()
                     for item in res_dict.get("organic_results", []):
                         link = item.get("link")
-                        if link and link.startswith("http") and not is_social_media_url(link) and link not in urls:
-                            urls.append(link)
+                        title = item.get("title", "")
+                        if link and link.startswith("http") and not is_social_media_url(link):
+                            if link not in urls:
+                                urls.append(link)
+                            if title:
+                                self.search_titles[link] = title.strip()
                     log.info(f"SerpAPI retrieved {len(urls)} URLs so far.")
                 except Exception as se:
                     log.warning(f"SerpAPI search fallback error: {se}")
@@ -411,11 +560,13 @@ class KnowledgeRetriever:
                 except Exception as e:
                     log.error(f"Failed to parse Scrapy results JSON: {e}")
 
-        # Fallback to direct extraction if Scrapy didn't return any items
-        if not raw_articles:
-            log.info("Scrapy returned 0 items. Attempting direct fallback extraction...")
+        # Fallback to direct extraction for any URLs Scrapy did not extract
+        extracted_spider_urls = {a.get("url") for a in raw_articles if a.get("url")}
+        missing_urls = [u for u in urls if u not in extracted_spider_urls]
+        if missing_urls:
+            log.info(f"Attempting direct extraction for {len(missing_urls)} URL(s)...")
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-            for u in urls:
+            for u in missing_urls:
                 try:
                     resp = requests.get(u, headers=headers, timeout=8)
                     if resp.status_code == 200:
@@ -433,9 +584,15 @@ class KnowledgeRetriever:
                             s = BeautifulSoup(resp.text, "html.parser")
                             if not t and s.title:
                                 t = s.title.text.strip()
+                            if not t:
+                                og_t = s.find("meta", property="og:title")
+                                if og_t and og_t.get("content"):
+                                    t = og_t["content"].strip()
                             if not txt:
                                 paras = [p.text.strip() for p in s.find_all("p") if len(p.text.strip()) > 30]
                                 txt = "\n\n".join(paras)
+                        if t and not self.search_titles.get(u):
+                            self.search_titles[u] = t
                         if t and txt and len(txt.strip()) >= 100:
                             raw_articles.append({"url": u, "title": t, "text": txt, "date": dt})
                 except Exception as ex:
@@ -644,6 +801,15 @@ class KnowledgeRetriever:
             lines.append(f"      {idx}. Title  : {art.get('title', 'N/A')}")
             lines.append(f"         Source : {art.get('url', 'N/A')}")
             lines.append(f"         Date   : {art.get('date', 'N/A')}")
+
+        unextractable = log_data.get("unextractable_whitelisted", [])
+        if unextractable:
+            lines.append("")
+            lines.append(f"    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : {len(unextractable)}")
+            for idx, art in enumerate(unextractable, 1):
+                lines.append(f"      {idx}. Title  : {art.get('headline', 'N/A')}")
+                lines.append(f"         Source : {art.get('source', 'N/A')}")
+                lines.append(f"         Status : Preserved for Supporting Links")
         lines.append("")
 
         lines.append(f"[4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= {self.similarity_threshold}")

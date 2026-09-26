@@ -47,19 +47,21 @@ The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and 
      2. *Secondary (DDGS News Package):* Falls back to DuckDuckGo's news API (`DDGS.news()`) if fewer than 5 URLs are retrieved.
      3. *Tertiary (Google News RSS):* If DuckDuckGo triggers bot-detection (HTTP 202) or IP rate limits (`403 Ratelimit`), queries the Google News RSS feed (`https://news.google.com/rss/search?q=...`) without API keys or IP blocks. Decodes Google News redirect tokens to direct canonical publisher URLs using `googlenewsdecoder`.
      4. *Quaternary Fallback (SerpAPI Google News):* If surviving URLs remain below 3, queries Google News via SerpAPI with `"tbm": "nws"` and query exclusions (`-site:facebook.com -site:twitter.com -site:x.com -site:threads.net -site:instagram.com`).
+   - **Search Metadata & Headline Tracking:** Captures publication titles/headlines directly from search engine result payloads (`DDG`, `DDGS`, `Google News RSS`, `SerpAPI`) so all retrieved articles retain authentic titles even if full web extraction is blocked.
    - **Active Social Media Exclusion:** Automatically intercepts and removes URLs from social media and user-generated content platforms (`facebook.com`, `threads.net`, `x.com`/`twitter.com`, `instagram.com`, `tiktok.com`, `reddit.com`, `youtube.com`, `linkedin.com`, `pinterest.com`, `weibo.com`) across all search stages to prevent unextractable posts from polluting downstream scraping.
 2. **Strict Domain Whitelisting:**
    - URLs are checked against an authoritative list of verified, reputable international, regional, and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT, The Jakarta Post, Kompas, Tempo, Dawn, GMA Network).
    - Unverified blogs, opinion sites, and tabloids are filtered out prior to scraping.
-3. **Concurrent Scrapy Spider & Heuristic Extraction:**
+3. **Concurrent Scrapy Spider, Heuristic Extraction & Unextractable Link Preservation:**
    - **Isolated Scrapy Subprocess:** Spawns an asynchronous Scrapy spider (`backend/news_spider.py`) inside an ephemeral temporary directory (`tempfile.TemporaryDirectory`) with 8 concurrent connections and a 25-second timeout.
-   - **Structured Parsing:** Extracts clean body text, title, and published timestamp using `trafilatura` (with `BeautifulSoup` fallback).
-   - **Direct Extraction Fallback:** If the spider yields 0 items, executes an in-process HTTP request using `requests` + `trafilatura`/`BeautifulSoup`.
-   - **Heuristic Filtering:** Performs title deduplication (case-insensitive set), drops text shorter than 100 characters, and validates article recency against `max_age_years` (default <= 3 years old). Caps surviving articles to `max_articles` (default 5).
+   - **Targeted Fallback Extraction:** For any candidate URLs not extracted by Scrapy, executes per-URL in-process HTTP requests using `requests` + `trafilatura`/`BeautifulSoup` to capture body text and `<title>`/`<meta property="og:title">` tags.
+   - **Heuristic Filtering (for Synthesis):** Performs title deduplication, drops text shorter than 100 characters, and validates article recency against `max_age_years` (default <= 3 years old). Caps surviving text-extracted articles to `max_articles` (default 5).
+   - **Unextractable Whitelisted Link Preservation:** Addresses publisher anti-scraping protections (e.g. Reuters returning HTTP 401 Unauthorized, paywalls, or video media formats). Even when body text cannot be extracted (`len(text) < 100`), the article is NOT discarded. The system resolves its headline using (1) captured search engine metadata, (2) page `<title>` / OpenGraph metadata, or (3) robust URL slug parsing (`extract_title_from_url_slug`), preserving all whitelisted articles for frontend supporting references.
 4. **Dense Semantic Verification (MiniLM Embedding & Paragraph Chunking):**
-   - Splits surviving article text into paragraph chunks (>50 characters).
+   - Splits text-extracted article bodies into paragraph chunks (>50 characters).
    - Uses `all-MiniLM-L6-v2` to compute cosine similarity between the claim embedding and each chunk embedding.
    - Retains the top 3 matching chunks per article that meet or exceed the semantic threshold (`similarity_threshold >= 0.35`), stripping irrelevant boilerplate or tangential reporting.
+   - *Fallback if all whitelisted links are unextractable:* If every whitelisted source blocks text extraction, the module preserves all whitelisted references for supporting links and notifies the Judge with an explanatory summary note rather than aborting.
 5. **Structured Fact-Outline LLM Synthesis:**
    - Passes verified snippets into the local Ollama `qwen2.5:7b` or `llama3:8b` at low temperature (`0.2`) to prevent hallucination.
    - Prompts the LLM under strict forensic rules to generate a structured 3-part key-fact outline:
@@ -71,10 +73,10 @@ The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and 
    - Automatically writes an end-to-end, timestamped forensic audit report to `output/KR_output.txt` logging:
      - **[1] Input Claim & Execution Backend** (Local LLM vs. OpenRouter).
      - **[2] Link Retrieval & Whitelist Audit:** Full list of candidate URLs tagged `[WHITELISTED]` or `[FILTERED OUT]`.
-     - **[3] Extracted Article Metadata:** Article titles, verified URLs, and dates.
+     - **[3] Extracted & Preserved Article Metadata:** Text-extracted articles (titles, URLs, dates) alongside unextractable whitelisted supporting references.
      - **[4] Semantic Verification Snippets:** All surviving chunks tagged with their source headlines and similarity pass status.
      - **[5] LLM Synthesis Output:** The verbatim generated key-facts outline.
-     - **[6] Final Pipeline Status:** Explicit execution status (`success`, `failed - no urls`, etc.).
+     - **[6] Final Pipeline Status:** Explicit execution status (`success`, `completed - supporting links preserved`, etc.).
 
 ---
 
@@ -232,6 +234,6 @@ Automatically logs the end-to-end judicial reasoning session to `output/JUDGE_ou
 ### 6. Backend Orchestrator & Frontend
 **Location:** `backend/analyzer.py`, `app.py`, `frontend/script.js`
 
-- **Analyzer (`analyzer.py`):** Acts as the central nervous system. It lazily loads the heavy machine learning models, handles fallback logic (e.g., text-only processing if no image is uploaded), routes data between modules, and coordinates the Pipeline Logger.
+- **Analyzer (`analyzer.py`):** Acts as the central nervous system. It lazily loads the heavy machine learning models, handles fallback logic (e.g., text-only processing if no image is uploaded), routes data between modules, and coordinates the Pipeline Logger. It formats up to 6 supporting links from Knowledge Retrieval articles (incorporating unextractable whitelisted outlets like Reuters alongside extracted sources).
 - **Pipeline Logger (`pipeline_logger.py`):** Captures intermediate states, LLM prompts, tensor shapes, and tracks the LLM backend utilized, logging them to the terminal and saving them to `output_log.txt`.
-- **Frontend App:** A sleek vanilla JS/CSS web app that renders the analysis dynamically, parses Markdown bolding tags into HTML `<strong>`, and beautifully presents the reasoning accordion, confidence score, and verified external news links.
+- **Frontend App:** A sleek vanilla JS/CSS web app that renders the analysis dynamically, parses Markdown bolding tags into HTML `<strong>`, and beautifully presents the reasoning accordion, confidence score, and verified external news links (built with safe DOM creation so special characters and quotes render cleanly).
