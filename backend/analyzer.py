@@ -170,7 +170,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     if len(input_text.strip()) < 10:
         log.info("[analyzer] Input too short — returning INCONCLUSIVE.")
         plog.save()
-        return {
+        yield {"type": "result", "data": {
             "verdict":       "INCONCLUSIVE",
             "color_class":   "inconclusive",
             "confidence":    "0.0%",
@@ -182,7 +182,8 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "links":      [],
             "ep_signal":  {},
         }
-
+}
+    yield {"type": "status", "step": "PRE-PROCESSING INPUT...", "status": "IN PROGRESS"}
     # ── 1. Decode image & 2. Pre-process inputs ────────────────────────────
     t_prep_start = time.perf_counter()
     image = _decode_image(image_data)
@@ -216,7 +217,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         prep_runtime = time.perf_counter() - t_prep_start
         plog.log_ep_skipped("no image provided", runtime=prep_runtime)
         print(f"  [Step 1 & 2] Text Pre-processing completed in {prep_runtime:.2f}s (No image provided)")
+    yield {"type": "status", "step": "PRE-PROCESSING INPUT...", "status": "OK"}
 
+    yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "IN PROGRESS"}
     # ── 3 & 4. Early Predictor ────────────────────────────────────────────
     t_ep_start = time.perf_counter()
     ep_result = _NO_IMAGE_EP.copy()
@@ -248,16 +251,20 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             # Log CLIP tensors and EP verdict
             plog.log_clip_output(text_embeds, image_embeds, fused)
             plog.log_ep_output(ep_result, runtime=ep_runtime)
+            yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "OK"}
 
         except Exception as exc:
             ep_runtime = time.perf_counter() - t_ep_start
             log.error(f"[analyzer] Early Predictor failed: {exc}", exc_info=True)
             plog.log_ep_skipped(f"EarlyPredictor error: {exc}", runtime=ep_runtime)
             print(f"  [Step 3 & 4] Early Predictor failed in {ep_runtime:.2f}s: {exc}")
+            yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "FAIL"}
     else:
         ep_runtime = time.perf_counter() - t_ep_start
         print(f"  [Step 3 & 4] Early Predictor skipped (Runtime: {ep_runtime:.2f}s)")
+        yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "SKIPPED"}
 
+    yield {"type": "status", "step": "FETCHING EVIDENCE...", "status": "IN PROGRESS"}
     # ── 4.5. Knowledge Retrieval ──────────────────────────────────────────
     t_kr_start = time.perf_counter()
     external_knowledge = ""
@@ -273,6 +280,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         kr_runtime = time.perf_counter() - t_kr_start
         plog.log_knowledge_retrieval(kr_data, runtime=kr_runtime)
         print(f"  [Step 4.5] Knowledge Retrieval completed in {kr_runtime:.2f}s ({len(kr_articles)} article(s) retrieved)")
+        yield {"type": "status", "step": "FETCHING EVIDENCE...", "status": "OK"}
     except Exception as exc:
         kr_runtime = time.perf_counter() - t_kr_start
         log.error(f"[analyzer] Knowledge Retrieval failed: {exc}", exc_info=True)
@@ -282,7 +290,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "summary": f"Knowledge Retrieval error: {exc}"
         }, runtime=kr_runtime)
         print(f"  [Step 4.5] Knowledge Retrieval failed in {kr_runtime:.2f}s: {exc}")
+        yield {"type": "status", "step": "FETCHING EVIDENCE...", "status": "FAIL"}
 
+    yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "IN PROGRESS"}
     # ── 4.6. Reverse Image Search (RIS) ───────────────────────────────────
     t_ris_start = time.perf_counter()
     ris_summary = ""
@@ -305,15 +315,18 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
                 )
             ris_runtime = time.perf_counter() - t_ris_start
             print(f"  [Step 4.6] Reverse Image Search completed in {ris_runtime:.2f}s")
+            yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "OK"}
         except Exception as exc:
             ris_runtime = time.perf_counter() - t_ris_start
             log.error(f"[analyzer] Reverse Image Search failed: {exc}", exc_info=True)
             ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nRIS encountered an error: {exc}"
             ris_data_for_log = {"status": "failed", "visual_agent_summary": f"RIS encountered an error: {exc}"}
             print(f"  [X] RIS Pipeline Error in {ris_runtime:.2f}s: {exc}")
+            yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "FAIL"}
     else:
         ris_runtime = time.perf_counter() - t_ris_start
         print(f"  [Step 4.6] Reverse Image Search skipped (Runtime: {ris_runtime:.2f}s)")
+        yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "SKIPPED"}
         try:
             ris_pipeline = _get_ris_pipeline()
             ris_pipeline.log_skipped(input_text, reason="No image provided with news query.")
@@ -323,6 +336,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     # Log RIS output
     plog.log_ris_output(ris_data_for_log, runtime=ris_runtime)
 
+    yield {"type": "status", "step": "DEBATING...", "status": "IN PROGRESS"}
     # ── 4.7. Multi-Agent Debate (MAD) ─────────────────────────────────────
     t_mad_start = time.perf_counter()
     mad_summary = ""
@@ -333,14 +347,17 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
         mad_runtime = time.perf_counter() - t_mad_start
         print(f"  [Step 4.7] Multi-Agent Debate completed in {mad_runtime:.2f}s")
+        yield {"type": "status", "step": "DEBATING...", "status": "OK"}
     except Exception as exc:
         mad_runtime = time.perf_counter() - t_mad_start
         log.error(f"[analyzer] MAD failed: {exc}", exc_info=True)
         mad_summary = f"MAD encountered an error: {exc}"
         print(f"  [X] MAD Pipeline Error in {mad_runtime:.2f}s: {exc}")
+        yield {"type": "status", "step": "DEBATING...", "status": "FAIL"}
         
     plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
 
+    yield {"type": "status", "step": "SYNTHESIZING RESULTS...", "status": "IN PROGRESS"}
     # ── 5. Judge Module ───────────────────────────────────────────────────
     t_judge_start = time.perf_counter()
     try:
@@ -458,14 +475,17 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         print("=" * 50 + "\n")
 
         plog.save()
-        return result
+        yield {"type": "status", "step": "SYNTHESIZING RESULTS...", "status": "OK"}
+        yield {"type": "status", "step": "OUTPUTTING PREDICTION...", "status": "IN PROGRESS"}
+        yield {"type": "status", "step": "OUTPUTTING PREDICTION...", "status": "OK"}
+        yield {"type": "result", "data": result}
 
     except Exception as exc:
         judge_runtime = time.perf_counter() - t_judge_start
         total_runtime = time.perf_counter() - t_pipeline_start
         log.error(f"[analyzer] Judge Module failed: {exc}", exc_info=True)
         plog.save()
-        return {
+        yield {"type": "result", "data": {
             "verdict":       "INCONCLUSIVE",
             "color_class":   "inconclusive",
             "confidence":    "0.0%",
@@ -474,4 +494,4 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "links":         [],
             "ep_signal":     ep_result,
         }
-
+}

@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-26  20:57:58
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-26  21:22:46
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -38,11 +38,11 @@ In
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
     Articles Successfully Extracted : 3
-      1. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online
-         Source : https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
-         Date   : 
-      2. Title  : Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online
+      1. Title  : Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online
          Source : https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
+         Date   : 
+      2. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online
+         Source : https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
          Date   : 
       3. Title  : Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM
          Source : https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
@@ -52,7 +52,7 @@ In
       1. Title  : Indonesian wildfire emissions surge to world's highest, data shows
          Source : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
          Status : Preserved for Supporting Links
-      2. Title  : Indonesia's choking wildfire, haze worsen breathing woes on Borneo - NST Online
+      2. Title  : Indonesia's choking wildfire, haze worsen breathing woes on Borneo - nst.com.my
          Source : https://www.nst.com.my/world/region/2026/09/1533819/indonesias-choking-wildfire-haze-worsen-breathing-woes-borneo
          Status : Preserved for Supporting Links
 
@@ -60,13 +60,13 @@ In
 ------------------------------------------------------------
     Snippets Passed : 7
       Snippet #1:
-        [Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online] Indonesia, an archipelago of 17,000 islands, relies heavily on ferries as a key mode of transportation, with sea routes ⁠more ​affordable and readily available than air travel.
-      Snippet #2:
         [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Indonesia is battling its most intense wildfires in 11 years, and its Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November this year.
-      Snippet #3:
+      Snippet #2:
         [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Transboundary haze has also created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
-      Snippet #4:
+      Snippet #3:
         [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] "Malaysia has offered assistance to help us address the forest fires in Kalimantan. I welcome this with gratitude and pleasure," Prabowo said.
+      Snippet #4:
+        [Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online] Indonesia, an archipelago of 17,000 islands, relies heavily on ferries as a key mode of transportation, with sea routes ⁠more ​affordable and readily available than air travel.
       Snippet #5:
         [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] SINGAPORE: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
       Snippet #6:
@@ -80,36 +80,31 @@ In
       ### Comprehensive Key-Fact Outline
       
       #### 1. Key Entities, Names, and Roles Involved
-      - **Indonesia**: The country facing a surge in wildfire emissions.
-      - **Forestry Minister Raja Juli Antoni**: The official who warned about the wildfires.
-      - **Prabowo**: The official who welcomed Malaysia's assistance.
-      - **Malaysia**: Offering assistance to Indonesia to contain the wildfires.
-      - **Fire Emissions Watch**: A portal developed by the European Union's Copernicus climate monitoring service, used to track fire emissions.
+      - **Indonesia**: Country facing a surge in wildfire emissions.
+      - **Forestry Minister Raja Juli Antoni**: Indonesian official warning about the duration of the wildfires.
+      - **Prabowo**: Indonesian official who welcomed Malaysian assistance.
+      - **Malaysia**: Country offering assistance to Indonesia to contain wildfires.
+      - **Fire Emissions Watch**: Portal developed by the European Union's Copernicus climate monitoring service, providing data on fire emissions.
+      - **Copernicus Climate Monitoring Service**: European Union service that developed Fire Emissions Watch.
       
       #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **No monetary amounts or legal rulings are mentioned in the snippets**.
+      - **Not specified**: No monetary amounts, legal rulings, or official outcomes are mentioned in the snippets.
       
       #### 3. Timeline of Events and Corroborating Evidence
-      - **Date not specified**: Indonesia is facing a surge in emissions from wildfires burning through forest and peatland on the islands of Borneo and Sumatra.
-      - **September 1 to September 7, 2023**: 
-        - Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
-        - Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level.
-        - The highest concentrations of emissions were in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
-      - **September 9, 2023**: 
-        - Indonesia is battling its most intense wildfires in 11 years.
-        - The wildfires could continue until November this year.
-        - Transboundary haze has created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
-        - Malaysia has offered assistance to help address the forest fires in Kalimantan.
-        - Prabowo welcomed Malaysia's assistance with gratitude and pleasure.
+      1. **Date not specified**: Indonesia is battling its most intense wildfires in 11 years, as stated by Forestry Minister Raja Juli Antoni.
+      2. **Date not specified**: Fire emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
+      3. **Date not specified**: Carbon dioxide readings from Indonesia's wildfires are currently the highest in the world.
+      4. **Date not specified**: Malaysia has offered assistance to help Indonesia address the forest fires in Kalimantan, as welcomed by Prabowo.
+      5. **Date not specified**: Transboundary haze has created unhealthy air conditions in Indonesia's neighbors, Malaysia, and Singapore.
+      6. **Date not specified**: Fire emission intensity exceeded 1,500 kg/sq km from September 1 to September 7, more than 10 times the Russian level, with the highest concentrations in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
       
       ### Summary
       - **Indonesia** is experiencing a significant surge in wildfire emissions, with carbon dioxide readings currently the highest in the world.
-      - Fire emissions from September 1 to September 7, 2023, reached 19.7 million metric tons, surpassing Russia and accounting for more than a third of the global total.
-      - The intensity of the fires is extremely high, with emission intensity exceeding 1,500 kg/sq km, more than 10 times the Russian level.
-      - The highest concentrations of emissions are in Kalimantan and eastern parts of Sumatra.
-      - The situation is severe enough to create unhealthy air conditions in neighboring countries like Malaysia and Singapore.
-      - Indonesia is facing its most intense wildfires in 11 years, which could continue until November.
-      - Malaysia has offered assistance to help contain the wildfires, and Prabowo, a relevant official, has welcomed this assistance.
+      - Fire emissions from September 1 to September 7 reached 19.7 million metric tons, surpassing Russia and accounting for more than a third of the global total.
+      - Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November.
+      - Malaysia has offered assistance to help Indonesia address the forest fires in Kalimantan.
+      - Transboundary haze has affected neighboring countries, including Malaysia and Singapore.
+      - Fire emission intensity was notably higher in Kalimantan and eastern parts of Sumatra, with concentrations exceeding 1,500 kg/sq km, more than 10 times the Russian level.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

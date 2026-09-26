@@ -153,53 +153,88 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsSection.classList.remove('visible');
         resultsSection.classList.add('hidden');
 
-        // Start the fetch request to the Python backend
-        const fetchPromise = fetch('http://127.0.0.1:5000/api/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: textInput, image: imageInput })
-        }).then(res => res.json()).catch(err => {
-            console.error('Error fetching from backend:', err);
-            return null;
+        // Draw initial pending steps
+        const linesMap = {};
+        streamSteps.forEach(step => {
+            const fLine = document.createElement('div');
+            fLine.className = 'log-line';
+            fLine.style.color = 'var(--border-light)';
+            fLine.innerHTML = `<span class="log-time">[ ]</span><span class="log-text"> ${step.text}</span>`;
+            processStream.appendChild(fLine);
+            linesMap[step.text] = fLine;
         });
 
-        // We will execute the steps sequentially
-        for (let i = 0; i < streamSteps.length; i++) {
-            const step = streamSteps[i];
+        let responseData = null;
 
-            // Create the line initially with IN PROGRESS
-            const line = createLogLine(step.text, step.status, false);
-            processStream.appendChild(line);
+        try {
+            // Start the fetch request to the Python backend
+            const response = await fetch('http://127.0.0.1:5000/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: textInput, image: imageInput })
+            });
 
-            // Show the remaining future steps as [ ]
-            const futureLines = [];
-            for (let j = i + 1; j < streamSteps.length; j++) {
-                const fLine = document.createElement('div');
-                fLine.className = 'log-line';
-                fLine.style.color = 'var(--border-light)';
-                fLine.innerHTML = `<span class="log-time">[ ]</span><span class="log-text"> ${streamSteps[j].text}</span>`;
-                processStream.appendChild(fLine);
-                futureLines.push(fLine);
+            if (!response.ok) {
+                console.error("Backend error", response.statusText);
+            } else {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const parts = buffer.split("\n");
+                    
+                    buffer = parts.pop();
+                    
+                    for (const part of parts) {
+                        if (!part.trim()) continue;
+                        try {
+                            const parsed = JSON.parse(part);
+                            if (parsed.type === "status") {
+                                const stepText = parsed.step;
+                                const status = parsed.status;
+                                let targetLine = linesMap[stepText];
+                                
+                                if (targetLine) {
+                                    if (status === "IN PROGRESS") {
+                                        const newLine = createLogLine(stepText, status, false);
+                                        targetLine.replaceWith(newLine);
+                                        linesMap[stepText] = newLine;
+                                    } else {
+                                        // Final status (OK, FAIL, SKIPPED)
+                                        let statusEl = targetLine.querySelector('.log-status');
+                                        if (!statusEl) {
+                                            // Fallback if IN PROGRESS was skipped
+                                            const newLine = createLogLine(stepText, status, true);
+                                            targetLine.replaceWith(newLine);
+                                            linesMap[stepText] = newLine;
+                                            statusEl = newLine.querySelector('.log-status');
+                                        }
+                                        
+                                        if (statusEl) {
+                                            statusEl.textContent = status;
+                                            statusEl.classList.remove('log-status--in-progress', 'log-status--ok', 'log-status--fail');
+                                            const finalClass = (status === 'OK' || status === 'SKIPPED') ? 'log-status--ok' : 'log-status--fail';
+                                            statusEl.classList.add(finalClass);
+                                        }
+                                    }
+                                }
+                            } else if (parsed.type === "result") {
+                                responseData = parsed.data;
+                            }
+                        } catch(e) {
+                            console.error("Error parsing NDJSON chunk:", e, part);
+                        }
+                    }
+                }
             }
-
-            // Wait for the simulated delay
-            await new Promise(resolve => setTimeout(resolve, step.delay));
-
-            // Update to final status (text + colour class)
-            const statusEl = line.querySelector('.log-status');
-            statusEl.textContent = step.status;
-            statusEl.classList.remove('log-status--in-progress', 'log-status--ok', 'log-status--fail');
-            const finalClass = step.status === 'OK' ? 'log-status--ok' : 'log-status--fail';
-            statusEl.classList.add(finalClass);
-
-            // Remove future placeholder lines so we can redraw them next tick
-            futureLines.forEach(l => l.remove());
+        } catch(err) {
+            console.error('Error fetching from backend:', err);
         }
-
-        // Wait for the backend to finish if it hasn't already
-        const responseData = await fetchPromise;
 
         // Update DOM with backend data if successful
         if (responseData && !responseData.error) {

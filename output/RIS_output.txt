@@ -1,5 +1,5 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-26  20:58:29
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-26  21:23:16
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
@@ -187,7 +187,7 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
       - Indonesian wildfires cause respiratory infections to double ... (Source: Reuters)
 
     Visual Agent Forensic Synthesis:
-      The image is used in multiple sources that directly match the claim about Indonesian wildfires and emissions. There are 6 sources supporting the authentic context, and no sources indicate the image is from a different event or time. The image depicts smoke and flames, which aligns with the description of wildfires in Indonesia. The majority of sources are from reputable news outlets like Reuters and the South China Morning Post, which lends high confidence to the image's authenticity in this context.
+      The image is used in multiple sources that directly match the claim about Indonesian wildfires and emissions. There are 6 sources supporting the authentic context, and no sources indicate the image is from a different event or time. The image depicts smoke and flames, which aligns with the description of wildfires in Indonesia.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
@@ -196,7 +196,7 @@ Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in
     Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      The image depicts smoke and flames, matching the description of Indonesian wildfires. It is used in multiple sources covering the same event, including Reuters and the South China Morning Post. This evidence strongly supports the image being in an authentic context, and it should be treated as such.
+      The image depicts smoke and flames, consistent with the description of Indonesian wildfires. It is used in multiple sources that match the claim about emissions and wildfires, with no indication of it being from a different event or time. It should be treated as authentic evidence.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------

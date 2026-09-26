@@ -42,10 +42,14 @@ def analyze():
     else:
         print("No image attached.")
 
-    # 2. Run the AI analysis pipeline.
-    response_data = analyze_text(input_text, image_data)
+    # 2. Run the AI analysis pipeline as a stream.
+    import json
+    def generate():
+        for chunk in analyze_text(input_text, image_data):
+            yield json.dumps(chunk) + "\n"
 
-    return jsonify(response_data)
+    from flask import Response
+    return Response(generate(), mimetype='application/x-ndjson')
 
 if __name__ == '__main__':
     # Run the server on port 5000
