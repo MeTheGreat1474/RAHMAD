@@ -293,11 +293,11 @@ Your reasoning, justification, and key facts will be read directly by everyday u
 - Explain the evidence naturally and objectively, as a professional investigative journalist or fact-checker explaining findings to the public.
 
 {
-  "reasoning": "<your step-by-step scratchpad covering steps 1–7, written as 8–12 concise sentences, using **bold** for key concepts, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
+  "reasoning": "<your step-by-step scratchpad covering steps 1–7, formatted as structured Markdown bullet points (e.g. '* **Visual Verification:** ...'). Do NOT write a wall of text. Use 1-2 detailed sentences per bullet point, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'. You MUST explicitly include dedicated bullet points for ALL pipeline components: Factual Assessment, Linguistic Assessment, Logical Assessment, Debate Analysis, Early Predictor (initial screening), External Knowledge Retrieval (verified news), and Reverse Image Search (visual provenance). Summarize their results transparently, even if they contradict your final verdict.>",
   "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
   "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
   "confidence": "<number>%",
-  "justification": "<2–3 sentence explanation of your final verdict, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
+  "justification": "<4–6 sentence comprehensive explanation of your final verdict, detailing the main evidence and your reasoning clearly, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
   "key_facts": ["<observation 1 with **key points** bolded>", "<observation 2>", "<observation 3>"]
 }
 """
@@ -446,11 +446,11 @@ Your output MUST be a single, valid JSON object formatted exactly as follows:
 Important: Use markdown bolding (e.g. **key finding** or **critical claim**) to emphasize important phrases across "justification", "reasoning", and "key_facts".
 
 {
-  "reasoning": "<synthesized judicial deliberation detailing how the specialist findings were weighed, written as 8–12 concise sentences, using **bold** for key concepts, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
+  "reasoning": "<synthesized judicial deliberation detailing how the specialist findings were weighed, formatted as structured Markdown bullet points (e.g. '* **Factual Priority:** ...'). Do NOT write a wall of text. Use 1-2 detailed sentences per bullet point, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'. You MUST explicitly include dedicated bullet points for ALL pipeline components: Factual Assessment, Linguistic Assessment, Logical Assessment, Debate Analysis, Early Predictor (initial screening), External Knowledge Retrieval (verified news), and Reverse Image Search (visual provenance). Summarize their results transparently, even if they contradict your final verdict.>",
   "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
   "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
   "confidence": "<number>%",
-  "justification": "<2–3 sentence explanation of your final verdict, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
+  "justification": "<4–6 sentence comprehensive explanation of your final verdict, detailing the main evidence and your reasoning clearly, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
   "key_facts": ["<observation 1 with **key points** bolded>", "<observation 2>", "<observation 3>"]
 }
 """

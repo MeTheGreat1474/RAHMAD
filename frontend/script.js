@@ -379,16 +379,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 let formattedReasoning = formatMarkdownText(rawReasoning);
                     
                 // Format "STEP X" or "STEP X — SOMETHING" as headers
-                // This regex finds STEP followed by a number, captures the title up to a colon or newline, and consumes the colon/spacing
                 formattedReasoning = formattedReasoning.replace(/(STEP\s+\d+[^:\n]*?)(?::\s*|\n|$)/gi, function(match, p1) {
                     return `<h4 style="margin-top: 18px; margin-bottom: 6px; font-size: 0.95rem; color: var(--text-primary); font-weight: 600; border-bottom: 1px solid var(--border-light); padding-bottom: 4px;">${p1}</h4>`;
                 });
                 
+                // Format markdown lists (* or -)
+                let lines = formattedReasoning.split('\n');
+                let processedLines = [];
+                let inList = false;
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    let match = line.match(/^[ \t]*[\*\-][ \t]+(.*)/);
+                    if (match) {
+                        if (!inList) {
+                            processedLines.push('<ul style="margin-top: 8px; margin-bottom: 12px; padding-left: 20px;">');
+                            inList = true;
+                        }
+                        processedLines.push(`<li style="margin-bottom: 6px;">${match[1]}</li>`);
+                    } else {
+                        if (inList) {
+                            processedLines.push('</ul>');
+                            inList = false;
+                        }
+                        processedLines.push(line);
+                    }
+                }
+                if (inList) {
+                    processedLines.push('</ul>');
+                }
+                
+                formattedReasoning = processedLines.join('\n');
+                
                 // Convert remaining newlines to <br> to preserve paragraphs
                 formattedReasoning = formattedReasoning.replace(/\n/g, '<br>');
                 
-                // Clean up any stray <br> tags immediately following a heading
+                // Clean up stray <br> tags around HTML blocks
                 formattedReasoning = formattedReasoning.replace(/<\/h4><br>/g, '</h4>');
+                formattedReasoning = formattedReasoning.replace(/<ul[^>]*><br>/g, function(m) { return m.replace('<br>', ''); });
+                formattedReasoning = formattedReasoning.replace(/<\/li><br>/g, '</li>');
+                formattedReasoning = formattedReasoning.replace(/<\/ul><br>/g, '</ul>');
+                formattedReasoning = formattedReasoning.replace(/<br><ul/g, '<ul');
                 
                 reasoningText.innerHTML = formattedReasoning;
                 // Reset accordion state on each new result
