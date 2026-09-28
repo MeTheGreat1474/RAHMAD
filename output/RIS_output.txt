@@ -1,5 +1,5 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-26  21:23:16
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-09-28  12:34:55
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
@@ -32,180 +32,56 @@ Studies have shown that fires in Indonesia in 2015 produced more emissions per d
 "In two months we'll know how extreme this year has been, but the early indications are that ​it is at pace, if not slightly above those previous El Niño years."
 
 Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in Jakarta; Editing by Kate Mayberry
-    Target Image Source: Base64 Inline Image (data:image/jpeg;base64, length: 94,595 chars)
-    Public Search URL  : https://i.ibb.co/RGv9N6NX/a3a31094e631.jpg
+    Target Image Source: http://127.0.0.1:5000/res/news1.webp
+    Public Search URL  : http://127.0.0.1:5000/res/news1.webp
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
 ------------------------------------------------------------
     Search Engine Query: Google Lens (via SerpApi)
-    Total Retrieved    : 10 candidate matches
-    Search Status      : Retrieved 10 candidate matches via Google Lens.
-
-      Match #1:
-        Title    : Indonesian wildfire emissions surge to world's highest, data ...
-        Source   : Reuters
-        Link     : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdSbCWPkNhCLQ6z0t5JsOW_ceA1oHyDRo5DLLO2EPyAcC2vnsB
-      Match #2:
-        Title    : Indonesian wildfire emissions surge to world's highest, data ...
-        Source   : KSL News
-        Link     : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRfcsrCyaus2Slf0FvXLDikAfBOCP2zpOSPQ6oOrlHIZH20Prg0
-      Match #3:
-        Title    : Indonesia is facing a surge in emissions from wildfires ...
-        Source   : Instagram
-        Link     : https://www.instagram.com/p/DdGTqddjdDD/
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcT831RUJQyLMV9okMIWWN_MOlKSB-z2jqLDuDxbfUHD3OWNHRQs
-      Match #4:
-        Title    : Indonesia forest fires surge, stoking global warming fears
-        Source   : Phys.org
-        Link     : https://phys.org/news/2019-09-indonesia-forest-surge-stoking-global.html
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSMBUioqeVdfs_sBJZykER_93X4i-gfTA6ZxL7RmYwhh1_nuRXC
-      Match #5:
-        Title    : Indonesia's wildfire emissions surge to world's highest ...
-        Source   : South China Morning Post
-        Link     : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRd9cZxqk4ggnIH7WWD-njyfj8SdDo-UfU4LqxVLg3_J-aBQUZM
-      Match #6:
-        Title    : 7 images that show why the Southern California wildfires are ...
-        Source   : CNN
-        Link     : https://www.cnn.com/interactive/2017/12/us/wildfire-los-angeles-images-big-picture/
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRAIKeVCqFMOupDdpge6o8S0DsWvH6H81Zpv9SWJC7WC7ASJ8IB
-      Match #7:
-        Title    : 🔥CALIFORNIA WILDFIRE: Photos of the Canyon Fire in Southern ...
-        Source   : Facebook
-        Link     : https://www.facebook.com/FoxWeather/posts/california-wildfire-photos-of-the-canyon-fire-in-southern-california-show-firefi/787252810481682/
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcS0CooSFZPZD7Lw2V7MqEskM5nhHZ03cM0-65__sYabHdCjm2AR
-      Match #8:
-        Title    : Photography 4 Humanity | United Nations
-        Source   : the United Nations
-        Link     : https://www.un.org/en/exhibits/exhibit/photography4humanity2025
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTM7q4m7MHbTYnx6d29SDGeboop3bEefHxVNJk52kHNuyN8dpYM
-      Match #9:
-        Title    : Indonesian wildfires cause respiratory infections to double ...
-        Source   : Reuters
-        Link     : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT0KAzo_ABqudlhdcMDPWIrsr_kOcRDiLsbKFN1dvB08_wyAaMA
-      Match #10:
-        Title    : Indonesia faces its most intense wildfire season in 11 years ...
-        Source   : Yahoo
-        Link     : https://www.yahoo.com/news/world/articles/indonesia-faces-most-intense-wildfire-015900775.html
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTecFn7-xXy-RrxgACak3K610Ucsjnsjmw3372e_flcLc3-J4q
+    Total Retrieved    : 0 candidate matches
+    Search Status      : No matches returned by Google Lens.
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
     Filter Criterion   : Visual embedding cosine similarity >= 0.90
-    Evaluated Candidates (10):
-      1. [PASSED] Visual Similarity: 0.9276 (Threshold: >=0.90)
-         Title  : Indonesian wildfire emissions surge to world's highest, data ...
-         Source : Reuters
-         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      2. [PASSED] Visual Similarity: 0.9319 (Threshold: >=0.90)
-         Title  : Indonesian wildfire emissions surge to world's highest, data ...
-         Source : KSL News
-         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      3. [PASSED] Visual Similarity: 0.9301 (Threshold: >=0.90)
-         Title  : Indonesia is facing a surge in emissions from wildfires ...
-         Source : Instagram
-         Link   : https://www.instagram.com/p/DdGTqddjdDD/
-      4. [FAILED] Visual Similarity: 0.8812 (Threshold: >=0.90)
-         Title  : Indonesia forest fires surge, stoking global warming fears
-         Source : Phys.org
-         Link   : https://phys.org/news/2019-09-indonesia-forest-surge-stoking-global.html
-      5. [PASSED] Visual Similarity: 0.9303 (Threshold: >=0.90)
-         Title  : Indonesia's wildfire emissions surge to world's highest ...
-         Source : South China Morning Post
-         Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
-      6. [FAILED] Visual Similarity: 0.8934 (Threshold: >=0.90)
-         Title  : 7 images that show why the Southern California wildfires are ...
-         Source : CNN
-         Link   : https://www.cnn.com/interactive/2017/12/us/wildfire-los-angeles-images-big-picture/
-      7. [FAILED] Visual Similarity: 0.8908 (Threshold: >=0.90)
-         Title  : 🔥CALIFORNIA WILDFIRE: Photos of the Canyon Fire in Southern ...
-         Source : Facebook
-         Link   : https://www.facebook.com/FoxWeather/posts/california-wildfire-photos-of-the-canyon-fire-in-southern-california-show-firefi/787252810481682/
-      8. [PASSED] Visual Similarity: 0.9032 (Threshold: >=0.90)
-         Title  : Photography 4 Humanity | United Nations
-         Source : the United Nations
-         Link   : https://www.un.org/en/exhibits/exhibit/photography4humanity2025
-      9. [PASSED] Visual Similarity: 0.9257 (Threshold: >=0.90)
-         Title  : Indonesian wildfires cause respiratory infections to double ...
-         Source : Reuters
-         Link   : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
-      10. [FAILED] Visual Similarity: 0.8521 (Threshold: >=0.90)
-         Title  : Indonesia faces its most intense wildfire season in 11 years ...
-         Source : Yahoo
-         Link   : https://www.yahoo.com/news/world/articles/indonesia-faces-most-intense-wildfire-015900775.html
-
-    Outcome: 6 of 10 candidates passed visual filter.
+    Status : Pending
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
     Filter Criterion   : Contextual semantic embedding similarity >= 0.05
-    Evaluated Contexts (6):
-      1. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
-         Title  : Indonesian wildfire emissions surge to world's highest, data ...
-         Source : Reuters
-         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      2. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
-         Title  : Indonesian wildfire emissions surge to world's highest, data ...
-         Source : KSL News
-         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      3. [PASSED] Semantic Similarity: 0.7843 (Threshold: >=0.05)
-         Title  : Indonesia is facing a surge in emissions from wildfires ...
-         Source : Instagram
-         Link   : https://www.instagram.com/p/DdGTqddjdDD/
-      4. [PASSED] Semantic Similarity: 0.7732 (Threshold: >=0.05)
-         Title  : Indonesia's wildfire emissions surge to world's highest ...
-         Source : South China Morning Post
-         Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
-      5. [PASSED] Semantic Similarity: 0.0720 (Threshold: >=0.05)
-         Title  : Photography 4 Humanity | United Nations
-         Source : the United Nations
-         Link   : https://www.un.org/en/exhibits/exhibit/photography4humanity2025
-      6. [PASSED] Semantic Similarity: 0.5839 (Threshold: >=0.05)
-         Title  : Indonesian wildfires cause respiratory infections to double ...
-         Source : Reuters
-         Link   : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
-
-    Outcome: 6 of 6 candidates passed semantic filter.
+    Status : Pending
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
     Model Employed     : qwen2.5:7b
-    Assigned Category  : Authentic Context / Matching Event
+    Assigned Category  : Unknown
     Out-of-Context (OOC): NO (Authentic Context / Non-Deceptive)
-    Confidence Level   : High
+    Confidence Level   : Medium
 
     Context Sent to Visual Agent:
-      - Indonesian wildfire emissions surge to world's highest, data ... (Source: Reuters)
-      - Indonesian wildfire emissions surge to world's highest, data ... (Source: KSL News)
-      - Indonesia is facing a surge in emissions from wildfires ... (Source: Instagram)
-      - Indonesia's wildfire emissions surge to world's highest ... (Source: South China Morning Post)
-      - Photography 4 Humanity | United Nations (Source: the United Nations)
-      - Indonesian wildfires cause respiratory infections to double ... (Source: Reuters)
+      (No context passed to Visual Agent)
 
     Visual Agent Forensic Synthesis:
-      The image is used in multiple sources that directly match the claim about Indonesian wildfires and emissions. There are 6 sources supporting the authentic context, and no sources indicate the image is from a different event or time. The image depicts smoke and flames, which aligns with the description of wildfires in Indonesia.
+      (No summary produced)
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
-    Assigned Category          : Authentic Context / Matching Event
+    Assigned Category          : Unknown
     Out-of-Context Flag (OOC)  : NO (Authentic Context / Non-Deceptive)
-    Judicial Confidence Weight : High
+    Judicial Confidence Weight : Medium
 
     Executive Visual Evidence Summary for Judge:
-      The image depicts smoke and flames, consistent with the description of Indonesian wildfires. It is used in multiple sources that match the claim about emissions and wildfires, with no indication of it being from a different event or time. It should be treated as authentic evidence.
+      (No visual evidence summary generated)
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
-    Pipeline Status       : success
-    Forensic Category     : Authentic Context / Matching Event
+    Pipeline Status       : failed
+    Forensic Category     : Unknown
     Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
-    Confidence Level      : High
-    High-Fidelity Matches : 6
-    Forwarded to Judge    : YES
+    Confidence Level      : Medium
+    High-Fidelity Matches : 0
+    Forwarded to Judge    : NO
 
 ================================================================================
   END OF REVERSE IMAGE SEARCH FORENSIC LOG

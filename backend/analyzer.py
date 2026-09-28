@@ -319,9 +319,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         except Exception as exc:
             ris_runtime = time.perf_counter() - t_ris_start
             log.error(f"[analyzer] Reverse Image Search failed: {exc}", exc_info=True)
-            ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nRIS encountered an error: {exc}"
-            ris_data_for_log = {"status": "failed", "visual_agent_summary": f"RIS encountered an error: {exc}"}
-            print(f"  [X] RIS Pipeline Error in {ris_runtime:.2f}s: {exc}")
+            ris_summary = f"\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nReverse Image Search encountered an error: {exc}"
+            ris_data_for_log = {"status": "failed", "visual_agent_summary": f"Reverse Image Search encountered an error: {exc}"}
+            print(f"  [X] Reverse Image Search Error in {ris_runtime:.2f}s: {exc}")
             yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "FAIL"}
     else:
         ris_runtime = time.perf_counter() - t_ris_start
@@ -342,7 +342,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     mad_summary = ""
     agents_info = []
     try:
-        print("  [Step 4.7] Initializing Multi-Agent Debate (MAD) locally...")
+        print("  [Step 4.7] Initializing Multi-Agent Debate locally...")
         orchestrator = _get_mad_orchestrator()
         mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
         mad_runtime = time.perf_counter() - t_mad_start
@@ -350,9 +350,9 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         yield {"type": "status", "step": "DEBATING...", "status": "OK"}
     except Exception as exc:
         mad_runtime = time.perf_counter() - t_mad_start
-        log.error(f"[analyzer] MAD failed: {exc}", exc_info=True)
-        mad_summary = f"MAD encountered an error: {exc}"
-        print(f"  [X] MAD Pipeline Error in {mad_runtime:.2f}s: {exc}")
+        log.error(f"[analyzer] Multi-Agent Debate failed: {exc}", exc_info=True)
+        mad_summary = f"Multi-Agent Debate encountered an error: {exc}"
+        print(f"  [X] Multi-Agent Debate Error in {mad_runtime:.2f}s: {exc}")
         yield {"type": "status", "step": "DEBATING...", "status": "FAIL"}
         
     plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
