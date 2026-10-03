@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-28  13:31:56
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-30  21:17:17
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -17,66 +17,84 @@ In
 ------------------------------------------------------------
     Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-       2. [FILTERED OUT]  https://www.iqair.com/newsroom/wildfire-map-spotlight-indonesia-forest-and-peatland-fires-september-2026
-       3. [FILTERED OUT]  https://www.tradingview.com/news/reuters.com,2026:newsml_L4N4500C7:0-indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/
-       4. [FILTERED OUT]  https://caliber.az/en/post/indonesia-s-wildfire-emissions-surge-to-world-s-highest
-       5. [FILTERED OUT]  https://www.internazionale.it/ultime-notizie-reuters/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows
-       6. [WHITELISTED]   https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
-       7. [WHITELISTED]   https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
-       8. [WHITELISTED]   https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
-       9. [FILTERED OUT]  https://www.pressreader.com/new-zealand/otago-daily-times-world-focus/20260914/281638197097391
-      10. [WHITELISTED]   https://www.nst.com.my/world/region/2026/09/1533819/indonesias-choking-wildfire-haze-worsen-breathing-woes-borneo
+       1. [WHITELISTED]   https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
+       2. [WHITELISTED]   https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
+       3. [WHITELISTED]   https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
+       4. [FILTERED OUT]  https://www.carbonbrief.org/el-nino-indonesia-fire-emissions-in-2026-on-track-to-match-record-for-this-century
+       5. [WHITELISTED]   https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
+       6. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
+       7. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+       8. [FILTERED OUT]  https://www.aol.com/articles/mapped-indonesia-wildfires-spread-toxic-064408000.html
+       9. [WHITELISTED]   https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
+      10. [WHITELISTED]   https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
 
-    URLs Passing Whitelist : 5
-      1. https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      2. https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
-      3. https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
-      4. https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
-      5. https://www.nst.com.my/world/region/2026/09/1533819/indonesias-choking-wildfire-haze-worsen-breathing-woes-borneo
+    URLs Passing Whitelist : 8
+      1. https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
+      2. https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
+      3. https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
+      4. https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
+      5. https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
+      6. https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      7. https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
+      8. https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 3
-      1. Title  : Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online
-         Source : https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
+    Articles Successfully Extracted : 4
+      1. Title  : Indonesian wildfire emissions surge to world’s highest | FMT
+         Source : https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
          Date   : 
-      2. Title  : Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne
-         Source : https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
+      2. Title  : Indonesia wildfires: 2026 data compared to historical averages
+         Source : https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
          Date   : 
-      3. Title  : Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM
-         Source : https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
+      3. Title  : Explainer-How Severe Are Indonesia's Wildfires?
+         Source : https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
+         Date   : 
+      4. Title  : Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
+         Source : https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
          Date   : 
 
-    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 2
+    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 4
       1. Title  : Indonesian wildfire emissions surge to world's highest, data shows
-         Source : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+         Source : https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
          Status : Preserved for Supporting Links
-      2. Title  : Indonesia's choking wildfire, haze worsen breathing woes on Borneo - NST Online
-         Source : https://www.nst.com.my/world/region/2026/09/1533819/indonesias-choking-wildfire-haze-worsen-breathing-woes-borneo
+      2. Title  : Indonesia Tops Global Wildfire Emissions as Copernicus Warns of Undercounted Peat
+         Source : https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
+         Status : Preserved for Supporting Links
+      3. Title  : Maps show surge in Indonesian wildfire hotspots as haze engulfs region
+         Source : https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
+         Status : Preserved for Supporting Links
+      4. Title  : Indonesia's wildfire emissions surge to world's highest, data shows
+         Source : https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 9
+    Snippets Passed : 12
       Snippet #1:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Indonesia is battling its most intense wildfires in 11 years, and its Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November this year.
+        [Indonesian wildfire emissions surge to world’s highest | FMT] Fire emissions from Indonesia from Sept 1 to Sept 7 reached 19.7 million metric tonnes, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union’s Copernicus climate monitoring service.
       Snippet #2:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Transboundary haze has also created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
+        [Indonesian wildfire emissions surge to world’s highest | FMT] From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia’s part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
       Snippet #3:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] "Malaysia has offered assistance to help us address the forest fires in Kalimantan. I welcome this with gratitude and pleasure," Prabowo said.
+        [Indonesian wildfire emissions surge to world’s highest | FMT] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
       Snippet #4:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] Fires have been blazing across vast stretches of forest and peatland throughout the Indonesian archipelago, causing hazardous emissions to surge, particularly in the hardest-hit provinces on the islands of Sumatra and Borneo.
+        [Indonesia wildfires: 2026 data compared to historical averages] Indonesia is battling one of its most severe fire seasons in years. Forestry Ministry data showed significant hectares of land were hit by fires over the first half of the year, a substantial increase over the same period in the previous major El Niño event, the last time this weather pattern affected the country.
       Snippet #5:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] JAKARTA — Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, data from the country's health ministry showed on Thursday (Sept 10).
+        [Indonesia wildfires: 2026 data compared to historical averages] Burnt area perimeters and VIIRS and MODIS active-fire detections across Indonesia.
       Snippet #6:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] From January to July this year, fires burned around 202,000 hectares of land, government data showed. Environmental group YKAN has estimated that another 600,000 hectares were damaged by fire in August.
+        [Indonesia wildfires: 2026 data compared to historical averages] Carbon emissions from the fires reached significantly elevated levels over one week in late in the season, substantially above the seasonal average and among the highest globally, according to the EU’s Copernicus climate monitoring service.
       Snippet #7:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] SINGAPORE: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+        [Explainer-How Severe Are Indonesia's Wildfires?] According to Copernicus' Fire Emissions Watch, carbon emissions from Indonesian fires in the last seven days reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia.
       Snippet #8:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] Fire emissions from Indonesia from Sept 1 to 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union’s Copernicus climate monitoring service.
+        [Explainer-How Severe Are Indonesia's Wildfires?] In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU, and later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
       Snippet #9:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] “It’s much drier, it’s hotter, and when there’s ignition, these fires burn in a far more extreme way.” From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia’s part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
+        [Explainer-How Severe Are Indonesia's Wildfires?] Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia, ⁠the data showed.
+      Snippet #10:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions ⁠from wildfires ⁠burning through parched stretches of forest and peatland on ⁠the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      Snippet #11:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
+      Snippet #12:
+        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Fire ​emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire ‌Emissions Watch, a portal developed by the European ‌Union's Copernicus climate monitoring service.
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
@@ -84,42 +102,36 @@ In
       ### Comprehensive Key-Fact Outline
       
       #### 1. Key Entities, Names, and Roles Involved
-      - **Indonesia**: Country facing the surge in wildfire emissions.
-      - **Forestry Minister Raja Juli Antoni**: Indonesian official warning about the duration of the wildfires.
-      - **Prabowo**: Likely referring to Prabowo Subianto, a prominent Indonesian political figure who has offered assistance.
-      - **Malaysia**: Country offering assistance to Indonesia.
-      - **YKAN (Environmental Group)**: Group estimating additional hectares damaged by fire.
-      - **Fire Emissions Watch**: Portal developed by the European Union's Copernicus climate monitoring service, providing data on fire emissions.
+      - **Indonesia**: Country experiencing a surge in wildfire emissions.
+      - **European Union's Copernicus Climate Monitoring Service**: Developed the Fire Emissions Watch portal.
+      - **Fire Emissions Watch**: Portal used to track and report on wildfire emissions.
+      - **Kalimantan**: Region in Indonesia's part of Borneo where high concentrations of fires were observed.
+      - **Eastern parts of Sumatra**: Areas where high concentrations of fires were observed.
+      - **Forestry Ministry**: Government department in Indonesia providing data on fire-affected land.
+      - **VIIRS and MODIS**: Satellite systems used to detect active fires.
+      - **Reuters**: News agency reporting on the wildfire emissions.
+      - **FMT**: News source reporting on the wildfire emissions.
       
       #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **No monetary amounts, legal rulings, or official outcomes are explicitly mentioned in the snippets**.
+      - **None explicitly mentioned**.
       
       #### 3. Timeline of Events and Corroborating Evidence
-      1. **September 9, 2023**:
-         - **Indonesia's Wildfire Emissions Surge**: Data from Fire Emissions Watch shows that fire emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia and accounting for more than a third of the global total.
-         - **Global Context**: Carbon dioxide readings from Indonesia are currently the highest in the world.
+      - **Date not specified**: Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU and caused more than 100,000 excess deaths throughout Indonesia, Malaysia, and Singapore.
+      - **Date not specified**: In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU.
+      - **Date not specified**: Later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia, and Singapore.
+      - **September 1 to September 7, 2026**: Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
+        - **September 1 to September 7, 2026**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level.
+        - **September 1 to September 7, 2026**: Highest concentrations of fires were observed in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
+        - **September 1 to September 7, 2026**: Carbon emissions from the fires reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia.
+        - **September 1 to September 7, 2026**: Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia.
+        - **September 1 to September 7, 2026**: Burnt area perimeters and VIIRS and MODIS active-fire detections across Indonesia.
       
-      2. **September 10, 2023**:
-         - **Health Impact**: Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, according to data from the country's health ministry.
-         - **Land Damage**: From January to July 2023, fires burned around 202,000 hectares of land. Environmental group YKAN estimates that another 600,000 hectares were damaged by fire in August.
-      
-      3. **September 1 to September 7, 2023**:
-         - **Fire Intensity**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
-         - **Government Response**: Forestry Minister Raja Juli Antoni warned that the wildfires could continue until November this year.
-         - **International Assistance**: Malaysia offered assistance to help address the forest fires in Kalimantan, and Prabowo welcomed this offer with gratitude and pleasure.
-      
-      4. **Date Not Specified**:
-         - **Wildfire Duration**: The wildfires are described as the most intense in 11 years.
-         - **Health Impact**: Respiratory infections have doubled in a week, indicating the severity of the pollution.
-      
-      ### Summary of Evidence
-      - **Indonesia** is experiencing a significant surge in wildfire emissions, with carbon dioxide readings being the highest in the world.
-      - **Fire Emissions Watch** data indicates that from September 1 to September 7, fire emissions reached 19.7 million metric tons, surpassing Russia and accounting for more than a third of the global total.
-      - **Health Impact**: Respiratory infections have doubled in a week, highlighting the severe pollution.
-      - **Land Damage**: Fires have burned 202,000 hectares from January to July, with an additional 600,000 hectares estimated to have been damaged in August.
-      - **Government and International Response**: Forestry Minister Raja Juli Antoni warned of the prolonged nature of the wildfires, and Malaysia offered assistance, which was welcomed by Prabowo.
-      
-      This outline captures all the key facts, entities, and timelines provided in the verified news snippets without making any inferences or assumptions.
+      ### Summary
+      - **Indonesia** is experiencing a significant surge in wildfire emissions, with carbon dioxide readings currently the highest in the world.
+      - **Fire Emissions Watch**, a portal developed by the European Union's Copernicus climate monitoring service, reported that fire emissions from Indonesia from September 1 to September 7, 2026, reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
+      - The fire emission intensity was over 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan and eastern parts of Sumatra.
+      - Studies from 2015 showed that Indonesian wildfires produced more daily carbon dioxide emissions than the entire European Union and caused over 100,000 excess deaths in Indonesia, Malaysia, and Singapore.
+      - The Forestry Ministry data indicated significant hectares of land were hit by fires over the first half of the year, a substantial increase over the same period in the previous major El Niño event.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

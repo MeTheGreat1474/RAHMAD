@@ -3,8 +3,9 @@
     --text-main: #111111;
     --text-muted: #555555;
     --border-color: #333333;
-    --border-light: #cccccc;
-    --tag-bg: #687980;
+    --border-light: #b9b9b9;
+    --border-lighter: #cccccc;
+    --tag-bg: #737373;
     /* Slate grey */
     --tag-text: #ffffff;
     --red-alert: #9e2a2b;
@@ -77,7 +78,7 @@ body {
 .topbar-left span {
     font-family: var(--font-sans);
     font-size: 0.75rem;
-    color: #888;
+    color: var(--text-muted);
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -96,23 +97,24 @@ body {
 
 /* Header */
 header {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
 .version {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
     letter-spacing: 1px;
     text-transform: uppercase;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
 }
 
 h1 {
     font-family: var(--font-serif);
     font-size: 2.8rem;
     font-weight: 700;
-    margin-top: 0.5rem;
+    /* margin-top: 0.5rem; */
     color: var(--text-main);
+    line-height: 3.0rem;
 }
 
 .header-subtitle {
@@ -156,8 +158,8 @@ h1 {
 }
 
 .panel {
-    border: 2px solid var(--border-color);
-    padding: 1.5rem;
+    /* border: 2px solid var(--border-color); */
+    /* padding: 1.5rem; */
     display: flex;
     flex-direction: column;
 }
@@ -300,7 +302,8 @@ textarea {
 
 /* Stream Panel */
 .stream-panel {
-    border: 1px solid var(--border-light);
+    border: 2px solid var(--border-lighter);
+    padding: 1.5rem;
 }
 
 .panel-header {
@@ -333,7 +336,7 @@ textarea {
 }
 
 .stream-content {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.85rem;
     color: var(--text-muted);
     display: flex;
@@ -512,9 +515,9 @@ h2.verdict-text.inconclusive {
     cursor: pointer;
     padding: 0;
     color: inherit;
-    font-family: var(--font-mono, monospace);
+    font-family: var(--font-sans);
     font-size: 0.75rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     opacity: 0.6;
     transition: opacity 0.2s;
@@ -565,24 +568,17 @@ h2.verdict-text.inconclusive {
 }
 
 .links-list {
-    margin-top: 1.5rem;
+    margin-top: 1.0rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-}
-
-.link-item {
-    display: flex;
-    gap: 1rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-light);
+    /* gap: 1.5rem; */
 }
 
 .link-item {
     display: flex;
     align-items: flex-start;
     gap: 1.5rem;
-    padding: 1.2rem 0.5rem;
+    padding: 1.5rem 0.5rem;
     border-bottom: 1px solid var(--border-light);
     cursor: pointer;
     border-radius: 6px;
@@ -636,7 +632,7 @@ h2.verdict-text.inconclusive {
 footer {
     background-color: var(--text-main);
     color: white;
-    padding: 1.5rem 0;
+    padding: 2.5rem 0;
     margin-top: auto;
     width: 100%;
 }
@@ -675,7 +671,7 @@ footer {
     text-decoration: none;
     border-bottom: 1px solid #888;
     padding-bottom: 2px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     letter-spacing: 1px;
     text-transform: uppercase;
     font-family: var(--font-mono);

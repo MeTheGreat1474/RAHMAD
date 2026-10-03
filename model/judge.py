@@ -72,10 +72,10 @@ log = logging.getLogger(__name__)
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 _DEFAULT_FALLBACKS = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free,inclusionai/ling-3.0-flash:free,poolside/laguna-m.1:free"
-_JUDGE_FALLBACK_RAW = os.environ.get("JUDGE_MODEL_FALLBACK", _DEFAULT_FALLBACKS)
+_JUDGE_FALLBACK_RAW = os.environ.get("JUDGE_MODEL_FALLBACK") or os.environ.get("OPENROUTER_MODEL_FALLBACK", _DEFAULT_FALLBACKS)
 _JUDGE_FALLBACKS = [m.strip() for m in _JUDGE_FALLBACK_RAW.split(",") if m.strip()]
 
-_MODEL_ID = os.environ.get("JUDGE_MODEL", "deepseek/deepseek-v4-flash-0731")
+_MODEL_ID = os.environ.get("JUDGE_MODEL") or os.environ.get("OPENROUTER_MODEL", "deepseek/deepseek-v4.1-flash")
 
 # ---------------------------------------------------------------------------
 # Enhanced System Prompt
@@ -297,7 +297,7 @@ Your reasoning, justification, and key facts will be read directly by everyday u
   "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
   "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
   "confidence": "<number>%",
-  "justification": "<4–6 sentence comprehensive explanation of your final verdict, detailing the main evidence and your reasoning clearly, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
+  "justification": "<3–5 sentence comprehensive explanation of your final verdict, detailing the main evidence and your reasoning clearly, using **bold** for critical signals and key entities, strictly using user-friendly terms like 'Reverse Image Search shows...' or 'Debate shows...'>",
   "key_facts": ["<observation 1 with **key points** bolded>", "<observation 2>", "<observation 3>"]
 }
 """
