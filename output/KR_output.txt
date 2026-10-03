@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-09-30  21:17:17
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-14  13:04:10
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -17,125 +17,77 @@ In
 ------------------------------------------------------------
     Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
-       2. [WHITELISTED]   https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
-       3. [WHITELISTED]   https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
-       4. [FILTERED OUT]  https://www.carbonbrief.org/el-nino-indonesia-fire-emissions-in-2026-on-track-to-match-record-for-this-century
-       5. [WHITELISTED]   https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
-       6. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
-       7. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-       8. [FILTERED OUT]  https://www.aol.com/articles/mapped-indonesia-wildfires-spread-toxic-064408000.html
-       9. [WHITELISTED]   https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
-      10. [WHITELISTED]   https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
+       1. [WHITELISTED]   https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
+       2. [WHITELISTED]   https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
+       3. [WHITELISTED]   https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
+       4. [WHITELISTED]   https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
+       5. [WHITELISTED]   https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
+       6. [WHITELISTED]   https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
+       7. [WHITELISTED]   https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
+       8. [WHITELISTED]   https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
+       9. [WHITELISTED]   https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
+      10. [WHITELISTED]   https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
 
-    URLs Passing Whitelist : 8
-      1. https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
-      2. https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
-      3. https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
-      4. https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
-      5. https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
-      6. https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-      7. https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
-      8. https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
+    URLs Passing Whitelist : 10
+      1. https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
+      2. https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
+      3. https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
+      4. https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
+      5. https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
+      6. https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
+      7. https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
+      8. https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
+      9. https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
+      10. https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 4
-      1. Title  : Indonesian wildfire emissions surge to world’s highest | FMT
-         Source : https://www.freemalaysiatoday.com/category/world/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest
-         Date   : 
-      2. Title  : Indonesia wildfires: 2026 data compared to historical averages
-         Source : https://www.reuters.com/graphics/ASIA-WEATHER/INDONESIA-WILDFIRE/lgpdbwexdpo/
-         Date   : 
-      3. Title  : Explainer-How Severe Are Indonesia's Wildfires?
-         Source : https://www.usnews.com/news/world/articles/2026-08-31/explainer-how-severe-are-indonesias-wildfires
-         Date   : 
-      4. Title  : Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
-         Source : https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
-         Date   : 
+    Articles Successfully Extracted : 0
 
-    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 4
+    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 10
       1. Title  : Indonesian wildfire emissions surge to world's highest, data shows
-         Source : https://www.msn.com/en-us/news/other/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows/ar-AA2bRXVo
+         Source : https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
          Status : Preserved for Supporting Links
-      2. Title  : Indonesia Tops Global Wildfire Emissions as Copernicus Warns of Undercounted Peat
-         Source : https://www.msn.com/en-us/news/other/indonesia-tops-global-wildfire-emissions-as-copernicus-warns-of-undercounted-peat/ar-AA2bXuXK
+      2. Title  : Wildfire Map Spotlight: Indonesia forest and peatland fires - IQAir
+         Source : https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
          Status : Preserved for Supporting Links
-      3. Title  : Maps show surge in Indonesian wildfire hotspots as haze engulfs region
-         Source : https://www.msn.com/en-us/news/other/mapped-indonesia-s-wildfires-spread-toxic-haze-across-southeast-asia/ar-AA2btyRU
+      3. Title  : Indonesian wildfire emissions surge to world’s highest, data shows - Internazionale
+         Source : https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
          Status : Preserved for Supporting Links
-      4. Title  : Indonesia's wildfire emissions surge to world's highest, data shows
-         Source : https://www.msn.com/en-xl/news/other/indonesia-s-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bTt9r
+      4. Title  : Indonesian wildfire emissions surge to world’s highest - Dawn
+         Source : https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
+         Status : Preserved for Supporting Links
+      5. Title  : Indonesia to receive assistance from Malaysia to contain wildfires - GMA Network
+         Source : https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
+         Status : Preserved for Supporting Links
+      6. Title  : Indonesia’s wildfire emissions surge to world’s highest - Caliber.Az
+         Source : https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
+         Status : Preserved for Supporting Links
+      7. Title  : Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne
+         Source : https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
+         Status : Preserved for Supporting Links
+      8. Title  : 'Truly scared': Blazes outpace firefighters in Indonesian Borneo [WATCH] - NST Online
+         Source : https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
+         Status : Preserved for Supporting Links
+      9. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says - GMA Network
+         Source : https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
+         Status : Preserved for Supporting Links
+      10. Title  : Wildfire haze forces 1.4 million Indonesian students into remote learning - NST Online
+         Source : https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 12
-      Snippet #1:
-        [Indonesian wildfire emissions surge to world’s highest | FMT] Fire emissions from Indonesia from Sept 1 to Sept 7 reached 19.7 million metric tonnes, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union’s Copernicus climate monitoring service.
-      Snippet #2:
-        [Indonesian wildfire emissions surge to world’s highest | FMT] From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia’s part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
-      Snippet #3:
-        [Indonesian wildfire emissions surge to world’s highest | FMT] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
-      Snippet #4:
-        [Indonesia wildfires: 2026 data compared to historical averages] Indonesia is battling one of its most severe fire seasons in years. Forestry Ministry data showed significant hectares of land were hit by fires over the first half of the year, a substantial increase over the same period in the previous major El Niño event, the last time this weather pattern affected the country.
-      Snippet #5:
-        [Indonesia wildfires: 2026 data compared to historical averages] Burnt area perimeters and VIIRS and MODIS active-fire detections across Indonesia.
-      Snippet #6:
-        [Indonesia wildfires: 2026 data compared to historical averages] Carbon emissions from the fires reached significantly elevated levels over one week in late in the season, substantially above the seasonal average and among the highest globally, according to the EU’s Copernicus climate monitoring service.
-      Snippet #7:
-        [Explainer-How Severe Are Indonesia's Wildfires?] According to Copernicus' Fire Emissions Watch, carbon emissions from Indonesian fires in the last seven days reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia.
-      Snippet #8:
-        [Explainer-How Severe Are Indonesia's Wildfires?] In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU, and later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
-      Snippet #9:
-        [Explainer-How Severe Are Indonesia's Wildfires?] Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia, ⁠the data showed.
-      Snippet #10:
-        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions ⁠from wildfires ⁠burning through parched stretches of forest and peatland on ⁠the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
-      Snippet #11:
-        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Indonesian Wildfire Emissions Surge to World's Highest, Data Shows
-      Snippet #12:
-        [Indonesian Wildfire Emissions Surge to World's Highest, Data Shows] Fire ​emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire ‌Emissions Watch, a portal developed by the European ‌Union's Copernicus climate monitoring service.
+    Snippets Passed : 0
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      ### Comprehensive Key-Fact Outline
-      
-      #### 1. Key Entities, Names, and Roles Involved
-      - **Indonesia**: Country experiencing a surge in wildfire emissions.
-      - **European Union's Copernicus Climate Monitoring Service**: Developed the Fire Emissions Watch portal.
-      - **Fire Emissions Watch**: Portal used to track and report on wildfire emissions.
-      - **Kalimantan**: Region in Indonesia's part of Borneo where high concentrations of fires were observed.
-      - **Eastern parts of Sumatra**: Areas where high concentrations of fires were observed.
-      - **Forestry Ministry**: Government department in Indonesia providing data on fire-affected land.
-      - **VIIRS and MODIS**: Satellite systems used to detect active fires.
-      - **Reuters**: News agency reporting on the wildfire emissions.
-      - **FMT**: News source reporting on the wildfire emissions.
-      
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **None explicitly mentioned**.
-      
-      #### 3. Timeline of Events and Corroborating Evidence
-      - **Date not specified**: Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU and caused more than 100,000 excess deaths throughout Indonesia, Malaysia, and Singapore.
-      - **Date not specified**: In 2015, Indonesian wildfires generated more daily carbon dioxide emissions than the whole of the EU.
-      - **Date not specified**: Later studies estimated that wildfire pollution caused more than 100,000 excess deaths throughout Indonesia, Malaysia, and Singapore.
-      - **September 1 to September 7, 2026**: Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
-        - **September 1 to September 7, 2026**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level.
-        - **September 1 to September 7, 2026**: Highest concentrations of fires were observed in Kalimantan (Indonesia's part of Borneo) and eastern parts of Sumatra.
-        - **September 1 to September 7, 2026**: Carbon emissions from the fires reached 17.1 million metric tons, 429% higher than the seasonal mean and second only to Russia.
-        - **September 1 to September 7, 2026**: Fire emission intensity in Indonesia stood at 1,302 kg/sq km, compared to 185 kg/sq km in Russia.
-        - **September 1 to September 7, 2026**: Burnt area perimeters and VIIRS and MODIS active-fire detections across Indonesia.
-      
-      ### Summary
-      - **Indonesia** is experiencing a significant surge in wildfire emissions, with carbon dioxide readings currently the highest in the world.
-      - **Fire Emissions Watch**, a portal developed by the European Union's Copernicus climate monitoring service, reported that fire emissions from Indonesia from September 1 to September 7, 2026, reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
-      - The fire emission intensity was over 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan and eastern parts of Sumatra.
-      - Studies from 2015 showed that Indonesian wildfires produced more daily carbon dioxide emissions than the entire European Union and caused over 100,000 excess deaths in Indonesia, Malaysia, and Singapore.
-      - The Forestry Ministry data indicated significant hectares of land were hit by fires over the first half of the year, a substantial increase over the same period in the previous major El Niño event.
+      (No summary produced)
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------
-    Status : success
+    Status : completed - supporting links preserved
 
 ================================================================================
   END OF KNOWLEDGE RETRIEVAL FORENSIC LOG

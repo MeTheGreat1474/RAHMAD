@@ -11,6 +11,7 @@ VERIFIED_DOMAINS = {
     "apnews.com",
     "afp.com",
     "bloomberg.com",
+    "news.google.com",
     
     # US Outlets
     "nytimes.com",
