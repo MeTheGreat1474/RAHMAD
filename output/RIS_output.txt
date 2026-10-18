@@ -1,5 +1,5 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-14  13:04:25
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-18  11:14:47
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
@@ -32,56 +32,180 @@ Studies have shown that fires in Indonesia in 2015 produced more emissions per d
 "In two months we'll know how extreme this year has been, but the early indications are that ​it is at pace, if not slightly above those previous El Niño years."
 
 Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in Jakarta; Editing by Kate Mayberry
-    Target Image Source: http://127.0.0.1:5000/res/news1.webp
-    Public Search URL  : http://127.0.0.1:5000/res/news1.webp
+    Target Image Source: Base64 Inline Image (data:image/jpeg;base64, length: 94,595 chars)
+    Public Search URL  : https://i.ibb.co/cSg9sphX/511fbfd32dec.jpg
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
 ------------------------------------------------------------
     Search Engine Query: Google Lens (via SerpApi)
-    Total Retrieved    : 0 candidate matches
-    Search Status      : No matches returned by Google Lens.
+    Total Retrieved    : 10 candidate matches
+    Search Status      : Retrieved 10 candidate matches via Google Lens.
+
+      Match #1:
+        Title    : Indonesian wildfire emissions surge to world's highest, data ...
+        Source   : Reuters
+        Link     : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7c6H1GjwHgSXVib8V6NZsKr-SHwJroXVAJs0NeFUV_CtHvLYh
+      Match #2:
+        Title    : Indonesian wildfire emissions surge to world's highest, data ...
+        Source   : KSL-TV
+        Link     : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTmi2HrnaX2sOs87x-Din1CpGrAKD6y_FgYchZQXeQEozL5uKlC
+      Match #3:
+        Title    : Photos of the week - September 10, 2026 | Reuters
+        Source   : Photos of the week - September 10, 2026 | Reuters
+        Link     : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQRWljfT23Hn4qNwWi2yzABYBu5pDTvRqwB9orqYj7-EMFzP3nq
+      Match #4:
+        Title    : Licensable picture: A firefighter uses a tree branch to try ...
+        Source   : Reuters Connect
+        Link     : https://www.reutersconnect.com/item/a-firefighter-uses-a-tree-branch-to-try-and-douse-the-flames-amid-a-wildfire-in-palembang/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX01SUFJDMjRGTkFJRzMzVA
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpIzV9xwoC_2cvpqApttCggrvZc2XsEn0TSmpZjMBpsYby1DFZ
+      Match #5:
+        Title    : Indonesian wildfire emissions surge to world's highest, data ...
+        Source   : The Standard (HK)
+        Link     : https://www.thestandard.com.hk/world/article/342293/Indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcT59u1Xbqol6AAHtYg-DpUEFXrW__4-5ZVuEtdl8WNfwftsJ5RY
+      Match #6:
+        Title    : Indonesian wildfire emissions surge to world's highest ...
+        Source   : Dawn
+        Link     : https://www.dawn.com/news/2028791
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQE_EHsBunSVWOHLW9O9bfweVjvqNmW1XkGdFsue0R7uue99lC-
+      Match #7:
+        Title    : Indonesia's forest fire destruction in 2019 far worse than ...
+        Source   : South China Morning Post
+        Link     : https://www.scmp.com/news/asia/southeast-asia/article/3163482/indonesias-forest-fire-destruction-2019-far-worse-official
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTrY_juOmSwCWplHTWjxn_AtLTLMM_2A39XT4EK2hICMUfAhQnt
+      Match #8:
+        Title    : Firefighters halt growth of Feliz Fire in southern Mendocino ...
+        Source   : The Press Democrat
+        Link     : https://www.pressdemocrat.com/2026/08/01/feliz-fire-explodes-in-southern-mendocino-county-outside-hopland-evacuations-ordered/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9y5jTReS3DHqoMKHP14KZ_uoAmBciQkNraDYwvXWjHf35-5oG
+      Match #9:
+        Title    : Indonesia is facing a surge in emissions from wildfires ...
+        Source   : Instagram
+        Link     : https://www.instagram.com/p/DdGTqddjdDD/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcT831RUJQyLMV9okMIWWN_MOlKSB-z2jqLDuDxbfUHD3OWNHRQs
+      Match #10:
+        Title    : As the Santa Rosa Fire Spreads, See Inside Photographs of ...
+        Source   : National Geographic
+        Link     : https://www.nationalgeographic.com/photography/article/california-wildfires-drought
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQZkIt31VYIO7Lo67Umrq6bZM46q5o7RhZd0pB8nUAYaU6CpJUw
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
     Filter Criterion   : Visual embedding cosine similarity >= 0.90
-    Status : Pending
+    Evaluated Candidates (10):
+      1. [PASSED] Visual Similarity: 0.9212 (Threshold: >=0.90)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      2. [PASSED] Visual Similarity: 0.9262 (Threshold: >=0.90)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : KSL-TV
+         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      3. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.90)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Photos of the week - September 10, 2026 | Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+      4. [FAILED] Visual Similarity: 0.8275 (Threshold: >=0.90)
+         Title  : Licensable picture: A firefighter uses a tree branch to try ...
+         Source : Reuters Connect
+         Link   : https://www.reutersconnect.com/item/a-firefighter-uses-a-tree-branch-to-try-and-douse-the-flames-amid-a-wildfire-in-palembang/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX01SUFJDMjRGTkFJRzMzVA
+      5. [PASSED] Visual Similarity: 0.9274 (Threshold: >=0.90)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : The Standard (HK)
+         Link   : https://www.thestandard.com.hk/world/article/342293/Indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      6. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.90)
+         Title  : Indonesian wildfire emissions surge to world's highest ...
+         Source : Dawn
+         Link   : https://www.dawn.com/news/2028791
+      7. [FAILED] Visual Similarity: 0.8767 (Threshold: >=0.90)
+         Title  : Indonesia's forest fire destruction in 2019 far worse than ...
+         Source : South China Morning Post
+         Link   : https://www.scmp.com/news/asia/southeast-asia/article/3163482/indonesias-forest-fire-destruction-2019-far-worse-official
+      8. [FAILED] Visual Similarity: 0.8498 (Threshold: >=0.90)
+         Title  : Firefighters halt growth of Feliz Fire in southern Mendocino ...
+         Source : The Press Democrat
+         Link   : https://www.pressdemocrat.com/2026/08/01/feliz-fire-explodes-in-southern-mendocino-county-outside-hopland-evacuations-ordered/
+      9. [PASSED] Visual Similarity: 0.9301 (Threshold: >=0.90)
+         Title  : Indonesia is facing a surge in emissions from wildfires ...
+         Source : Instagram
+         Link   : https://www.instagram.com/p/DdGTqddjdDD/
+      10. [FAILED] Visual Similarity: 0.8822 (Threshold: >=0.90)
+         Title  : As the Santa Rosa Fire Spreads, See Inside Photographs of ...
+         Source : National Geographic
+         Link   : https://www.nationalgeographic.com/photography/article/california-wildfires-drought
+
+    Outcome: 6 of 10 candidates passed visual filter.
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
     Filter Criterion   : Contextual semantic embedding similarity >= 0.05
-    Status : Pending
+    Evaluated Contexts (6):
+      1. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      2. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : KSL-TV
+         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      3. [PASSED] Semantic Similarity: 0.2075 (Threshold: >=0.05)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Photos of the week - September 10, 2026 | Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+      4. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.05)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : The Standard (HK)
+         Link   : https://www.thestandard.com.hk/world/article/342293/Indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      5. [PASSED] Semantic Similarity: 0.7998 (Threshold: >=0.05)
+         Title  : Indonesian wildfire emissions surge to world's highest ...
+         Source : Dawn
+         Link   : https://www.dawn.com/news/2028791
+      6. [PASSED] Semantic Similarity: 0.7843 (Threshold: >=0.05)
+         Title  : Indonesia is facing a surge in emissions from wildfires ...
+         Source : Instagram
+         Link   : https://www.instagram.com/p/DdGTqddjdDD/
+
+    Outcome: 6 of 6 candidates passed semantic filter.
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
     Model Employed     : qwen2.5:7b
-    Assigned Category  : Unknown
+    Assigned Category  : Authentic Context / Matching Event
     Out-of-Context (OOC): NO (Authentic Context / Non-Deceptive)
-    Confidence Level   : Medium
+    Confidence Level   : High
 
     Context Sent to Visual Agent:
-      (No context passed to Visual Agent)
+      - Indonesian wildfire emissions surge to world's highest, data ... (Source: Reuters)
+      - Indonesian wildfire emissions surge to world's highest, data ... (Source: KSL-TV)
+      - Photos of the week - September 10, 2026 | Reuters (Source: Photos of the week - September 10, 2026 | Reuters)
+      - Indonesian wildfire emissions surge to world's highest, data ... (Source: The Standard (HK))
+      - Indonesian wildfire emissions surge to world's highest ... (Source: Dawn)
+      - Indonesia is facing a surge in emissions from wildfires ... (Source: Instagram)
 
     Visual Agent Forensic Synthesis:
-      (No summary produced)
+      The image is used in multiple sources that align with the claim, all of which are related to the surge in Indonesian wildfire emissions. There are 6 sources supporting the authentic context of the event, and no sources indicate the image is from a different event or time period. The image depicts the same event as described in the claim, making it highly likely to be in an authentic context.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
-    Assigned Category          : Unknown
+    Assigned Category          : Authentic Context / Matching Event
     Out-of-Context Flag (OOC)  : NO (Authentic Context / Non-Deceptive)
-    Judicial Confidence Weight : Medium
+    Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      (No visual evidence summary generated)
+      The image depicts Indonesian wildfires and emissions, matching the claim about the surge in emissions. It is used across multiple reputable sources, including Reuters and local news outlets, all reporting on the same event. The image should be treated as authentic evidence of the event.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
-    Pipeline Status       : failed
-    Forensic Category     : Unknown
+    Pipeline Status       : success
+    Forensic Category     : Authentic Context / Matching Event
     Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
-    Confidence Level      : Medium
-    High-Fidelity Matches : 0
-    Forwarded to Judge    : NO
+    Confidence Level      : High
+    High-Fidelity Matches : 6
+    Forwarded to Judge    : YES
 
 ================================================================================
   END OF REVERSE IMAGE SEARCH FORENSIC LOG

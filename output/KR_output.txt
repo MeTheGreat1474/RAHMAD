@@ -1,5 +1,5 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-14  13:04:10
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-18  11:14:13
 ================================================================================
 
 [1]  INPUT CLAIM
@@ -17,77 +17,111 @@ In
 ------------------------------------------------------------
     Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
-       2. [WHITELISTED]   https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
-       3. [WHITELISTED]   https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
-       4. [WHITELISTED]   https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
-       5. [WHITELISTED]   https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
-       6. [WHITELISTED]   https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
-       7. [WHITELISTED]   https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
-       8. [WHITELISTED]   https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
-       9. [WHITELISTED]   https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
-      10. [WHITELISTED]   https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
+       1. [WHITELISTED]   https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+       2. [FILTERED OUT]  https://www.iqair.com/newsroom/wildfire-map-spotlight-indonesia-forest-and-peatland-fires-september-2026
+       3. [FILTERED OUT]  https://www.tradingview.com/news/reuters.com,2026:newsml_L4N4500C7:0-indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/
+       4. [FILTERED OUT]  https://www.internazionale.it/ultime-notizie-reuters/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows
+       5. [WHITELISTED]   https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
+       6. [FILTERED OUT]  https://caliber.az/en/post/indonesia-s-wildfire-emissions-surge-to-world-s-highest
+       7. [WHITELISTED]   https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
+       8. [WHITELISTED]   https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
+       9. [WHITELISTED]   https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
+      10. [WHITELISTED]   https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
 
-    URLs Passing Whitelist : 10
-      1. https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
-      2. https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
-      3. https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
-      4. https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
-      5. https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
-      6. https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
-      7. https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
-      8. https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
-      9. https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
-      10. https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
+    URLs Passing Whitelist : 6
+      1. https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      2. https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
+      3. https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
+      4. https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
+      5. https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
+      6. https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 0
+    Articles Successfully Extracted : 4
+      1. Title  : Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne
+         Source : https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
+         Date   : 
+      2. Title  : Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online
+         Source : https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
+         Date   : 
+      3. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online
+         Source : https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
+         Date   : 
+      4. Title  : Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM
+         Source : https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
+         Date   : 
 
-    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 10
+    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 2
       1. Title  : Indonesian wildfire emissions surge to world's highest, data shows
-         Source : https://news.google.com/rss/articles/CBMiugFBVV95cUxQLUktTl9pT0cyQVZDTUVYVHlTNHlvN2dMZnFScnZUSDExNEdZcHVNT01OcFNwMU82LUJSZnU1V3hUdTJDUmxrUnpuaGdnRV9LUEFoY0FXQ1pad3h4bjl3WXFKbnVtaDF1RkUwamRGRlBibGxPWlMyRDN1aklNaWpPQXpoZHN2bnlSQzRJYWV4eUtRNmdYTVZyNm1UOFktY2lqc1AzLVF4QjRxdTRvVDhfUGpYZDAxN3J4X1E?oc=5
+         Source : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
          Status : Preserved for Supporting Links
-      2. Title  : Wildfire Map Spotlight: Indonesia forest and peatland fires - IQAir
-         Source : https://news.google.com/rss/articles/CBMipwFBVV95cUxObVN2VVpYczFrd08zX1J6ZURhTEwtbXExQ2RoaGtvRkVkLXM5V1JBMHZVMWdydHppMTEyc1Yzc2R1bEwwNlFQbTJmWjJCZkoxaUtwdVRzTnV6UXVKMDRfZzdneU1HSVRsYnp5cGFKOHRDajVmUmNPNU5nc1JrYS03V3p4dmo3cC1tTHA2UTVFM2N5NDFGSlFaN3Q4OHViZ05sUGg0VDdMYw?oc=5
-         Status : Preserved for Supporting Links
-      3. Title  : Indonesian wildfire emissions surge to world’s highest, data shows - Internazionale
-         Source : https://news.google.com/rss/articles/CBMiyAFBVV95cUxPSUoxeFpDYUtBWEFyaE5aZXAyWl9rdmNfVi0xTk9JZ01jb2xDSlNxY2ZsdW54d0lhZzlpTEg3V0NMU3dhbUJybTNSRUpBNXBobnBOWUxUMjZabnc3NXQySVFMQi1sYVlRWjlXY01Yd3QyNWlJSnY2Q241cjFTYkJVNC04RGhlRlZZTlljek5mN3hJcVNCRzJYT285OURxT2NLcko4Ykw0d2hJbU41Yk53aFFKZXFUZDF1QkxkVVRKN3lXc21rZ01NUA?oc=5
-         Status : Preserved for Supporting Links
-      4. Title  : Indonesian wildfire emissions surge to world’s highest - Dawn
-         Source : https://news.google.com/rss/articles/CBMilgJBVV95cUxQNGx5aTVmNkh6dEhNVXZfZ2FHTGpqVUN1RWhaVThCcVc3TUoxN3Bfc2kyNTJ1Q2tzdlBSM1NaUi1Id2tqcHNPbjJhbGNDRWFZLVJ6RUtXVGo3NzZmS2MtVE8xNnhNelNkUG9OX1JYYmJaN1RYSGR2TmVkYzY5VUl3cXozYVE3SDZucXE5V3B4aTBwMVR3TVpWbU9EQlpDYkdpV0k2U0dOWXVjeVRkMlEwTWdmSW1ldkpTY0hHR2pFY3F2RTR6ZVdFNjMyT21ET3hNT1dRa1RaNVRvN1NtcXUtdDZURnBrbU82WDF6RlZHS1VhOHAzRmlqZklUN0RwdFRXc1FxZm5yR3NtSlFBM3h3UmF0ejR4d9IBTkFVX3lxTFBzeGlZMG9jLVc3ZXZScmJ2MHgyQTlZczRuWkttTTZBN3dsXzVJcFV6VkowemMzTXhvOWFMaG5NRnlHWGNkRHNNTmNBbDV5Zw?oc=5
-         Status : Preserved for Supporting Links
-      5. Title  : Indonesia to receive assistance from Malaysia to contain wildfires - GMA Network
-         Source : https://news.google.com/rss/articles/CBMiygFBVV95cUxQU0V2dGxmV0J2OE52c2RJdGpJV2c2UjMtWFlrYzc1RXNVb01Hb0U0VGxhak9WVzdMREJ4NVVDcFBfX2E4cHBwMERBM2NLVzBUZmlWV2JFQnNyT1ZEYThRSGZlc3JIeDB4ZmF0TGEtNkFuM0NETm5Eb0ZxZ1NNYjdJeUt2ck04NzhuX2ZZWUNzTTJ6LS1WYklfaHhrZWEwZHlRV3F5N241cjg5ZUN2ZktmVzBJcldISzJuOEhPVHRhU3VJSk8tczVtRWZn0gHPAUFVX3lxTE5sdk5LNW5xb0owVmFDOENldXlpSWdJazVFRFNwZlg5WG1JckJHanRNOHBXdlhpTnhmUU85RkIwUFhTYTNOb3VfM0xvOUdoaU5kR3NmQ2dSN25YWlhNT3h6aWcyalRqM2tvZ1pZMjNiREhUMlF4cFEycU1yeWV0U3N4SmhGTXBxVFVnVG14d0tYaW1CbUJuRkk1clpIRkc2YnVJclVPNktLV1BaaHd5TUkzSllIZnh5VDJxZTU0bFJGY1FhNUEyZzloaEROeHBvMA?oc=5
-         Status : Preserved for Supporting Links
-      6. Title  : Indonesia’s wildfire emissions surge to world’s highest - Caliber.Az
-         Source : https://news.google.com/rss/articles/CBMiigFBVV95cUxNYVlOMWNNMzBtZmRta1JQTE1DXzlwSkZlTE1pUXdlejdGcTM4LV9wMlBMcEJzRmpYZHNDdTdZLVpZdnFRMlpUYnlJZlp5T2luZ2ZBZTFZWVY2MFhyZzVSVW9UckZLZk1LWXlWSEhPZkZJQkJhQ0RrZm55OXFvdVJlUjBNMXR4d3oxVmc?oc=5
-         Status : Preserved for Supporting Links
-      7. Title  : Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne
-         Source : https://news.google.com/rss/articles/CBMisAFBVV95cUxQTFc2cTFTUERCcGF3alRRbTFQSEs3eTlCVlc2VEMyUWdFYy0wR1ctbzFZektQZVp4UU1QTjZ2dUZ2bWM1dGNIZFZXVXBOcFNSbDNySk83cks5M2NkbGt2cHkyREp5RlV0bm1uQ2JDOEZJVm02NDZnOGtFTjc5NHdGLUwyZ19sRFF0M1JRVWFfOFJ1SEVid09XVlk5Z3FNYjFpR3lKYll6c1JscHZDY1hSRw?oc=5
-         Status : Preserved for Supporting Links
-      8. Title  : 'Truly scared': Blazes outpace firefighters in Indonesian Borneo [WATCH] - NST Online
-         Source : https://news.google.com/rss/articles/CBMitwFBVV95cUxPODBySDBFZlJmWWx1RWYyUkxaamc4eGwzU2ZrZlQ3OXZLSTd1V1Z6LW1JU041aWFCYkk0Q1hGVVpLX0hsaWdiZWhUOFk5bFRqLVQ4T1Q4dmRCbl94eDJPTjk4Z1Qxb1lONmthem0xYi12MExXQ0t3cDlFUFA1czdzdHpoejBTOHJIVWo4Tlg2bWFFOHFkaDhrVUw2TTVzSU1wc2VBVkg4U0o4OUh2UVVkYTFRUVdKU2vSAbwBQVVfeXFMUGI0T1dhSEN0b3VmTDAyQjNyYXNYOHpzemkwM0tBSWhyV1RWODkwUGpfdHFuZkVzTzMxQi1rVnc2LW02N0pwVkU4aDNnWWZSRHdONFNYa0JmRmpHYWJmcWpJUThBUmJiV2ZnSHpfdGJDQndjaHJ5azAwbElsV2Q4bDdqSF93NG5BdTR4SENqekZ1N2VIY2dhRFhsZWpHcGhHU3R5TG9XZGhINTZydzZKTTFMdFNtN3hzOWxLb0s?oc=5
-         Status : Preserved for Supporting Links
-      9. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says - GMA Network
-         Source : https://news.google.com/rss/articles/CBMi1wFBVV95cUxQc0hOeHdkOF9rZXFkNHlMdFJWV0d4UllidGlvRlZWNThNNlJIX2hGQUQtcGZuNHF6QzBuazZHZlplRGNNVThmTGhINWxGbWxWdnVHdVFKNmlNOURDeXZxWDg2Mi1scjVsZm5wOUlhN2dOUjk3YjVzQ2QwV1dZeGlqbHdZOUdXVC1vZTRNSWJPNE54TWxVUFhoSml5T2lNbVdNUnEzNTZLcGhvUk9yblJMU3VfLUJJQ0ZkeG44LU5wWVpya0FQU2NhNV9ieDdqaGRQNVhNanltdw?oc=5
-         Status : Preserved for Supporting Links
-      10. Title  : Wildfire haze forces 1.4 million Indonesian students into remote learning - NST Online
-         Source : https://news.google.com/rss/articles/CBMiuwFBVV95cUxPUHVGNjVmQU1EYkppYWExbjBVWFRBSTRLMzZUU19zUVRUYVpzdUZXRmRGZEhZVm9fbU4tVUJEY2loaEx5cVg4Qk9Db05KZm9zMHNqOHVKdkNZNGlEMTI5dzJOQndjeGFHcDN5VWlfNlE3cndaM0tSMTlOY3RQSHFlbWhXcWhZTGxiUnd3cVVBWGJHakNNcFVEN2xBd3cyS0k1Y3FXSUlsX2thYXUyaWQ3SEFVVGg5TVRNVWdV0gHAAUFVX3lxTE9VNFlMLVlnQ0ZSU012My13Y3Y1UkItXzBxZVRXbGwtb0JoS3I1T3Qtb2s4dlNRcFl6VG13aW1QbG1uajRpUHhkc2p4N19GeVdDYi1BZDdFSl90d3BwZEhBT2M1Zmx1TkowWWdDMS1GREFjNG02c1RrQ2xtT1h3QlFQZnMyekU1R3U4b1hVbWd6azcybmtvVHNDUDZmNFQ2WUlVVXlCcmJxZkFHVWRaV2xnMno5QmM4dUFaTFBTNVdmbA?oc=5
+      2. Title  : Wildfire haze forces 1.4 million Indonesian students into remote learning - NST Online
+         Source : https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 0
+    Snippets Passed : 10
+      Snippet #1:
+        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] Fires have been blazing across vast stretches of forest and peatland throughout the Indonesian archipelago, causing hazardous emissions to surge, particularly in the hardest-hit provinces on the islands of Sumatra and Borneo.
+      Snippet #2:
+        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] JAKARTA — Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, data from the country's health ministry showed on Thursday (Sept 10).
+      Snippet #3:
+        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] From January to July this year, fires burned around 202,000 hectares of land, government data showed. Environmental group YKAN has estimated that another 600,000 hectares were damaged by fire in August.
+      Snippet #4:
+        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Indonesia is battling its most intense wildfires in 11 years, and its Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November this year.
+      Snippet #5:
+        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Transboundary haze has also created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
+      Snippet #6:
+        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] "Malaysia has offered assistance to help us address the forest fires in Kalimantan. I welcome this with gratitude and pleasure," Prabowo said.
+      Snippet #7:
+        [Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online] Indonesia, an archipelago of 17,000 islands, relies heavily on ferries as a key mode of transportation, with sea routes ⁠more ​affordable and readily available than air travel.
+      Snippet #8:
+        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] SINGAPORE: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      Snippet #9:
+        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] Fire emissions from Indonesia from Sept 1 to 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union’s Copernicus climate monitoring service.
+      Snippet #10:
+        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] “It’s much drier, it’s hotter, and when there’s ignition, these fires burn in a far more extreme way.” From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia’s part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      (No summary produced)
+      ### Comprehensive Key-Fact Outline
+      
+      #### 1. Key Entities, Names, and Roles Involved
+      - **Indonesia**: The country experiencing the surge in wildfire emissions.
+      - **Indonesian Forestry Minister Raja Juli Antoni**: Government official responsible for forestry and addressing the wildfires.
+      - **Prabowo**: Likely referring to Prabowo Subianto, a prominent Indonesian political figure, who has expressed gratitude for assistance.
+      - **Malaysia**: Offering assistance to Indonesia to contain wildfires.
+      - **YKAN**: Environmental group that has estimated additional land damage.
+      - **Fire Emissions Watch**: Portal developed by the European Union's Copernicus climate monitoring service, providing data on wildfire emissions.
+      
+      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      - **No monetary amounts, legal rulings, or official outcomes are explicitly stated in the snippets**.
+      
+      #### 3. Timeline of Events and Corroborating Evidence
+      - **Date not specified**: Fires have been burning across vast stretches of forest and peatland in the Indonesian archipelago, particularly in Sumatra and Borneo.
+      - **September 1 to September 7, 2023**:
+        - **Fire Emissions**: Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
+        - **Carbon Dioxide Readings**: Carbon dioxide readings were the highest in the world during this period.
+        - **Fire Intensity**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan (Indonesia’s part of Borneo) and eastern parts of Sumatra.
+      - **September 10, 2023**:
+        - **Health Impact**: Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, according to the country's health ministry.
+      - **January to July 2023**:
+        - **Land Damage**: Fires burned around 202,000 hectares of land.
+        - **Additional Damage**: Environmental group YKAN estimated that another 600,000 hectares were damaged by fire in August.
+      - **September 2023**:
+        - **Wildfire Duration**: Indonesia is battling its most intense wildfires in 11 years, and the Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November.
+        - **Transboundary Haze**: Transboundary haze has created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
+        - **International Assistance**: Malaysia has offered assistance to help address the forest fires in Kalimantan, and Prabowo has expressed gratitude for this assistance.
+      
+      ### Summary
+      The key facts from the provided snippets indicate a significant surge in wildfire emissions in Indonesia, with carbon dioxide readings reaching the highest levels in the world. The fires have caused respiratory infections to double in a week, leading to health concerns and environmental damage. The wildfires are expected to continue until November, and international assistance from Malaysia is being sought to contain the situation. The data also highlights the extensive land damage caused by the fires and the transboundary impact on neighboring countries.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------
-    Status : completed - supporting links preserved
+    Status : success
 
 ================================================================================
   END OF KNOWLEDGE RETRIEVAL FORENSIC LOG

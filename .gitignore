@@ -19,6 +19,9 @@ JUDGE_output.txt
 __pycache__/
 *.pyc
 fyp-env-win/
+.venv/
+venv/
+
 
 # Environment / secrets
 .env
