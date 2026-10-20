@@ -1,0 +1,352 @@
+================================================================================
+RAHMAD SYSTEM — PHASE 1: UNIT TESTING REPORT & PROOF OF RESULTS
+================================================================================
+Date: 2026-10-20
+Project: RAHMAD (Reliable Automated Hybrid Multi-Agent Detection)
+Module Scope: Phase 1 — Unit Testing (Module-Level Isolation)
+Test Runner: pytest 9.1.1 on Python 3.14.5 (win32)
+Test File: testing/test_phase1_unit.py
+Test Results Summary: 47 PASSED / 0 FAILED (100% Pass Rate)
+Execution Time: ~16.64 seconds
+
+================================================================================
+PART 1: DETAILED SPECIFICATION OF WHAT WAS TESTED
+================================================================================
+
+--------------------------------------------------------------------------------
+1.1 Input Processing Module (backend/input_processing.py)
+--------------------------------------------------------------------------------
+Purpose: Verify text cleaning, lead text extraction, tokenization, image normalization,
+and the unified preprocessing entry point in complete isolation without network or LLM dependencies.
+
+Test Cases Conducted:
+1. test_clean_for_llm_normal_article
+   - Input: Multi-paragraph news text containing embedded raw URLs, email addresses, and phone numbers.
+   - Verification: URLs are sanitized to '<URL>', emails to '<EMAIL>', and phone numbers to '<PHONE>' placeholders while preserving case, punctuation, and structural context.
+   - Result: PASS
+
+2. test_clean_for_llm_unicode_handling
+   - Input: Text with accented Latin characters (é, ñ, ü) and Chinese ideographs (中文).
+   - Verification: Accented characters are transliterated to ASCII ('Cafe', 'resume'); output contains strictly valid ASCII characters (< 128) preventing encoder crashes.
+   - Result: PASS
+
+3. test_clean_for_llm_empty_string
+   - Input: Empty string ("").
+   - Verification: Gracefully returns an empty string without throwing null/index exceptions.
+   - Result: PASS
+
+4. test_extract_and_clean_lead_text_normal
+   - Input: Multi-line article with headline, body paragraphs, and multiple blank lines.
+   - Verification: Extracts strictly the first two non-empty lines (headline + lead sentence), collapses them into a single line, lowercases the text for CLIP embedding compatibility, and discards subsequent paragraphs.
+   - Result: PASS
+
+5. test_extract_and_clean_lead_text_single_line
+   - Input: A single-line headline with no line breaks.
+   - Verification: Cleans and lowercases the line without crashing on single-element slicing.
+   - Result: PASS
+
+6. test_tokenize_text_output_shape
+   - Input: Cleaned lead text.
+   - Verification: Tokenizer outputs PyTorch tensors 'input_ids' and 'attention_mask', each formatted to exact shape [1, 77] matching CLIP's fixed context limit.
+   - Result: PASS
+
+7. test_tokenize_text_long_truncation
+   - Input: Repetitive long text exceeding 500 words.
+   - Verification: Hard truncation at sequence length 77 tokens without overflow.
+   - Result: PASS
+
+8. test_process_image_output_shape
+   - Input: Standard RGB PIL image (400x300 pixels).
+   - Verification: Resized, center-cropped, and pixel-normalized into tensor shape [1, 3, 224, 224].
+   - Result: PASS
+
+9. test_process_image_grayscale_input
+   - Input: Grayscale PIL image in 'L' single-channel mode (320x240 pixels).
+   - Verification: Automatically converted to 3-channel format and normalized to [1, 3, 224, 224] without throwing channel-mismatch errors.
+   - Result: PASS
+
+10. test_preprocess_inputs_full_pipeline
+    - Input: Raw text string and raw PIL image.
+    - Verification: Combined wrapper correctly outputs dictionary containing all 5 required pipeline keys: 'llm_text', 'lead_text', 'input_ids', 'attention_mask', and 'pixel_values' with matching tensor dimensions.
+    - Result: PASS
+
+--------------------------------------------------------------------------------
+1.2 Early Predictor Module (model/early_predictor.py)
+--------------------------------------------------------------------------------
+Purpose: Verify regex preprocessing, verdict decision thresholds, artifact validation,
+and end-to-end inference prediction mapping.
+
+Test Cases Conducted:
+11. test_clean_text_for_clip_html_removal
+    - Input: Text containing HTML tags (<b>, </b>, <p>, </p>).
+    - Verification: Strips all HTML markup, collapses whitespace, and lowercases text.
+    - Result: PASS
+
+12. test_clean_text_for_clip_url_removal
+    - Input: Headline containing 'https://misinfo-source.com/hoax?id=99'.
+    - Verification: Strips URL components completely to match training distribution.
+    - Result: PASS
+
+13. test_clean_text_for_clip_emoji_removal
+    - Input: Sensationalist text with emojis (🚨, 📰, 💥).
+    - Verification: All Unicode emoji symbols are stripped cleanly.
+    - Result: PASS
+
+14. test_clean_text_for_clip_non_string
+    - Input: Non-string inputs (None, integer 123, list []).
+    - Verification: Gracefully returns empty string "" rather than raising TypeError.
+    - Result: PASS
+
+15. test_build_verdict_high_fake
+    - Input: probability = 0.85 (above FAKE threshold 0.60).
+    - Verification: Returns label="FAKE", color_class="manipulated", confidence="85.0%", pass_to_agents=True.
+    - Result: PASS
+
+16. test_build_verdict_high_real
+    - Input: probability = 0.15 (below REAL threshold 0.40).
+    - Verification: Returns label="REAL", color_class="real", confidence="15.0%", pass_to_agents=True.
+    - Result: PASS
+
+17. test_build_verdict_uncertain
+    - Input: probability = 0.50 (in uncertainty band 0.40 < p < 0.60).
+    - Verification: Returns label="UNCERTAIN", color_class="inconclusive", confidence="50.0%", pass_to_agents=True.
+    - Result: PASS
+
+18. test_build_verdict_boundary_fake
+    - Input: probability = 0.60 (exact boundary).
+    - Verification: Correctly satisfies p >= 0.60 condition and outputs label="FAKE".
+    - Result: PASS
+
+19. test_build_verdict_boundary_real
+    - Input: probability = 0.40 (exact boundary).
+    - Verification: Correctly satisfies p <= 0.40 condition and outputs label="REAL".
+    - Result: PASS
+
+20. test_model_loading_artifacts_exist
+    - Input: Paths to LoRA adapter, MLP head (mlp_head.pt), and processor directory.
+    - Verification: Validates that all trained artifact files exist on disk and EarlyPredictor._validate_artifacts() executes without error.
+    - Result: PASS
+
+21. test_model_loading_missing_artifacts
+    - Input: Mocked non-existent directory path.
+    - Verification: Raises FileNotFoundError with clear error message directing user to run training script.
+    - Result: PASS
+
+22. test_predict_mocked_forward
+    - Input: Raw text + PIL Image with mock forward pass (p = 0.88).
+    - Verification: End-to-end predict() wrapper correctly packages the output dictionary with probability, label, confidence, color_class, and pass_to_agents flag.
+    - Result: PASS
+
+--------------------------------------------------------------------------------
+1.3 Judge Module (model/judge.py)
+--------------------------------------------------------------------------------
+Purpose: Verify LLM output parsing, markdown fence removal, <think> scratchpad stripping,
+JSON repair for truncated outputs, verdict canonicalization, user-facing text sanitization,
+Self-Consistency majority voting aggregation, and fallback mechanisms.
+
+Test Cases Conducted:
+23. test_parse_response_clean_json
+    - Input: Standard JSON string with verdict, confidence, justification, reasoning, and key_facts.
+    - Verification: Correctly parses all fields and populates dictionary.
+    - Result: PASS
+
+24. test_parse_response_markdown_fences
+    - Input: JSON wrapped inside ```json ... ``` markdown code fences.
+    - Verification: Fences stripped cleanly and JSON parsed accurately.
+    - Result: PASS
+
+25. test_parse_response_think_blocks
+    - Input: Output with DeepSeek/reasoning LLM <think> ... </think> tags preceding JSON.
+    - Verification: <think> tags and internal thoughts stripped completely; valid JSON parsed.
+    - Result: PASS
+
+26. test_parse_response_truncated_json
+    - Input: Incomplete JSON cut off mid-string due to token limit truncation.
+    - Verification: Auto-closing salvage parser balances quotes and braces, restoring valid JSON.
+    - Result: PASS
+
+27. test_parse_response_verdict_normalization_fabricated
+    - Input: verdict = "FABRICATED"
+    - Verification: Normalizes to canonical category "FABRICATED CONTENT".
+    - Result: PASS
+
+28. test_parse_response_verdict_normalization_credible
+    - Input: verdict = "CREDIBLE"
+    - Verification: Preserves canonical category "CREDIBLE".
+    - Result: PASS
+
+29. test_parse_response_verdict_normalization_real_news
+    - Input: verdict = "REAL NEWS"
+    - Verification: Normalizes synonym to canonical "CREDIBLE".
+    - Result: PASS
+
+30. test_parse_response_unknown_verdict
+    - Input: verdict = "BOGUS_UNSEEN_CATEGORY"
+    - Verification: Safely falls back to "INCONCLUSIVE" with color_class="inconclusive".
+    - Result: PASS
+
+31. test_clean_user_facing_text_mad_acronym
+    - Input: "MAD shows that the report contains internal contradictions. Also the MAD module analyzed bias."
+    - Verification: Replaces internal acronyms with user-friendly terms ("Debate shows", "the debate analysis").
+    - Result: PASS
+
+32. test_clean_user_facing_text_ris_acronym
+    - Input: "RIS indicates that the image was taken in 2018. The RIS module confirmed location."
+    - Verification: Replaces "RIS indicates" with "Reverse Image Search indicates".
+    - Result: PASS
+
+33. test_clean_user_facing_text_kr_acronym
+    - Input: "According to KR, the event happened yesterday. KR shows corroboration."
+    - Verification: Replaces "According to KR" with "According to external news reports".
+    - Result: PASS
+
+34. test_parse_confidence_float
+    - Input: "87.0%", " 95.5 % ", and invalid "invalid".
+    - Verification: Converts strings to floats (87.0, 95.5) and returns default 50.0 for invalid text.
+    - Result: PASS
+
+35. test_aggregate_verdicts_majority_vote
+    - Input: 3 parallel run outputs (2 CREDIBLE at 80% and 90%, 1 FABRICATED CONTENT at 70%).
+    - Verification: Majority voting chooses "CREDIBLE", averages majority confidence to "85.0%", merges unique key facts, and records vote breakdown {'CREDIBLE': 2, 'FABRICATED CONTENT': 1}.
+    - Result: PASS
+
+36. test_fallback_response
+    - Input: Error message "API timeout".
+    - Verification: Returns safe fallback verdict ("INCONCLUSIVE", confidence="0.0%", error justification).
+    - Result: PASS
+
+--------------------------------------------------------------------------------
+1.4 Knowledge Retrieval Module (model/knowledge_retrieval.py)
+--------------------------------------------------------------------------------
+Purpose: Verify URL filtering (social media blacklist vs. news whitelist), slug headline
+extraction, and semantic filtering with and without embedding models.
+
+Test Cases Conducted:
+37. test_is_social_media_url_facebook
+    - Input: URLs from Facebook, Twitter, Instagram.
+    - Verification: Returns True for all user-generated/social platforms.
+    - Result: PASS
+
+38. test_is_social_media_url_reuters
+    - Input: URLs from Reuters, AP News, BBC.
+    - Verification: Returns False for verified journalism outlets.
+    - Result: PASS
+
+39. test_filter_domains_mixed_urls
+    - Input: 5 URLs (3 verified: Reuters, AP News, BBC; 2 untrusted blogs/clickbait).
+    - Verification: Filters out untrusted domains; exactly the 3 whitelisted URLs survive.
+    - Result: PASS
+
+40. test_extract_title_from_url_slug
+    - Input: "https://www.reuters.com/world/asia-flood-disaster-emergency-aid-2024"
+    - Verification: Parses slug and transforms hyphens into capitalized headline ("Asia Flood Disaster Emergency Aid 2024").
+    - Result: PASS
+
+41. test_semantic_filter_embedder_not_loaded
+    - Input: Article texts with self.embedder = None.
+    - Verification: Safely falls back to returning raw text excerpts without crashing.
+    - Result: PASS
+
+42. test_semantic_filter_mocked_similarity
+    - Input: Claim text and article with two chunks (one high similarity 0.85, one low 0.10) against threshold 0.35.
+    - Verification: Strictly preserves the high-similarity chunk ([Verified News] ...) and filters out the irrelevant chunk.
+    - Result: PASS
+
+--------------------------------------------------------------------------------
+1.5 Multi-Agent Debate Module (model/mad_orchestrator.py + mad_agent.py + shared_memory.py)
+--------------------------------------------------------------------------------
+Purpose: Verify agent initialization, shared memory recording, dynamic role profile
+generation, fallback profiles upon LLM error, and 3-stage debate execution.
+
+Test Cases Conducted:
+43. test_debater_agent_initialization
+    - Input: name="Agent_1", side="Real News", profile="Investigative Journalist", speaker_role="First Speaker".
+    - Verification: Correctly initializes all attributes and LLM client instance.
+    - Result: PASS
+
+44. test_shared_memory_bank_add_and_format
+    - Input: Adding arguments for Round 1 from Real News and Fake News agents.
+    - Verification: Formats discourse history with article context, round headers, speaker names, and distinct arguments.
+    - Result: PASS
+
+45. test_assign_profiles_valid_response
+    - Input: LLM returning JSON list of 6 specialized roles.
+    - Verification: Parses exactly 6 cleaned profile strings (e.g. Investigative Journalist, Forensic Data Analyst).
+    - Result: PASS
+
+46. test_assign_profiles_llm_failure_fallback
+    - Input: LLM raises exception (simulating network failure or unparseable text).
+    - Verification: Falls back to the 6 predefined professional fallback profiles.
+    - Result: PASS
+
+47. test_mad_debate_structure_and_rounds
+    - Input: Article and external knowledge executed through OrchestratorAgent.run_debate() with mocked LLM.
+    - Verification: Executes all 3 stages (First Speakers, Second Speakers, Third Speakers), activates 2 opposing agents per round, records 6 arguments in shared memory, and synthesizes consolidated discourse.
+    - Result: PASS
+
+================================================================================
+PART 2: VERIFIED PYTEST EXECUTION LOG & PROOF OF RESULTS
+================================================================================
+
+$ pytest testing/test_phase1_unit.py -v
+
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.7.0 -- C:\Users\ahmad\Documents\Programming\fyp\RAHMAD\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\ahmad\Documents\Programming\fyp\RAHMAD
+plugins: anyio-4.15.1, platformdirs-4.12.3
+collecting ... collected 47 items
+
+testing/test_phase1_unit.py::TestInputProcessing::test_clean_for_llm_normal_article PASSED [  2%]
+testing/test_phase1_unit.py::TestInputProcessing::test_clean_for_llm_unicode_handling PASSED [  4%]
+testing/test_phase1_unit.py::TestInputProcessing::test_clean_for_llm_empty_string PASSED [  6%]
+testing/test_phase1_unit.py::TestInputProcessing::test_extract_and_clean_lead_text_normal PASSED [  8%]
+testing/test_phase1_unit.py::TestInputProcessing::test_extract_and_clean_lead_text_single_line PASSED [ 10%]
+testing/test_phase1_unit.py::TestInputProcessing::test_tokenize_text_output_shape PASSED [ 12%]
+testing/test_phase1_unit.py::TestInputProcessing::test_tokenize_text_long_truncation PASSED [ 14%]
+testing/test_phase1_unit.py::TestInputProcessing::test_process_image_output_shape PASSED [ 17%]
+testing/test_phase1_unit.py::TestInputProcessing::test_process_image_grayscale_input PASSED [ 19%]
+testing/test_phase1_unit.py::TestInputProcessing::test_preprocess_inputs_full_pipeline PASSED [ 21%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_clean_text_for_clip_html_removal PASSED [ 23%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_clean_text_for_clip_url_removal PASSED [ 25%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_clean_text_for_clip_emoji_removal PASSED [ 27%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_clean_text_for_clip_non_string PASSED [ 29%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_build_verdict_high_fake PASSED [ 31%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_build_verdict_high_real PASSED [ 34%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_build_verdict_uncertain PASSED [ 36%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_build_verdict_boundary_fake PASSED [ 38%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_build_verdict_boundary_real PASSED [ 40%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_model_loading_artifacts_exist PASSED [ 42%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_model_loading_missing_artifacts PASSED [ 44%]
+testing/test_phase1_unit.py::TestEarlyPredictor::test_predict_mocked_forward PASSED [ 46%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_clean_json PASSED [ 48%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_markdown_fences PASSED [ 51%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_think_blocks PASSED [ 53%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_truncated_json PASSED [ 55%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_verdict_normalization_fabricated PASSED [ 57%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_verdict_normalization_credible PASSED [ 59%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_verdict_normalization_real_news PASSED [ 61%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_response_unknown_verdict PASSED [ 63%]
+testing/test_phase1_unit.py::TestJudgeModule::test_clean_user_facing_text_mad_acronym PASSED [ 65%]
+testing/test_phase1_unit.py::TestJudgeModule::test_clean_user_facing_text_ris_acronym PASSED [ 68%]
+testing/test_phase1_unit.py::TestJudgeModule::test_clean_user_facing_text_kr_acronym PASSED [ 70%]
+testing/test_phase1_unit.py::TestJudgeModule::test_parse_confidence_float PASSED [ 72%]
+testing/test_phase1_unit.py::TestJudgeModule::test_aggregate_verdicts_majority_vote PASSED [ 74%]
+testing/test_phase1_unit.py::TestJudgeModule::test_fallback_response PASSED [ 76%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_is_social_media_url_facebook PASSED [ 78%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_is_social_media_url_reuters PASSED [ 80%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_filter_domains_mixed_urls PASSED [ 82%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_extract_title_from_url_slug PASSED [ 85%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_semantic_filter_embedder_not_loaded PASSED [ 87%]
+testing/test_phase1_unit.py::TestKnowledgeRetrieval::test_semantic_filter_mocked_similarity PASSED [ 89%]
+testing/test_phase1_unit.py::TestMultiAgentDebate::test_debater_agent_initialization PASSED [ 91%]
+testing/test_phase1_unit.py::TestMultiAgentDebate::test_shared_memory_bank_add_and_format PASSED [ 93%]
+testing/test_phase1_unit.py::TestMultiAgentDebate::test_assign_profiles_valid_response PASSED [ 95%]
+testing/test_phase1_unit.py::TestMultiAgentDebate::test_assign_profiles_llm_failure_fallback PASSED [ 97%]
+testing/test_phase1_unit.py::TestMultiAgentDebate::test_mad_debate_structure_and_rounds PASSED [100%]
+
+====================== 47 passed, 14 warnings in 16.64s =======================
+
+================================================================================
+END OF UNIT TESTING REPORT
+================================================================================
