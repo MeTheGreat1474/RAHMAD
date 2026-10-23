@@ -9,11 +9,11 @@ fyp-env-win/
 **/early_predictor_output/
 
 # Model outputs
-output_log.txt
-KR_output.txt
-RIS_output.txt
-MAD_output.txt
-JUDGE_output.txt
+output/output_log.txt
+output/KR_output.txt
+output/RIS_output.txt
+output/MAD_output.txt
+output/JUDGE_output.txt
 
 # Python/env clutter
 __pycache__/
@@ -26,4 +26,5 @@ venv/
 # Environment / secrets
 .env
 
+# dataset
 testing/test_dataset.csv
