@@ -80,12 +80,12 @@ def get_args():
     parser.add_argument(
         "--csv_path",
         type=str,
-        default="/mnt/c/Users/User/Documents/Programming/fyp/Dataset/super_dataset.csv",
+        default=r"C:\Users\ahmad\Documents\Programming\fyp\Dataset\super_dataset.csv",
     )
     parser.add_argument(
         "--dataset_root",
         type=str,
-        default="/mnt/c/Users/User/Documents/Programming/fyp/Dataset",
+        default=r"C:\Users\ahmad\Documents\Programming\fyp\Dataset",
     )
     parser.add_argument(
         "--output_dir",

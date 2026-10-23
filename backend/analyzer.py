@@ -183,6 +183,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             "ep_signal":  {},
         }
 }
+        return
     yield {"type": "status", "step": "PRE-PROCESSING INPUT...", "status": "IN PROGRESS"}
     # ── 1. Decode image & 2. Pre-process inputs ────────────────────────────
     t_prep_start = time.perf_counter()
@@ -426,6 +427,10 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
                     "url": url
                 })
             result["links"] = formatted_links
+        else:
+            result.setdefault("links", [])
+
+        result["ep_signal"] = ep_result
 
         judge_runtime = time.perf_counter() - t_judge_start
 

@@ -25,3 +25,5 @@ venv/
 
 # Environment / secrets
 .env
+
+testing/test_dataset.csv

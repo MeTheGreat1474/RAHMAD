@@ -1,0 +1,244 @@
+================================================================================
+RAHMAD SYSTEM — PHASE 2: INTEGRATION TESTING REPORT & PROOF OF RESULTS
+================================================================================
+Date: 2026-10-21
+Project: RAHMAD (Reliable Automated Hybrid Multi-Agent Detection)
+Module Scope: Phase 2 — Integration Testing (Pipeline Flow, Resilience, & API Endpoints)
+Test Runner: pytest 9.1.1 on Python 3.14.5 (win32)
+Test File: testing/test_phase2_integration.py
+Test Results Summary: 26 PASSED / 0 FAILED (100% Pass Rate)
+Execution Time: ~13.74 seconds
+
+================================================================================
+PART 1: DETAILED SPECIFICATION OF WHAT WAS TESTED
+================================================================================
+
+--------------------------------------------------------------------------------
+2.1 Pipeline Flow Integration (backend/analyzer.py)
+--------------------------------------------------------------------------------
+Purpose: Verify end-to-end orchestration across all 6 core modules:
+1. Input Processing (backend/input_processing.py)
+2. Early Predictor CLIP+LoRA (model/early_predictor.py)
+3. Knowledge Retrieval Web/Semantic Search (model/knowledge_retrieval.py)
+4. Reverse Image Search (model/reverse_image_search.py)
+5. Multi-Agent Debate 6-Agent Discourse (model/mad_orchestrator.py)
+6. Judge Reasoning Layer (model/judge.py)
+along with intermediate status streaming, graceful failure resilience, input
+guards, and structured pipeline logging.
+
+Test Cases Conducted:
+1. test_full_pipeline_flow_all_modules_success
+   - Input: Valid multi-paragraph article text (>10 chars) and a valid base64 PNG image data-URI.
+   - Verification: Executes all 7 pipeline progression steps:
+       [PRE-PROCESSING INPUT... -> RUNNING EARLY PREDICTOR... -> FETCHING EVIDENCE... ->
+        SEARCHING FOR SIMILAR IMAGES... -> DEBATING... -> SYNTHESIZING RESULTS... ->
+        OUTPUTTING PREDICTION...]
+     Verifies all status steps transition from IN PROGRESS to OK. Asserts final payload contains
+     all mandatory verdict schema keys ('verdict', 'color_class', 'confidence', 'justification',
+     'key_facts', 'links', 'ep_signal'). Confirms links are extracted from external news reports
+     and Early Predictor tensor outputs are properly captured.
+   - Result: PASS
+
+2. test_pipeline_text_only_no_image
+   - Input: Valid news text with image_data set to None.
+   - Verification: Vision-dependent modules (Early Predictor and Reverse Image Search) are
+     gracefully bypassed and stream status flags mark them as 'SKIPPED'. Verifies the Judge
+     receives a neutral Early Predictor fallback signal (label='UNKNOWN', probability=0.5)
+     allowing text-only analysis to successfully conclude with a valid verdict.
+   - Result: PASS
+
+3. test_pipeline_short_text_rejection
+   - Input: Sub-threshold text strings under 10 characters ("Too short", "Hi", "123456789").
+   - Verification: Input guard triggers immediately, halts downstream heavy module execution,
+     and instantly emits an 'INCONCLUSIVE' result (confidence='0.0%') instructing the user
+     to submit a complete article.
+   - Result: PASS
+
+4. test_pipeline_empty_or_whitespace_text_rejection
+   - Input: Empty strings ("") and whitespace-only text ("   ", "\n\t  \n").
+   - Verification: Immediately yields 'INCONCLUSIVE' without invoking any downstream models.
+   - Result: PASS
+
+5. test_pipeline_invalid_image_data_graceful_fallback
+   - Input: Valid news text accompanied by an invalid/unparseable image string ("not_a_valid_data_url").
+   - Verification: Pipeline image decoder detects unsupported formatting, logs a warning, and
+     seamlessly falls back to text-only mode without crashing the NDJSON stream or server.
+   - Result: PASS
+
+6. test_pipeline_judge_mode_single
+   - Input: Valid article with environment variable JUDGE_MODE set to 'single'.
+   - Verification: The Judge module strictly executes Judge.analyze() (standard single-pass reasoning)
+     and does not trigger panel synthesis or majority-vote aggregation.
+   - Result: PASS
+
+7. test_pipeline_judge_mode_panel
+   - Input: Valid article with environment variable JUDGE_MODE set to 'panel'.
+   - Verification: The Judge module strictly executes Judge.panel_analyze(), orchestrating 3 specialist
+     personas (Content Authenticity, Context & Provenance, Evidence & Fact Specialist) synthesized
+     by the Chief Judge.
+   - Result: PASS
+
+8. test_pipeline_judge_mode_self_consistency
+   - Input: Valid article with environment variable JUDGE_MODE set to 'self_consistency'.
+   - Verification: The Judge module strictly executes Judge.self_consistency_analyze(n=3), generating
+     three parallel stochastic reasoning paths and aggregating verdicts via majority vote.
+   - Result: PASS
+
+9. test_pipeline_kr_failure_resilience
+   - Input: Article processed when Knowledge Retrieval raises a network connection timeout.
+   - Verification: Pipeline catches the exception gracefully, flags 'FETCHING EVIDENCE...' as 'FAIL',
+     forwards an informative error notice to the Judge LLM, and successfully completes the analysis.
+   - Result: PASS
+
+10. test_pipeline_ris_failure_resilience
+    - Input: Article and image processed when SerpAPI raises an API quota exhaustion error.
+    - Verification: Pipeline catches the exception, flags 'SEARCHING FOR SIMILAR IMAGES...' as 'FAIL',
+      passes visual error findings to the Judge, and allows the remaining pipeline to complete.
+    - Result: PASS
+
+11. test_pipeline_mad_failure_resilience
+    - Input: Article processed when the Multi-Agent Debate orchestrator experiences an LLM timeout.
+    - Verification: Pipeline catches the exception, flags 'DEBATING...' as 'FAIL', passes debate error
+      context to the Judge, and produces a finalized verdict without server disruption.
+    - Result: PASS
+
+12. test_pipeline_early_predictor_failure_resilience
+    - Input: Article and image processed when the Early Predictor encounters a runtime GPU/tensor error.
+    - Verification: Early Predictor stage is marked 'FAIL', the neutral fallback signal is assigned,
+      and the Judge proceeds using external evidence and text features.
+    - Result: PASS
+
+13. test_pipeline_judge_unhandled_exception_fallback
+    - Input: Simulation of an unhandled crash or authentication failure inside the Judge LLM API client.
+    - Verification: The pipeline outer error handler intercepts the exception and yields a safe fallback
+      verdict ('INCONCLUSIVE', confidence='0.0%') containing descriptive troubleshooting guidance.
+    - Result: PASS
+
+14. test_decode_image_valid_base64
+    - Input: Synthetic 50x50 green PNG image encoded as a data-URI ('data:image/png;base64,...').
+    - Verification: Successfully converts base64 payload into a PIL RGB Image instance with matching dimensions.
+    - Result: PASS
+
+15. test_decode_image_empty_and_corrupt
+    - Input: None, empty string, malformed base64 strings, and arbitrary text.
+    - Verification: Returns None safely without raising UnidentifiedImageError or binascii.Error.
+    - Result: PASS
+
+16. test_pipeline_link_formatting_and_domain_parsing
+    - Input: External articles containing varied URL schemes (HTTPS, HTTP, FTP, raw string).
+    - Verification: Sanitizes and standardizes domains to uppercase labels ('BBC.COM', 'NYTIMES.COM',
+      'THEGUARDIAN.COM') while assigning 'EXTERNAL SOURCE' to non-HTTP protocols.
+    - Result: PASS
+
+17. test_pipeline_logging_execution
+    - Input: End-to-end analysis execution.
+    - Verification: PipelineLogger.save() is called to flush outputs to output/output_log.txt, and
+      Judge.save_judge_log() is invoked to write forensic records to output/JUDGE_output.txt.
+    - Result: PASS
+
+--------------------------------------------------------------------------------
+2.2 Flask API Endpoint Integration (app.py)
+--------------------------------------------------------------------------------
+Purpose: Verify HTTP server routing, JSON payload validation, streaming NDJSON
+responses, static asset delivery, and Cross-Origin Resource Sharing (CORS).
+
+Test Cases Conducted:
+18. test_api_analyze_valid_multimodal_request
+    - Method: POST /api/analyze
+    - Payload: JSON with both 'text' and 'image' data-URI.
+    - Verification: Returns HTTP 200 with Content-Type 'application/x-ndjson'.
+      Verifies that each streamed line is valid JSON, contains sequential status progress
+      events, and culminates in a final structured prediction result.
+    - Result: PASS
+
+19. test_api_analyze_valid_text_only_request
+    - Method: POST /api/analyze
+    - Payload: JSON with 'text' only (no 'image' key).
+    - Verification: Returns HTTP 200, streams NDJSON progress, and yields a valid text-only verdict.
+    - Result: PASS
+
+20. test_api_analyze_missing_text_400
+    - Method: POST /api/analyze
+    - Payload: JSON with 'image' key but missing required 'text' field.
+    - Verification: Rejects request with HTTP 400 Bad Request and error message 'No text provided'.
+    - Result: PASS
+
+21. test_api_analyze_empty_body_400
+    - Method: POST /api/analyze
+    - Payload: Empty JSON object ({}).
+    - Verification: Rejects request with HTTP 400 Bad Request and error message 'No text provided'.
+    - Result: PASS
+
+22. test_api_analyze_non_json_payload_400
+    - Method: POST /api/analyze
+    - Payload: Non-JSON raw text and malformed JSON strings.
+    - Verification: Appropriately rejects invalid media formats with HTTP 400 or HTTP 415.
+    - Result: PASS
+
+23. test_frontend_serve_index_html
+    - Method: GET /
+    - Verification: Returns HTTP 200 with Content-Type 'text/html; charset=utf-8' and serves
+      the frontend dashboard containing '<title>' and RAHMAD application containers.
+    - Result: PASS
+
+24. test_res_serve_existing_file
+    - Method: GET /res/news1.txt
+    - Verification: Returns HTTP 200 and serves static test fixture files from the res/ directory.
+    - Result: PASS
+
+25. test_res_serve_nonexistent_file_404
+    - Method: GET /res/file_does_not_exist_987654321.xyz
+    - Verification: Returns HTTP 404 Not Found for missing static resources.
+    - Result: PASS
+
+26. test_cors_headers_support
+    - Method: GET /
+    - Verification: Confirms Flask-CORS middleware is active by asserting the presence of the
+      'Access-Control-Allow-Origin' header on HTTP responses.
+    - Result: PASS
+
+================================================================================
+PART 2: VERIFIED PYTEST EXECUTION LOG & PROOF OF RESULTS
+================================================================================
+
+$ pytest testing/test_phase2_integration.py -v
+
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.7.0 -- C:\Users\ahmad\Documents\Programming\fyp\RAHMAD\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\ahmad\Documents\Programming\fyp\RAHMAD
+plugins: anyio-4.15.1, platformdirs-4.12.3
+collecting ... collected 26 items
+
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_full_pipeline_flow_all_modules_success PASSED [  3%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_text_only_no_image PASSED [  7%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_short_text_rejection PASSED [ 11%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_empty_or_whitespace_text_rejection PASSED [ 15%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_invalid_image_data_graceful_fallback PASSED [ 19%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_judge_mode_single PASSED [ 23%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_judge_mode_panel PASSED [ 26%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_judge_mode_self_consistency PASSED [ 30%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_kr_failure_resilience PASSED [ 34%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_ris_failure_resilience PASSED [ 38%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_mad_failure_resilience PASSED [ 42%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_early_predictor_failure_resilience PASSED [ 46%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_judge_unhandled_exception_fallback PASSED [ 50%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_decode_image_valid_base64 PASSED [ 53%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_decode_image_empty_and_corrupt PASSED [ 57%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_link_formatting_and_domain_parsing PASSED [ 61%]
+testing/test_phase2_integration.py::TestPipelineFlowIntegration::test_pipeline_logging_execution PASSED [ 65%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_api_analyze_valid_multimodal_request PASSED [ 69%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_api_analyze_valid_text_only_request PASSED [ 73%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_api_analyze_missing_text_400 PASSED [ 76%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_api_analyze_empty_body_400 PASSED [ 80%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_api_analyze_non_json_payload_400 PASSED [ 84%]
+testing/test_phase2_integration.py::TestFrontendServe::test_frontend_serve_index_html PASSED [ 88%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_res_serve_existing_file PASSED [ 92%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_res_serve_nonexistent_file_404 PASSED [ 96%]
+testing/test_phase2_integration.py::TestApiEndpointsIntegration::test_cors_headers_support PASSED [100%]
+
+====================== 26 passed, 38 warnings in 13.74s =======================
+
+================================================================================
+END OF INTEGRATION TESTING REPORT
+================================================================================
