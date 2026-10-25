@@ -525,7 +525,7 @@ class ReverseImageSearchPipeline:
             
             try:
                 log.info(f"Visual Agent: trying model {model} (via {'Local' if USE_LOCAL_LLM else 'OpenRouter'})...")
-                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=30)
+                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=120)
                 resp.raise_for_status()
                 data = resp.json()
                 

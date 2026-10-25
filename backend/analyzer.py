@@ -135,7 +135,7 @@ _NO_IMAGE_EP = {
     "label":          "UNKNOWN",
     "confidence":     "N/A",
     "pass_to_agents": True,
-    "note":           "EP skipped — no image provided; Judge will rely on text only.",
+    "note":           "EP failed — no image provided; Judge will rely on text only.",
 }
 
 
@@ -262,8 +262,8 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "FAIL"}
     else:
         ep_runtime = time.perf_counter() - t_ep_start
-        print(f"  [Step 3 & 4] Early Predictor skipped (Runtime: {ep_runtime:.2f}s)")
-        yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "SKIPPED"}
+        print(f"  [Step 3 & 4] Early Predictor failed: No image provided (Runtime: {ep_runtime:.2f}s)")
+        yield {"type": "status", "step": "RUNNING EARLY PREDICTOR...", "status": "FAIL"}
 
     yield {"type": "status", "step": "FETCHING EVIDENCE...", "status": "IN PROGRESS"}
     # ── 4.5. Knowledge Retrieval ──────────────────────────────────────────
@@ -326,8 +326,10 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "FAIL"}
     else:
         ris_runtime = time.perf_counter() - t_ris_start
-        print(f"  [Step 4.6] Reverse Image Search skipped (Runtime: {ris_runtime:.2f}s)")
-        yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "SKIPPED"}
+        print(f"  [Step 4.6] Reverse Image Search failed: No image provided (Runtime: {ris_runtime:.2f}s)")
+        yield {"type": "status", "step": "SEARCHING FOR SIMILAR IMAGES...", "status": "FAIL"}
+        ris_summary = "\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nReverse Image Search failed: No image provided."
+        ris_data_for_log = {"status": "failed", "visual_agent_summary": "Reverse Image Search failed: No image provided."}
         try:
             ris_pipeline = _get_ris_pipeline()
             ris_pipeline.log_skipped(input_text, reason="No image provided with news query.")

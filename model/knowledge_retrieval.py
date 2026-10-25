@@ -437,7 +437,7 @@ class KnowledgeRetriever:
                             if gnewsdecoder:
                                 try:
                                     decoded = gnewsdecoder(raw_link)
-                                    if decoded.get("status") and decoded.get("decoded_url"):
+                                    if (decoded.get("status") or decoded.get("success")) and decoded.get("decoded_url"):
                                         resolved_url = decoded["decoded_url"]
                                 except Exception as de:
                                     log.debug(f"Google News RSS decode error: {de}")
@@ -730,7 +730,7 @@ class KnowledgeRetriever:
             }
             try:
                 log.info(f"Calling {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter API'} ({model}) for Knowledge Retrieval synthesis...")
-                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=40)
+                resp = requests.post(_API_URL, headers=headers, json=payload, timeout=120)
                 resp.raise_for_status()
                 
                 data = resp.json()

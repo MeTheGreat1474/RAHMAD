@@ -41,7 +41,7 @@ class LLMClient:
 
             try:
                 logger.debug(f"Calling Ollama with model {model}")
-                response = requests.post(url, json=payload, timeout=120)  # Local models can take time
+                response = requests.post(url, json=payload, timeout=180)  # Local models can take time
                 response.raise_for_status()
                 data = response.json()
                 return data.get("response", "").strip()

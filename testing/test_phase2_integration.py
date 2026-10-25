@@ -233,8 +233,8 @@ class TestPipelineFlowIntegration:
 
     def test_pipeline_text_only_no_image(self, mock_pipeline_components):
         """
-        Verify that when no image is provided, Early Predictor and RIS are skipped
-        cleanly and the Judge still receives appropriate neutral signals.
+        Verify that when no image is provided, Early Predictor and RIS display FAIL
+        cleanly without hard crashing, and the Judge still receives appropriate neutral signals.
         """
         chunks = list(analyze_text(SAMPLE_ARTICLE_TEXT, image_data=None))
         status_events = [c for c in chunks if c.get("type") == "status"]
@@ -243,10 +243,10 @@ class TestPipelineFlowIntegration:
         assert len(result_events) == 1
         final_result = result_events[0]["data"]
 
-        # EP and RIS must be skipped in status updates
-        skipped_steps = [e["step"] for e in status_events if e.get("status") == "SKIPPED"]
-        assert "RUNNING EARLY PREDICTOR..." in skipped_steps
-        assert "SEARCHING FOR SIMILAR IMAGES..." in skipped_steps
+        # EP and RIS must be marked as FAIL in status updates when no image is provided
+        failed_steps = [e["step"] for e in status_events if e.get("status") == "FAIL"]
+        assert "RUNNING EARLY PREDICTOR..." in failed_steps
+        assert "SEARCHING FOR SIMILAR IMAGES..." in failed_steps
 
         # Judge must have been called with the neutral _NO_IMAGE_EP signal
         mock_judge = mock_pipeline_components["judge"]

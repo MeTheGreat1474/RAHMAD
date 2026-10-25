@@ -22,7 +22,6 @@ fyp-env-win/
 .venv/
 venv/
 
-
 # Environment / secrets
 .env
 

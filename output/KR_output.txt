@@ -1,127 +1,60 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-18  11:14:13
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-25  01:35:39
 ================================================================================
 
 [1]  INPUT CLAIM
 ------------------------------------------------------------
-    Original Claim     : Indonesian wildfire emissions surge to world's highest, data shows
-
-SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland ​on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
-Fire emissions from ‌Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, opens new tab, a portal developed by the European Union's Copernicus climate monitoring service.
-
-Stay up to date on the key companies, data, and decisions in the ESG world with the Reuters Sustainable Finance newsletter. Sign up here.
-In
+    Original Claim     : Test claim text for no-image verification
     Execution Backend  : Local LLM
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 10
+    Total URLs Retrieved (Pre-Filter) : 8
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-       2. [FILTERED OUT]  https://www.iqair.com/newsroom/wildfire-map-spotlight-indonesia-forest-and-peatland-fires-september-2026
-       3. [FILTERED OUT]  https://www.tradingview.com/news/reuters.com,2026:newsml_L4N4500C7:0-indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/
-       4. [FILTERED OUT]  https://www.internazionale.it/ultime-notizie-reuters/2026/09/09/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows
-       5. [WHITELISTED]   https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
-       6. [FILTERED OUT]  https://caliber.az/en/post/indonesia-s-wildfire-emissions-surge-to-world-s-highest
-       7. [WHITELISTED]   https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
-       8. [WHITELISTED]   https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
-       9. [WHITELISTED]   https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
-      10. [WHITELISTED]   https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
+       1. [FILTERED OUT]  https://www.manilatimes.net/2026/10/24/tmt-newswire/globenewswire/jellutide-gummies-introduces-jellu-tide-multi-ingredient-dietary-supplement-formulation/2453282
+       2. [FILTERED OUT]  https://consumer.ftc.gov/consumer-alerts/2026/06/real-ftc-employee-wont-text-you-their-photo-id-verify-their-identity
+       3. [WHITELISTED]   https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
+       4. [WHITELISTED]   https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
+       5. [FILTERED OUT]  https://iowadot.gov/news/2026-03-27/fraudulent-text-messages-and-calls-target-recipients-false-claims-unpaid-traffic-violations-or-tolls
+       6. [FILTERED OUT]  https://gijn.org/resource/guide-detecting-ai-generated-content/
+       7. [WHITELISTED]   https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
+       8. [FILTERED OUT]  https://consumer.ftc.gov/articles/how-recognize-and-report-spam-text-messages
 
-    URLs Passing Whitelist : 6
-      1. https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
-      2. https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
-      3. https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
-      4. https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
-      5. https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
-      6. https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
+    URLs Passing Whitelist : 3
+      1. https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
+      2. https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
+      3. https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 4
-      1. Title  : Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne
-         Source : https://www.asiaone.com/asia/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-says
+    Articles Successfully Extracted : 2
+      1. Title  : Fact check: Trump’s false claims to the United Nations | CNN Politics
+         Source : https://edition.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
          Date   : 
-      2. Title  : Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online
-         Source : https://www.gmanetwork.com/news/topstories/world/1002910/indonesia-to-receive-assistance-from-malaysia-to-contain-wildfires/story/
-         Date   : 
-      3. Title  : Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online
-         Source : https://www.gmanetwork.com/news/topstories/world/1002191/indonesia-passenger-ship-with-243-people-reported-missing-at-sea-agency-says/story/
-         Date   : 
-      4. Title  : Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM
-         Source : https://www.dawn.com/news/2028791/indonesian-wildfire-emissions-surge-to-worlds-highest?utm_source=dylanradloff&utm_medium=email&utm_campaign=dylans-environmental-digest-september-11-2026
+      2. Title  : Republicans Revive False Miscarriage Statistic, Twist Fauci's Texts About COVID-19 Shots - FactCheck.org
+         Source : https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
          Date   : 
 
     Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 2
-      1. Title  : Indonesian wildfire emissions surge to world's highest, data shows
-         Source : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      1. Title  : Fact check: Trump’s false claims to the United Nations
+         Source : https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
          Status : Preserved for Supporting Links
-      2. Title  : Wildfire haze forces 1.4 million Indonesian students into remote learning - NST Online
-         Source : https://www.nst.com.my/world/region/2026/09/1524390/wildfire-haze-forces-14-million-indonesian-students-remote-learning
+      2. Title  : Fact check: False claim that early suffragettes would eat pizza in swimsuits to annoy men - USA Today
+         Source : https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 10
-      Snippet #1:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] Fires have been blazing across vast stretches of forest and peatland throughout the Indonesian archipelago, causing hazardous emissions to surge, particularly in the hardest-hit provinces on the islands of Sumatra and Borneo.
-      Snippet #2:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] JAKARTA — Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, data from the country's health ministry showed on Thursday (Sept 10).
-      Snippet #3:
-        [Indonesian wildfires cause respiratory infections to double in a week, health ministry says, Asia News - AsiaOne] From January to July this year, fires burned around 202,000 hectares of land, government data showed. Environmental group YKAN has estimated that another 600,000 hectares were damaged by fire in August.
-      Snippet #4:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Indonesia is battling its most intense wildfires in 11 years, and its Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November this year.
-      Snippet #5:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] Transboundary haze has also created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
-      Snippet #6:
-        [Indonesia to receive assistance from Malaysia to contain wildfires | GMA News Online] "Malaysia has offered assistance to help us address the forest fires in Kalimantan. I welcome this with gratitude and pleasure," Prabowo said.
-      Snippet #7:
-        [Rescuers searching for 140 people from Indonesia passenger ship, official says | GMA News Online] Indonesia, an archipelago of 17,000 islands, relies heavily on ferries as a key mode of transportation, with sea routes ⁠more ​affordable and readily available than air travel.
-      Snippet #8:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] SINGAPORE: Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
-      Snippet #9:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] Fire emissions from Indonesia from Sept 1 to 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union’s Copernicus climate monitoring service.
-      Snippet #10:
-        [Indonesian wildfire emissions surge to world’s highest - World - DAWN.COM] “It’s much drier, it’s hotter, and when there’s ignition, these fires burn in a far more extreme way.” From Sept 1 to Sept 7, fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia’s part of Borneo and eastern parts of Sumatra, Copernicus data showed on Wednesday.
+    Snippets Passed : 0
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      ### Comprehensive Key-Fact Outline
-      
-      #### 1. Key Entities, Names, and Roles Involved
-      - **Indonesia**: The country experiencing the surge in wildfire emissions.
-      - **Indonesian Forestry Minister Raja Juli Antoni**: Government official responsible for forestry and addressing the wildfires.
-      - **Prabowo**: Likely referring to Prabowo Subianto, a prominent Indonesian political figure, who has expressed gratitude for assistance.
-      - **Malaysia**: Offering assistance to Indonesia to contain wildfires.
-      - **YKAN**: Environmental group that has estimated additional land damage.
-      - **Fire Emissions Watch**: Portal developed by the European Union's Copernicus climate monitoring service, providing data on wildfire emissions.
-      
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **No monetary amounts, legal rulings, or official outcomes are explicitly stated in the snippets**.
-      
-      #### 3. Timeline of Events and Corroborating Evidence
-      - **Date not specified**: Fires have been burning across vast stretches of forest and peatland in the Indonesian archipelago, particularly in Sumatra and Borneo.
-      - **September 1 to September 7, 2023**:
-        - **Fire Emissions**: Fire emissions from Indonesia reached 19.7 million metric tons, overtaking Russia and making up more than a third of the global total.
-        - **Carbon Dioxide Readings**: Carbon dioxide readings were the highest in the world during this period.
-        - **Fire Intensity**: Fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan (Indonesia’s part of Borneo) and eastern parts of Sumatra.
-      - **September 10, 2023**:
-        - **Health Impact**: Respiratory infections caused by hazardous wildfire pollution in Indonesia have more than doubled in just over a week, according to the country's health ministry.
-      - **January to July 2023**:
-        - **Land Damage**: Fires burned around 202,000 hectares of land.
-        - **Additional Damage**: Environmental group YKAN estimated that another 600,000 hectares were damaged by fire in August.
-      - **September 2023**:
-        - **Wildfire Duration**: Indonesia is battling its most intense wildfires in 11 years, and the Forestry Minister Raja Juli Antoni has warned that the wildfires could continue until November.
-        - **Transboundary Haze**: Transboundary haze has created unhealthy air conditions in Indonesia's neighbors Malaysia and Singapore.
-        - **International Assistance**: Malaysia has offered assistance to help address the forest fires in Kalimantan, and Prabowo has expressed gratitude for this assistance.
-      
-      ### Summary
-      The key facts from the provided snippets indicate a significant surge in wildfire emissions in Indonesia, with carbon dioxide readings reaching the highest levels in the world. The fires have caused respiratory infections to double in a week, leading to health concerns and environmental damage. The wildfires are expected to continue until November, and international assistance from Malaysia is being sought to contain the situation. The data also highlights the extensive land damage caused by the fires and the transboundary impact on neighboring countries.
+      (No summary produced)
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------
-    Status : success
+    Status : failed - no semantic snippets
 
 ================================================================================
   END OF KNOWLEDGE RETRIEVAL FORENSIC LOG
