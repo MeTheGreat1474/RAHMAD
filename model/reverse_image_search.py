@@ -54,7 +54,7 @@ else:
 _CLIP_MODEL_ID  = "openai/clip-vit-base-patch32"
 
 class ReverseImageSearchPipeline:
-    def __init__(self, visual_threshold: float = 0.90, semantic_threshold: float = 0.05):
+    def __init__(self, visual_threshold: float = 0.68, semantic_threshold: float = 0.0):
         self.visual_threshold = visual_threshold
         self.semantic_threshold = semantic_threshold
         
@@ -92,11 +92,13 @@ class ReverseImageSearchPipeline:
         log.info(f"Starting Reverse Image Search for claim: '{claim_text}'")
 
         # Describe image format for logging
-        if image_url.startswith("data:"):
+        if isinstance(image_url, str) and image_url.startswith("data:"):
             header = image_url.split(",", 1)[0]
             img_desc = f"Base64 Inline Image ({header}, length: {len(image_url):,} chars)"
+        elif isinstance(image_url, (str, Path)) and os.path.isfile(str(image_url)):
+            img_desc = f"Local Image File ({image_url})"
         else:
-            img_desc = image_url
+            img_desc = str(image_url)
 
         backend_desc = f"Local LLM ({_MODEL_ID})" if USE_LOCAL_LLM else f"OpenRouter ({_MODEL_ID})"
 
@@ -165,15 +167,20 @@ class ReverseImageSearchPipeline:
                 "status": f"{len(semantically_filtered)} of {len(visually_filtered)} candidates passed semantic threshold."
             }
             
-            if not semantically_filtered:
-                print("  [Step 3/4] [X] No contexts passed semantic threshold.")
-                result_info["visual_agent_summary"] = "No contextual text passed the semantic similarity threshold."
-                log_data["final_result"] = {"status": "no_semantic_matches", "category": "No Semantic Match", "matches_count": 0}
+            # If some candidates passed semantic threshold, prioritize them;
+            # otherwise, if visual matches exist, pass them directly to Visual Agent
+            # so the Visual Agent can diagnose potential out-of-context misattribution.
+            candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered
+            
+            if not candidate_contexts:
+                print("  [Step 3/4] [X] No contexts passed visual or semantic filters.")
+                result_info["visual_agent_summary"] = "No contextual text available for visual verification."
+                log_data["final_result"] = {"status": "no_contexts", "category": "No Contextual Match", "matches_count": 0}
                 self.save_ris_log(log_data)
                 return result_info
                 
             print(f"  [Step 4/4] Synthesizing context via {'Local LLM' if USE_LOCAL_LLM else 'OpenRouter'} Visual Agent...")
-            summary_data = self.analyze_with_visual_agent(claim_text, semantically_filtered)
+            summary_data = self.analyze_with_visual_agent(claim_text, candidate_contexts)
             log_data["visual_agent"] = summary_data
             
             result_info["category"] = summary_data.get("category", "Inconclusive / Insufficient Evidence")
@@ -280,8 +287,8 @@ class ReverseImageSearchPipeline:
         if not self.serpapi_key:
             return [], image_url
             
-        search_url = image_url
-        if image_url.startswith("data:"):
+        search_url = str(image_url) if image_url is not None else ""
+        if isinstance(image_url, str) and image_url.startswith("data:"):
             import base64
             try:
                 header, encoded = image_url.split(",", 1)
@@ -300,6 +307,21 @@ class ReverseImageSearchPipeline:
                     return [], search_url
             except Exception as e:
                 log.error(f"Error uploading image for RIS: {e}")
+                return [], search_url
+        elif isinstance(image_url, (str, Path)) and os.path.isfile(str(image_url)):
+            try:
+                img_path = Path(image_url)
+                raw_bytes = img_path.read_bytes()
+                file_ext = img_path.suffix.lstrip(".").lower() or "jpg"
+                uploaded_url = self._upload_for_ris(raw_bytes, file_ext)
+                if uploaded_url:
+                    search_url = uploaded_url
+                    log.info(f"Local image uploaded successfully: {search_url}")
+                else:
+                    log.error("Failed to upload local image to all fallback public hosts.")
+                    return [], search_url
+            except Exception as e:
+                log.error(f"Error uploading local image for RIS: {e}")
                 return [], search_url
                 
         results = []
@@ -330,7 +352,11 @@ class ReverseImageSearchPipeline:
         
     def _download_image(self, url: str) -> Image.Image:
         try:
-            if url.startswith("data:"):
+            if isinstance(url, Image.Image):
+                return url.convert("RGB")
+            if isinstance(url, (str, Path)) and os.path.isfile(str(url)):
+                return Image.open(str(url)).convert("RGB")
+            if isinstance(url, str) and url.startswith("data:"):
                 import base64
                 raw_bytes = base64.b64decode(url.split(",", 1)[1])
                 return Image.open(BytesIO(raw_bytes)).convert("RGB")
@@ -478,7 +504,7 @@ class ReverseImageSearchPipeline:
             "  \"is_out_of_context\": <true or false>,\n"
             "  \"confidence\": \"<High / Medium / Low>\",\n"
             "  \"summary\": \"<Detailed, objective forensic explanation of why the imagery matches or does not match the claim's context. You MUST explicitly state the count of sources supporting Authentic vs Out-Of-Context.>\",\n"
-            "  \"judge_summary\": \"<Concise 2-4 sentence executive evidence summary formulated specifically for the Judge module, outlining: (1) what the image depicts and its verified origin, (2) whether it matches the claim's event/time, and (3) explicit judicial recommendation on whether it should be treated as authentic evidence or decontextualized deception.>\"\n"
+            "  \"judge_summary\": \"<Concise 2-4 sentence executive evidence summary formulated specifically for the Judge module, outlining: (1) what the image depicts and its verified origin, (2) whether it matches the claim's event/time, and (3) explicit judicial recommendation on visual provenance. Note: Explicitly state that an authentic image verifies media integrity but does not independently prove unverified claims or speculative character attributions in the text.>\"\n"
             "}"
         )
         

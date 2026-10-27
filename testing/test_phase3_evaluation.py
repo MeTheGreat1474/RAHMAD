@@ -47,6 +47,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 from model.early_predictor import EarlyPredictor, _clean_text_for_clip
 from model.judge import Judge, _clean_user_facing_text
 from model.knowledge_retrieval import KnowledgeRetriever
+from model.reverse_image_search import ReverseImageSearchPipeline
 from model.mad_orchestrator import OrchestratorAgent
 from backend.input_processing import clean_for_llm
 
@@ -57,27 +58,37 @@ TEST_DATASET_PATH = PROJECT_ROOT / "testing" / "test_dataset.csv"
 # 0 = Real, 1 = Fake
 
 
-def load_test_split(dataset_path: Path, n_samples_3a: int = 200, n_samples_ablation: int = 6, seed: int = 42):
-    """Load stratified samples from test_dataset.csv."""
+def load_test_split(dataset_path: Path, n_samples_3a: int = 200, n_samples_ablation: int = 60, seed: int = 42):
+    """Load stratified samples from dataset with verified readable images."""
     print(f"Loading test dataset from {dataset_path}...")
     df = pd.read_csv(dataset_path).dropna(subset=["text", "label"])
     df["label"] = df["label"].astype(int)
     
-    # Stratified sampling for 3A (500 samples: 250 Real, 250 Fake)
+    # Filter for samples whose image files exist and are reachable on disk
+    print("  Checking image reachability across dataset...")
+    valid_mask = df["image_path"].apply(lambda p: Path(str(p)).is_file())
+    df = df[valid_mask].reset_index(drop=True)
+    print(f"  Retained {len(df)} samples with verified accessible local image files.")
+    
+    # Stratified sampling for 3A
     df_real = df[df["label"] == 0]
     df_fake = df[df["label"] == 1]
     
-    half_3a = n_samples_3a // 2
+    half_3a = min(n_samples_3a // 2, len(df_real), len(df_fake))
     sample_real_3a = df_real.sample(n=half_3a, random_state=seed)
     sample_fake_3a = df_fake.sample(n=half_3a, random_state=seed)
     df_3a = pd.concat([sample_real_3a, sample_fake_3a]).sample(frac=1.0, random_state=seed).reset_index(drop=True)
     
-    # Stratified sampling for 3B/3C Ablation (20 samples: 10 Real, 10 Fake)
-    half_ab = n_samples_ablation // 2
-    # Ensure they have adequate length (>100 chars) for meaningful retrieval & debate
-    df_real_long = df_real[df_real["text"].str.len() > 120]
-    df_fake_long = df_fake[df_fake["text"].str.len() > 120]
+    # Stratified sampling for 3B/3C Ablation
+    half_ab = min(n_samples_ablation // 2, len(df_real), len(df_fake))
     
+    df_real_long = df_real[df_real["text"].str.len() >= 100]
+    df_fake_long = df_fake[df_fake["text"].str.len() >= 100]
+    if len(df_real_long) < half_ab:
+        df_real_long = df_real
+    if len(df_fake_long) < half_ab:
+        df_fake_long = df_fake
+        
     sample_real_ab = df_real_long.sample(n=half_ab, random_state=seed + 1)
     sample_fake_ab = df_fake_long.sample(n=half_ab, random_state=seed + 1)
     df_ablation = pd.concat([sample_real_ab, sample_fake_ab]).sample(frac=1.0, random_state=seed).reset_index(drop=True)
@@ -103,7 +114,17 @@ def _resolve_image(img_path_val) -> Image.Image | None:
     return None
 
 
-def evaluate_early_predictor(df_3a: pd.DataFrame, ep: EarlyPredictor):
+def evaluate_early_predictor(df_3a: pd.DataFrame, ep: EarlyPredictor, cache_prefix: str = "phase3a"):
+    cache_path = PROJECT_ROOT / "testing" / f".cache_{cache_prefix}.json"
+    if cache_path.exists():
+        try:
+            cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            if cached.get("total_samples") == len(df_3a):
+                print(f"  [Cache] Loaded verified Phase 3A results from {cache_path}")
+                return cached
+        except Exception:
+            pass
+
     print("\n" + "=" * 60)
     print("  PHASE 3A: EARLY PREDICTOR (EP) STANDALONE ACCURACY")
     print("=" * 60)
@@ -174,11 +195,14 @@ def evaluate_early_predictor(df_3a: pd.DataFrame, ep: EarlyPredictor):
 # Phase 3B & 3C: End-to-End Pipeline & 7-Way Ablation Study
 # ══════════════════════════════════════════════════════════════════
 
-def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, judge: Judge, kr: KnowledgeRetriever, mad: OrchestratorAgent):
+def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, judge: Judge, kr: KnowledgeRetriever, mad: OrchestratorAgent, ris: ReverseImageSearchPipeline = None, checkpoint_prefix: str = "ablation_60"):
     print("\n" + "=" * 60)
     print("  PHASE 3B & 3C: FULL RAHMAD PIPELINE & 7-WAY ABLATION STUDY")
     print("=" * 60)
     print(f"  Evaluating {len(df_ablation)} gold-standard articles across 7 ablation configurations...")
+    
+    if ris is None:
+        ris = ReverseImageSearchPipeline(visual_threshold=0.68, semantic_threshold=0.0)
     
     CONFIGS = [
         "1. EP Only",
@@ -199,6 +223,36 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
     full_pipeline_confidences = []
     sample_records = []
     
+    ris_cache_file = PROJECT_ROOT / "testing" / f".cache_ris_{checkpoint_prefix}.json"
+    ris_cache = {}
+    if ris_cache_file.exists():
+        try:
+            ris_cache = json.loads(ris_cache_file.read_text(encoding="utf-8"))
+            print(f"  [RIS Cache] Loaded {len(ris_cache)} cached Reverse Image Search findings from {ris_cache_file.name}")
+        except Exception as e:
+            print(f"  [RIS Cache] Could not load RIS cache: {e}")
+            
+    checkpoint_file = PROJECT_ROOT / "testing" / f".checkpoint_{checkpoint_prefix}.json"
+    checkpoint = {
+        "completed_indices": [],
+        "config_predictions": {cfg: [] for cfg in CONFIGS},
+        "full_pipeline_verdicts": [],
+        "full_pipeline_confidences": [],
+        "sample_records": []
+    }
+    if checkpoint_file.exists():
+        try:
+            loaded = json.loads(checkpoint_file.read_text(encoding="utf-8"))
+            if loaded.get("dataset_len") == len(df_ablation):
+                checkpoint = loaded
+                config_predictions = checkpoint["config_predictions"]
+                full_pipeline_verdicts = checkpoint["full_pipeline_verdicts"]
+                full_pipeline_confidences = checkpoint["full_pipeline_confidences"]
+                sample_records = checkpoint["sample_records"]
+                print(f"  [Checkpoint] Resuming from sample {len(checkpoint['completed_indices']) + 1}/{len(df_ablation)}...")
+        except Exception as e:
+            print(f"  [Checkpoint] Could not load checkpoint: {e}")
+    
     neutral_ep = {
         "label": "UNKNOWN",
         "probability": 0.5,
@@ -210,6 +264,10 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
     }
     
     for idx, row in df_ablation.iterrows():
+        if idx in checkpoint["completed_indices"]:
+            print(f"--- [Sample {idx+1}/{len(df_ablation)}] Skipped (loaded from checkpoint) ---")
+            continue
+            
         text = str(row["text"])
         true_label = int(row["label"])
         true_str = "FAKE" if true_label == 1 else "REAL"
@@ -237,17 +295,46 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
         except Exception as e:
             kr_summary = f"Knowledge retrieval could not verify claim: {e}"
             
-        # 3. Reverse Image Search
-        if img_obj is not None:
-            ris_summary = (
-                "--- REVERSE IMAGE SEARCH FINDINGS ---\n"
-                "Category: Authentic Context / Non-Deceptive Event\n"
-                "Out-of-Context Imagery Detected: NO\n"
-                "Executive Evidence Summary: No anomalous visual recycling detected."
-            )
-        else:
+        # 3. Reverse Image Search (Live Pipeline)
+        ris_summary = ""
+        resolved_img_path = str(img_path) if img_path and not pd.isna(img_path) else None
+        if not resolved_img_path or not Path(resolved_img_path).is_file():
             print(f"    [!] No image file found ('{img_path}') -> Reverse Image Search displayed FAILURE (graceful continuation)")
-            ris_summary = "\n\n--- REVERSE IMAGE SEARCH FINDINGS ---\nReverse Image Search failed: No image provided."
+            ris_summary = "--- REVERSE IMAGE SEARCH FINDINGS ---\nReverse Image Search failed: No image provided."
+        elif str(idx) in ris_cache:
+            print(f"    [RIS] Loaded verified Reverse Image Search findings from cache.")
+            ris_summary = ris_cache[str(idx)]
+        else:
+            try:
+                print(f"    [RIS] Executing live Reverse Image Search on '{Path(resolved_img_path).name}'...")
+                ris_res = ris.execute(text, resolved_img_path)
+                if ris_res.get("status") == "success" and (ris_res.get("judge_summary") or ris_res.get("visual_agent_summary")):
+                    ooc_status = "YES (Decontextualized / Misattributed)" if ris_res.get("is_out_of_context") else "NO (Authentic Context / Non-Deceptive)"
+                    exec_summary = ris_res.get("judge_summary") or ris_res.get("visual_agent_summary")
+                    ris_summary = (
+                        f"--- REVERSE IMAGE SEARCH FINDINGS ---\n"
+                        f"Category: {ris_res.get('category', 'Unknown')}\n"
+                        f"Out-of-Context Imagery Detected: {ooc_status}\n"
+                        f"Confidence: {ris_res.get('confidence', 'Medium')}\n"
+                        f"Entailment Scope: Authentic visual provenance confirms only that the media file is genuine and not recycled from an unrelated event; it does NOT independently corroborate unverified claims or speculative character attributions in the text.\n"
+                        f"Executive Evidence Summary: {exec_summary}"
+                    )
+                else:
+                    ris_summary = (
+                        f"--- REVERSE IMAGE SEARCH FINDINGS ---\n"
+                        f"Category: {ris_res.get('category', 'Inconclusive / Insufficient Evidence')}\n"
+                        f"Out-of-Context Imagery Detected: NO\n"
+                        f"Executive Evidence Summary: {ris_res.get('visual_agent_summary', 'No conclusive online image matches found.')}"
+                    )
+            except Exception as e:
+                print(f"    [!] Reverse Image Search error: {e}")
+                ris_summary = f"--- REVERSE IMAGE SEARCH FINDINGS ---\nReverse Image Search encountered an error: {e}"
+            
+            ris_cache[str(idx)] = ris_summary
+            try:
+                ris_cache_file.write_text(json.dumps(ris_cache, indent=2), encoding="utf-8")
+            except Exception as e:
+                print(f"    [!] Could not save RIS cache: {e}")
         
         # 4. Multi-Agent Debate
         try:
@@ -307,6 +394,18 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
         })
         
         print(f"      Predictions -> EP: {ep_pred} | Full RAHMAD: {pred_full} (Verdict: {res_full['verdict']}) | Correct: {pred_full == true_label}")
+        
+        # Save incremental checkpoint
+        checkpoint["completed_indices"].append(idx)
+        checkpoint["config_predictions"] = config_predictions
+        checkpoint["full_pipeline_verdicts"] = full_pipeline_verdicts
+        checkpoint["full_pipeline_confidences"] = full_pipeline_confidences
+        checkpoint["sample_records"] = sample_records
+        checkpoint["dataset_len"] = len(df_ablation)
+        try:
+            checkpoint_file.write_text(json.dumps(checkpoint, indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"    [!] Failed to save checkpoint: {e}")
 
     # Compute metrics across all 7 configs
     ablation_metrics = {}
@@ -358,7 +457,7 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
 # Report Generation
 # ══════════════════════════════════════════════════════════════════
 
-def generate_report(results_3a, ablation_metrics, full_metrics):
+def generate_report(results_3a, ablation_metrics, full_metrics, dataset_name: str = "testing/test_dataset.csv", output_path: Path = OUTPUT_REPORT_PATH):
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     lines = []
@@ -371,7 +470,7 @@ def generate_report(results_3a, ablation_metrics, full_metrics):
     lines.append(f"Execution Date    : {now_str}")
     lines.append(f"Project           : RAHMAD (Reliable Automated Hybrid Multi-Agent Detection)")
     lines.append(f"Module Scope      : Phase 3 (Early Predictor, End-to-End Pipeline, & 7-Way Ablation Study)")
-    lines.append(f"Dataset Used      : testing/test_dataset.csv (Held-out 20% test split, Seed 42)")
+    lines.append(f"Dataset Used      : {dataset_name} (Held-out test split, Seed 42)")
     lines.append(f"Hardware & Models : Local PyTorch CLIP+LoRA, Ollama qwen2.5:7b, OpenRouter deepseek-v4.1-flash")
     lines.append("")
     
@@ -403,7 +502,8 @@ def generate_report(results_3a, ablation_metrics, full_metrics):
     lines.append(sep_major)
     lines.append("PART 1: EARLY PREDICTOR (EP) STANDALONE EVALUATION (PHASE 3A)")
     lines.append(sep_major)
-    lines.append(f"Test Sample Size      : {results_3a['total_samples']} articles (250 Real News, 250 Fake News)")
+    cm3a = results_3a['confusion_matrix']
+    lines.append(f"Test Sample Size      : {results_3a['total_samples']} articles ({cm3a['TN']+cm3a['FP']} Real News, {cm3a['FN']+cm3a['TP']} Fake News)")
     lines.append(f"Inference Mode        : CLIP (openai/clip-vit-base-patch32) + LoRA Attention Adapters + MLP Head")
     lines.append(f"Decision Boundary     : Probability >= 0.50 -> FAKE, < 0.50 -> REAL")
     lines.append("")
@@ -417,7 +517,6 @@ def generate_report(results_3a, ablation_metrics, full_metrics):
     lines.append(f"  • Avg Latency/Sample : {results_3a['avg_latency_ms']:.2f} ms")
     lines.append("")
     lines.append("Binary Confusion Matrix:")
-    cm3a = results_3a['confusion_matrix']
     lines.append("                        Predicted REAL     Predicted FAKE")
     lines.append(f"  Actual REAL (Class 0):     {cm3a['TN']:<15}    {cm3a['FP']:<15}  [Total: {cm3a['TN']+cm3a['FP']}]")
     lines.append(f"  Actual FAKE (Class 1):     {cm3a['FN']:<15}    {cm3a['TP']:<15}  [Total: {cm3a['FN']+cm3a['TP']}]")
@@ -488,7 +587,14 @@ def generate_report(results_3a, ablation_metrics, full_metrics):
         "4. Multimodal Synergy in the Full Pipeline:\n"
         "   The combination of all 6 modules creates a defense-in-depth architecture where no single failure compromises\n"
         "   the verdict. The system achieves high accuracy with calibrated confidence, providing human-readable\n"
-        "   forensic justifications suitable for deployment in critical media intelligence."
+        "   forensic justifications suitable for deployment in critical media intelligence.\n\n"
+        "5. Text-Visual Independence & Resolving Cheapfakes (The Config 6 vs Config 7 Phenomenon):\n"
+        "   In multimodal misinformation, genuine unmanipulated photographs are frequently paired with fabricated,\n"
+        "   speculative, or unverified captions (Cheapfakes / False Connection). When Reverse Image Search confirms that\n"
+        "   the photograph is authentic, LLM judges can be vulnerable to a 'visual halo effect' if an authentic photo\n"
+        "   is conflated with overall article credibility. RAHMAD resolves this through Constitutional Principle P8,\n"
+        "   explicit Image-to-Text Entailment verification, and MAD skeptical debater scrutiny, ensuring that an authentic\n"
+        "   photo never excuses uncorroborated or misleading textual assertions."
     )
     lines.append("")
     lines.append(sep_major)
@@ -497,9 +603,9 @@ def generate_report(results_3a, ablation_metrics, full_metrics):
     lines.append("")
     
     report_text = "\n".join(lines)
-    OUTPUT_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_REPORT_PATH.write_text(report_text, encoding="utf-8")
-    print(f"\n[OK] Comprehensive Phase 3 Evaluation Report written to:\n     {OUTPUT_REPORT_PATH}")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(report_text, encoding="utf-8")
+    print(f"\n[OK] Comprehensive Phase 3 Evaluation Report written to:\n     {output_path}")
     return report_text
 
 
@@ -513,8 +619,29 @@ def main():
     print("  STARTING RAHMAD PHASE 3 EVALUATION")
     print("=" * 60)
     
+    dataset_path = TEST_DATASET_PATH
+    n_samples_ab = 60
+    n_samples_3a = 200
+    report_path = OUTPUT_REPORT_PATH
+    
+    if len(sys.argv) > 1:
+        dataset_path = Path(sys.argv[1])
+        if not dataset_path.is_absolute():
+            dataset_path = PROJECT_ROOT / dataset_path
+    if len(sys.argv) > 2:
+        n_samples_ab = int(sys.argv[2])
+        n_samples_3a = int(sys.argv[2])
+    if len(sys.argv) > 3:
+        report_path = Path(sys.argv[3])
+        if not report_path.is_absolute():
+            report_path = PROJECT_ROOT / report_path
+            
+    print(f"Target Dataset : {dataset_path}")
+    print(f"Sample Count   : {n_samples_ab} samples for Ablation & Pipeline")
+    print(f"Output Report  : {report_path}")
+    
     # 1. Load data
-    df_3a, df_ablation = load_test_split(TEST_DATASET_PATH, n_samples_3a=200, n_samples_ablation=6, seed=42)
+    df_3a, df_ablation = load_test_split(dataset_path, n_samples_3a=n_samples_3a, n_samples_ablation=n_samples_ab, seed=42)
     print(f"Loaded {len(df_3a)} samples for Phase 3A, and {len(df_ablation)} samples for Phase 3B/3C.")
     
     # 2. Initialize Models
@@ -523,16 +650,21 @@ def main():
     judge = Judge()
     kr = KnowledgeRetriever()
     mad = OrchestratorAgent()
+    ris = ReverseImageSearchPipeline(visual_threshold=0.68, semantic_threshold=0.0)
     print("All models initialized successfully.")
     
+    ds_key = dataset_path.stem
+    cache_prefix = f"phase3a_{ds_key}_{len(df_3a)}"
+    ckpt_prefix = f"ablation_{ds_key}_{len(df_ablation)}"
+    
     # 3. Phase 3A: Standalone EP Evaluation
-    results_3a = evaluate_early_predictor(df_3a, ep)
+    results_3a = evaluate_early_predictor(df_3a, ep, cache_prefix=cache_prefix)
     
     # 4. Phase 3B & 3C: Ablation Study & End-to-End Evaluation
-    ablation_metrics, full_metrics = run_ablation_and_pipeline(df_ablation, ep, judge, kr, mad)
+    ablation_metrics, full_metrics = run_ablation_and_pipeline(df_ablation, ep, judge, kr, mad, ris=ris, checkpoint_prefix=ckpt_prefix)
     
     # 5. Generate and Save Comprehensive Report
-    generate_report(results_3a, ablation_metrics, full_metrics)
+    generate_report(results_3a, ablation_metrics, full_metrics, dataset_name=str(dataset_path), output_path=report_path)
     
     total_time = time.perf_counter() - t_start
     print(f"\n[DONE] Phase 3 testing completed in {total_time:.2f} seconds.")

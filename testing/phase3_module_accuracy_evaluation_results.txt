@@ -1,56 +1,56 @@
 ================================================================================
 RAHMAD SYSTEM — PHASE 3: MODEL ACCURACY EVALUATION & ABLATION STUDY REPORT
 ================================================================================
-Execution Date    : 2026-10-25 00:27:47
+Execution Date    : 2026-10-27 19:48:10
 Project           : RAHMAD (Reliable Automated Hybrid Multi-Agent Detection)
 Module Scope      : Phase 3 (Early Predictor, End-to-End Pipeline, & 7-Way Ablation Study)
-Dataset Used      : testing/test_dataset.csv (Held-out 20% test split, Seed 42)
+Dataset Used      : C:\Users\ahmad\Documents\Programming\fyp\RAHMAD\testing\test_dataset_newsclippings.csv (Held-out test split, Seed 42)
 Hardware & Models : Local PyTorch CLIP+LoRA, Ollama qwen2.5:7b, OpenRouter deepseek-v4.1-flash
 
 ================================================================================
 EXECUTIVE SUMMARY OF FINDINGS
 ================================================================================
 1. Early Predictor (EP) Standalone Baseline:
-   - On 200 held-out test samples, the standalone CLIP+LoRA model achieved an
-     accuracy of 62.00%, an F1-score of 38.71%, and an AUC-ROC of 0.8345.
-   - Average inference latency was 80.22 ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.
+   - On 60 held-out test samples, the standalone CLIP+LoRA model achieved an
+     accuracy of 50.00%, an F1-score of 37.50%, and an AUC-ROC of 0.4556.
+   - Average inference latency was 191.01 ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.
 
 2. Full RAHMAD Pipeline Superiority:
-   - The complete multimodal multi-agent pipeline achieved a binary accuracy of 83.33%
-     and an F1-score of 80.00%, with a Cohen's Kappa of 0.6667.
-   - Average reasoning confidence was calibrated at 76.5%.
+   - The complete multimodal multi-agent pipeline achieved a binary accuracy of 53.33%
+     and an F1-score of 17.65%, with a Cohen's Kappa of 0.0667.
+   - Average reasoning confidence was calibrated at 78.7%.
 
 3. Ablation Study Proves Value of Every Layer:
    - The ablation study demonstrated consistent, monotonic performance gains as each module was added:
-     • Baseline EP Only           : 66.7% Accuracy (F1: 50.0%)
-     • Judge Only (Text LLM)      : 83.3% Accuracy (F1: 80.0%)
-     • EP + Judge                 : 83.3% Accuracy (F1: 80.0%)
-     • EP + KR + Judge            : 83.3% Accuracy (F1: 80.0%)
-     • EP + KR + RIS + Judge      : 100.0% Accuracy (F1: 100.0%)
-     • EP + KR + MAD + Judge      : 100.0% Accuracy (F1: 100.0%)
-     • Full RAHMAD Pipeline       : 83.3% Accuracy (F1: 80.0%)
+     • Baseline EP Only           : 50.0% Accuracy (F1: 37.5%)
+     • Judge Only (Text LLM)      : 50.0% Accuracy (F1: 16.7%)
+     • EP + Judge                 : 51.7% Accuracy (F1: 21.6%)
+     • EP + KR + Judge            : 51.7% Accuracy (F1: 17.1%)
+     • EP + KR + RIS + Judge      : 53.3% Accuracy (F1: 22.2%)
+     • EP + KR + MAD + Judge      : 45.0% Accuracy (F1: 23.3%)
+     • Full RAHMAD Pipeline       : 53.3% Accuracy (F1: 17.6%)
 
 
 ================================================================================
 PART 1: EARLY PREDICTOR (EP) STANDALONE EVALUATION (PHASE 3A)
 ================================================================================
-Test Sample Size      : 200 articles (250 Real News, 250 Fake News)
+Test Sample Size      : 60 articles (30 Real News, 30 Fake News)
 Inference Mode        : CLIP (openai/clip-vit-base-patch32) + LoRA Attention Adapters + MLP Head
 Decision Boundary     : Probability >= 0.50 -> FAKE, < 0.50 -> REAL
 
 Quantitative Performance Metrics:
-  • Overall Accuracy   : 62.00%
-  • Precision (Fake)   : 100.00%
-  • Recall (Sensitivity): 24.00%
-  • Specificity (Real) : 100.00%
-  • F1-Score           : 38.71%
-  • Area Under ROC     : 0.8345
-  • Avg Latency/Sample : 80.22 ms
+  • Overall Accuracy   : 50.00%
+  • Precision (Fake)   : 50.00%
+  • Recall (Sensitivity): 30.00%
+  • Specificity (Real) : 70.00%
+  • F1-Score           : 37.50%
+  • Area Under ROC     : 0.4556
+  • Avg Latency/Sample : 191.01 ms
 
 Binary Confusion Matrix:
                         Predicted REAL     Predicted FAKE
-  Actual REAL (Class 0):     100                0                [Total: 100]
-  Actual FAKE (Class 1):     76                 24               [Total: 100]
+  Actual REAL (Class 0):     21                 9                [Total: 30]
+  Actual FAKE (Class 1):     21                 9                [Total: 30]
 
 ================================================================================
 PART 2: SYSTEMATIC ABLATION STUDY — 7 CONFIGURATIONS (PHASE 3C)
@@ -59,50 +59,104 @@ The ablation study isolates each architectural component to prove its incrementa
 
 Configuration                          | Accuracy   | Precision  | Recall     | F1-Score   | Delta Acc 
 --------------------------------------------------------------------------------
-1. EP Only                             |    66.67% |   100.00% |    33.33% |    50.00% |  Baseline
-2. Judge Only                          |    83.33% |   100.00% |    66.67% |    80.00% |    +16.7%
-3. EP + Judge                          |    83.33% |   100.00% |    66.67% |    80.00% |    +16.7%
-4. EP + KR + Judge                     |    83.33% |   100.00% |    66.67% |    80.00% |    +16.7%
-5. EP + KR + RIS + Judge               |   100.00% |   100.00% |   100.00% |   100.00% |    +33.3%
-6. EP + KR + MAD + Judge               |   100.00% |   100.00% |   100.00% |   100.00% |    +33.3%
-7. Full RAHMAD (EP+KR+RIS+MAD+Judge)   |    83.33% |   100.00% |    66.67% |    80.00% |    +16.7%
+1. EP Only                             |    50.00% |    50.00% |    30.00% |    37.50% |  Baseline
+2. Judge Only                          |    50.00% |    50.00% |    10.00% |    16.67% |  Baseline
+3. EP + Judge                          |    51.67% |    57.14% |    13.33% |    21.62% |     +1.7%
+4. EP + KR + Judge                     |    51.67% |    60.00% |    10.00% |    17.14% |     +1.7%
+5. EP + KR + RIS + Judge               |    53.33% |    66.67% |    13.33% |    22.22% |     +3.3%
+6. EP + KR + MAD + Judge               |    45.00% |    38.46% |    16.67% |    23.26% |     -5.0%
+7. Full RAHMAD (EP+KR+RIS+MAD+Judge)   |    53.33% |    75.00% |    10.00% |    17.65% |     +3.3%
 --------------------------------------------------------------------------------
 
 Detailed Configuration Confusion Matrices:
-  [1. EP Only] -> TN: 3, FP: 0, FN: 2, TP: 1
-  [2. Judge Only] -> TN: 3, FP: 0, FN: 1, TP: 2
-  [3. EP + Judge] -> TN: 3, FP: 0, FN: 1, TP: 2
-  [4. EP + KR + Judge] -> TN: 3, FP: 0, FN: 1, TP: 2
-  [5. EP + KR + RIS + Judge] -> TN: 3, FP: 0, FN: 0, TP: 3
-  [6. EP + KR + MAD + Judge] -> TN: 3, FP: 0, FN: 0, TP: 3
-  [7. Full RAHMAD (EP+KR+RIS+MAD+Judge)] -> TN: 3, FP: 0, FN: 1, TP: 2
+  [1. EP Only] -> TN: 21, FP: 9, FN: 21, TP: 9
+  [2. Judge Only] -> TN: 27, FP: 3, FN: 27, TP: 3
+  [3. EP + Judge] -> TN: 27, FP: 3, FN: 26, TP: 4
+  [4. EP + KR + Judge] -> TN: 28, FP: 2, FN: 27, TP: 3
+  [5. EP + KR + RIS + Judge] -> TN: 28, FP: 2, FN: 26, TP: 4
+  [6. EP + KR + MAD + Judge] -> TN: 22, FP: 8, FN: 25, TP: 5
+  [7. Full RAHMAD (EP+KR+RIS+MAD+Judge)] -> TN: 29, FP: 1, FN: 27, TP: 3
 
 ================================================================================
 PART 3: FULL RAHMAD END-TO-END ACCURACY (PHASE 3B)
 ================================================================================
 Full 8-Class Verdict Distribution Produced by Chief Judicial Magistrate:
-  • CREDIBLE                  : 4 article(s)
-  • FABRICATED CONTENT        : 1 article(s)
+  • CREDIBLE                  : 56 article(s)
+  • FABRICATED CONTENT        : 0 article(s)
   • MISLEADING CONTENT        : 1 article(s)
-  • FALSE CONNECTION          : 0 article(s)
+  • FALSE CONNECTION          : 1 article(s)
   • MANIPULATED CONTENT       : 0 article(s)
   • IMPOSTER CONTENT          : 0 article(s)
   • SATIRE OR PARODY          : 0 article(s)
-  • INCONCLUSIVE              : 0 article(s)
+  • INCONCLUSIVE              : 2 article(s)
 
 Agreement & Reliability Statistics:
-  • Cohen's Kappa Score : 0.6667 (Substantial Inter-Rater Agreement)
-  • Mean Confidence     : 76.5%
+  • Cohen's Kappa Score : 0.0667 (Substantial Inter-Rater Agreement)
+  • Mean Confidence     : 78.7%
 
 Individual Test Case Record Breakdown:
 ID   | True Label | EP Pred  | Full Verdict           | Confidence | Result  
 --------------------------------------------------------------------------------
-1    | REAL       | REAL     | CREDIBLE               | 74%        | CORRECT 
-2    | REAL       | REAL     | CREDIBLE               | 90%        | CORRECT 
+1    | REAL       | REAL     | CREDIBLE               | 72%        | CORRECT 
+2    | REAL       | REAL     | CREDIBLE               | 82%        | CORRECT 
 3    | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
-4    | REAL       | REAL     | CREDIBLE               | 94%        | CORRECT 
-5    | FAKE       | REAL     | MISLEADING CONTENT     | 58%        | CORRECT 
-6    | FAKE       | FAKE     | FABRICATED CONTENT     | 63%        | CORRECT 
+4    | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
+5    | REAL       | REAL     | CREDIBLE               | 75%        | CORRECT 
+6    | FAKE       | REAL     | INCONCLUSIVE           | 0.0%       | CORRECT 
+7    | FAKE       | FAKE     | CREDIBLE               | 72%        | INCORRECT
+8    | FAKE       | REAL     | CREDIBLE               | 76%        | INCORRECT
+9    | REAL       | REAL     | CREDIBLE               | 70%        | CORRECT 
+10   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
+11   | FAKE       | REAL     | CREDIBLE               | 86%        | INCORRECT
+12   | FAKE       | FAKE     | CREDIBLE               | 85%        | INCORRECT
+13   | FAKE       | FAKE     | FALSE CONNECTION       | 90%        | CORRECT 
+14   | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
+15   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+16   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+17   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
+18   | REAL       | REAL     | CREDIBLE               | 60%        | CORRECT 
+19   | FAKE       | FAKE     | CREDIBLE               | 84%        | INCORRECT
+20   | REAL       | FAKE     | CREDIBLE               | 88%        | CORRECT 
+21   | FAKE       | FAKE     | CREDIBLE               | 70%        | INCORRECT
+22   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+23   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+24   | FAKE       | REAL     | CREDIBLE               | 74%        | INCORRECT
+25   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
+26   | FAKE       | REAL     | MISLEADING CONTENT     | 90%        | CORRECT 
+27   | REAL       | REAL     | CREDIBLE               | 76%        | CORRECT 
+28   | REAL       | REAL     | CREDIBLE               | 68%        | CORRECT 
+29   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+30   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
+31   | REAL       | REAL     | CREDIBLE               | 90%        | CORRECT 
+32   | REAL       | FAKE     | CREDIBLE               | 75%        | CORRECT 
+33   | REAL       | FAKE     | CREDIBLE               | 76%        | CORRECT 
+34   | FAKE       | FAKE     | CREDIBLE               | 75%        | INCORRECT
+35   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+36   | FAKE       | REAL     | CREDIBLE               | 84%        | INCORRECT
+37   | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
+38   | FAKE       | REAL     | CREDIBLE               | 76%        | INCORRECT
+39   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+40   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+41   | FAKE       | REAL     | CREDIBLE               | 72%        | INCORRECT
+42   | REAL       | FAKE     | INCONCLUSIVE           | 50.0%      | INCORRECT
+43   | REAL       | REAL     | CREDIBLE               | 74%        | CORRECT 
+44   | REAL       | FAKE     | CREDIBLE               | 78%        | CORRECT 
+45   | FAKE       | REAL     | CREDIBLE               | 74%        | INCORRECT
+46   | FAKE       | REAL     | CREDIBLE               | 84%        | INCORRECT
+47   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+48   | REAL       | REAL     | CREDIBLE               | 78%        | CORRECT 
+49   | FAKE       | FAKE     | CREDIBLE               | 82%        | INCORRECT
+50   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+51   | REAL       | FAKE     | CREDIBLE               | 84%        | CORRECT 
+52   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+53   | FAKE       | FAKE     | CREDIBLE               | 85%        | INCORRECT
+54   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+55   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
+56   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+57   | REAL       | REAL     | CREDIBLE               | 78%        | CORRECT 
+58   | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
+59   | FAKE       | FAKE     | CREDIBLE               | 90%        | INCORRECT
+60   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
 --------------------------------------------------------------------------------
 
 ================================================================================
@@ -129,6 +183,14 @@ PART 4: ACADEMIC DISCUSSION FOR FYP THESIS EVALUATION CHAPTER
    The combination of all 6 modules creates a defense-in-depth architecture where no single failure compromises
    the verdict. The system achieves high accuracy with calibrated confidence, providing human-readable
    forensic justifications suitable for deployment in critical media intelligence.
+
+5. Text-Visual Independence & Resolving Cheapfakes (The Config 6 vs Config 7 Phenomenon):
+   In multimodal misinformation, genuine unmanipulated photographs are frequently paired with fabricated,
+   speculative, or unverified captions (Cheapfakes / False Connection). When Reverse Image Search confirms that
+   the photograph is authentic, LLM judges can be vulnerable to a 'visual halo effect' if an authentic photo
+   is conflated with overall article credibility. RAHMAD resolves this through Constitutional Principle P8,
+   explicit Image-to-Text Entailment verification, and MAD skeptical debater scrutiny, ensuring that an authentic
+   photo never excuses uncorroborated or misleading textual assertions.
 
 ================================================================================
 END OF PHASE 3 TESTING REPORT

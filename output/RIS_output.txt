@@ -1,60 +1,176 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-25  01:35:53
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-27  22:02:57
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
 ------------------------------------------------------------
-    Original Claim     : Test claim text for no-image verification
-    Target Image Source: None (Text-only input)
-    Public Search URL  : N/A
+    Original Claim     : We must stamp out hatred wherever we see it
+
+British Muslims campaign outside the BBC headquarters in London against negative media portrayals of Muslims
+    Target Image Source: Local Image File (C:/Users/ahmad/Documents/Programming/fyp/Dataset/news_clippings/images/nc_596778.jpg)
+    Public Search URL  : https://i.ibb.co/Y7PdwVtR/5267ffba7559.jpg
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
 ------------------------------------------------------------
     Search Engine Query: Google Lens (via SerpApi)
-    Total Retrieved    : 0 candidate matches
-    Search Status      : Skipped — No image provided with news query.
+    Total Retrieved    : 10 candidate matches
+    Search Status      : Retrieved 10 candidate matches via Google Lens.
+
+      Match #1:
+        Title    : Algerian army repeats call to declare president unfit for ...
+        Source   : Reuters
+        Link     : https://www.reuters.com/article/world/algerian-army-repeats-call-to-declare-president-unfit-for-office-idUSKCN1RB0N7/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSzqtXZkmo7-3Y6YKaNETO__uurqEx5F4F31GPiAFb9_uR36SE0
+      Match #2:
+        Title    : Don't Get Your Hopes Up About Algeria | Council on Foreign ...
+        Source   : Council on Foreign Relations
+        Link     : https://www.cfr.org/articles/dont-get-your-hopes-about-algeria
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQtLumhorO7eMw83F1Yt04NbFO3jR-tQLgXzuvg-v_HugauSLNt
+      Match #3:
+        Title    : Thousands of Algerians in Paris mark the end of Bouteflika's ...
+        Source   : Al Jazeera
+        Link     : https://www.aljazeera.com/gallery/2019/4/8/thousands-of-algerians-in-paris-mark-the-end-of-bouteflikas-rule
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQZ6Vg-S3w4rQHxo_H7_97ac9OtzXrZKQUF3HGW4njbo6XCPTLf
+      Match #4:
+        Title    : Algeria protests grow against fifth term for president ...
+        Source   : The Guardian
+        Link     : https://www.theguardian.com/world/2019/mar/08/algeria-protests-grow-at-presidents-decision-to-stand-for-fifth-term
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoMEf-AFL9xHVwJqj3-ZSMXnJm_GyaPl42br8vYOKdCgBo7CBn
+      Match #5:
+        Title    : Hopes Fade for New Political Course in Algeria a Year After ...
+        Source   : The New York Times
+        Link     : https://www.nytimes.com/2020/10/04/world/africa/algeria-protests-politics.html
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ9hm8eUzqxWDW3_Mvka3MGPoaSTa_FpbiW93Q6VOmbMsjazBw
+      Match #6:
+        Title    : 3,222 Algeria Terrorism Stock Photos and High-Res Images ...
+        Source   : Getty Images
+        Link     : https://www.gettyimages.com/photos/algeria-terrorism
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTgmFSLWDHB-uyE1v-5jipssvBbGoQpkohHRCiDhvWaRUvXcrLz
+      Match #7:
+        Title    : In Homs, Syria, Sectarian Battles Stir Fears of Civil War - The ...
+        Source   : The New York Times
+        Link     : https://www.nytimes.com/2011/11/20/world/middleeast/in-homs-syria-sectarian-battles-stir-fears-of-civil-war.html
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnh9Rp6c9d5S7yx5TL9xc5BUV5XzkKURrZaG075i-IKaG4JK3O
+      Match #8:
+        Title    : Algeria's protesters expand focus to political elite beyond ...
+        Source   : France 24
+        Link     : https://www.france24.com/en/20190329-algeria-protesters-political-elite-bouteflika-president-army
+        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqPobssWS4N0SjyUPGrG1AlZf4YuBxibToctqvbEblbDSGbx__
+      Match #9:
+        Title    : Algerians protest against Bouteflika
+        Source   : Al Arabiya
+        Link     : https://english.alarabiya.net/perspective/2014/03/07/Algerians-protest-against-Bouteflika
+        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQ9H3SQN4S50lWwDznlcJiBvLLcvC96TBddtP5HW-7gzscU2ONL
+      Match #10:
+        Title    : Algeria profile - Timeline - BBC News
+        Source   : BBC
+        Link     : https://www.bbc.com/news/world-africa-14118856
+        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRs9PuprFKY_0xdfQqF0Fij6pzLrh1FdcP5MPjbiqm0xe9oAzAT
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
-    Filter Criterion   : Visual embedding cosine similarity >= 0.90
-    Status : Skipped — No image provided with news query.
+    Filter Criterion   : Visual embedding cosine similarity >= 0.68
+    Evaluated Candidates (10):
+      1. [PASSED] Visual Similarity: 0.7410 (Threshold: >=0.68)
+         Title  : Algerian army repeats call to declare president unfit for ...
+         Source : Reuters
+         Link   : https://www.reuters.com/article/world/algerian-army-repeats-call-to-declare-president-unfit-for-office-idUSKCN1RB0N7/
+      2. [PASSED] Visual Similarity: 0.7115 (Threshold: >=0.68)
+         Title  : Don't Get Your Hopes Up About Algeria | Council on Foreign ...
+         Source : Council on Foreign Relations
+         Link   : https://www.cfr.org/articles/dont-get-your-hopes-about-algeria
+      3. [PASSED] Visual Similarity: 0.6941 (Threshold: >=0.68)
+         Title  : Thousands of Algerians in Paris mark the end of Bouteflika's ...
+         Source : Al Jazeera
+         Link   : https://www.aljazeera.com/gallery/2019/4/8/thousands-of-algerians-in-paris-mark-the-end-of-bouteflikas-rule
+      4. [FAILED] Visual Similarity: 0.6539 (Threshold: >=0.68)
+         Title  : Algeria protests grow against fifth term for president ...
+         Source : The Guardian
+         Link   : https://www.theguardian.com/world/2019/mar/08/algeria-protests-grow-at-presidents-decision-to-stand-for-fifth-term
+      5. [FAILED] Visual Similarity: 0.6411 (Threshold: >=0.68)
+         Title  : Hopes Fade for New Political Course in Algeria a Year After ...
+         Source : The New York Times
+         Link   : https://www.nytimes.com/2020/10/04/world/africa/algeria-protests-politics.html
+      6. [FAILED] Visual Similarity: 0.6314 (Threshold: >=0.68)
+         Title  : 3,222 Algeria Terrorism Stock Photos and High-Res Images ...
+         Source : Getty Images
+         Link   : https://www.gettyimages.com/photos/algeria-terrorism
+      7. [FAILED] Visual Similarity: 0.6271 (Threshold: >=0.68)
+         Title  : In Homs, Syria, Sectarian Battles Stir Fears of Civil War - The ...
+         Source : The New York Times
+         Link   : https://www.nytimes.com/2011/11/20/world/middleeast/in-homs-syria-sectarian-battles-stir-fears-of-civil-war.html
+      8. [FAILED] Visual Similarity: 0.6587 (Threshold: >=0.68)
+         Title  : Algeria's protesters expand focus to political elite beyond ...
+         Source : France 24
+         Link   : https://www.france24.com/en/20190329-algeria-protesters-political-elite-bouteflika-president-army
+      9. [FAILED] Visual Similarity: 0.6725 (Threshold: >=0.68)
+         Title  : Algerians protest against Bouteflika
+         Source : Al Arabiya
+         Link   : https://english.alarabiya.net/perspective/2014/03/07/Algerians-protest-against-Bouteflika
+      10. [PASSED] Visual Similarity: 0.6833 (Threshold: >=0.68)
+         Title  : Algeria profile - Timeline - BBC News
+         Source : BBC
+         Link   : https://www.bbc.com/news/world-africa-14118856
+
+    Outcome: 4 of 10 candidates passed visual filter.
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
-    Filter Criterion   : Contextual semantic embedding similarity >= 0.05
-    Status : Skipped — No image provided with news query.
+    Filter Criterion   : Contextual semantic embedding similarity >= 0.00
+    Evaluated Contexts (4):
+      1. [PASSED] Semantic Similarity: 0.1399 (Threshold: >=0.00)
+         Title  : Algerian army repeats call to declare president unfit for ...
+         Source : Reuters
+         Link   : https://www.reuters.com/article/world/algerian-army-repeats-call-to-declare-president-unfit-for-office-idUSKCN1RB0N7/
+      2. [PASSED] Semantic Similarity: 0.1984 (Threshold: >=0.00)
+         Title  : Don't Get Your Hopes Up About Algeria | Council on Foreign ...
+         Source : Council on Foreign Relations
+         Link   : https://www.cfr.org/articles/dont-get-your-hopes-about-algeria
+      3. [PASSED] Semantic Similarity: 0.2024 (Threshold: >=0.00)
+         Title  : Thousands of Algerians in Paris mark the end of Bouteflika's ...
+         Source : Al Jazeera
+         Link   : https://www.aljazeera.com/gallery/2019/4/8/thousands-of-algerians-in-paris-mark-the-end-of-bouteflikas-rule
+      4. [PASSED] Semantic Similarity: 0.2432 (Threshold: >=0.00)
+         Title  : Algeria profile - Timeline - BBC News
+         Source : BBC
+         Link   : https://www.bbc.com/news/world-africa-14118856
+
+    Outcome: 4 of 4 candidates passed semantic filter.
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
-    Model Employed     : N/A
-    Assigned Category  : Skipped
-    Out-of-Context (OOC): NO (Authentic Context / Non-Deceptive)
-    Confidence Level   : N/A
+    Model Employed     : qwen2.5:7b
+    Assigned Category  : Out-of-Context (Misattributed / Recycled)
+    Out-of-Context (OOC): YES (Decontextualized / Misattributed)
+    Confidence Level   : High
 
     Context Sent to Visual Agent:
-      (No context passed to Visual Agent)
+      - Algerian army repeats call to declare president unfit for ... (Source: Reuters)
+      - Don't Get Your Hopes Up About Algeria | Council on Foreign ... (Source: Council on Foreign Relations)
+      - Thousands of Algerians in Paris mark the end of Bouteflika's ... (Source: Al Jazeera)
+      - Algeria profile - Timeline - BBC News (Source: BBC)
 
     Visual Agent Forensic Synthesis:
-      Reverse Image Search was not performed because no image provided with news query..
+      The image has been sourced from multiple unrelated events in Algeria, including army declarations and protests. There are 4 sources supporting out-of-context usage and 0 sources supporting the claim's context. The image does not depict British Muslims campaigning against negative media portrayals of Muslims.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
-    Assigned Category          : Skipped
-    Out-of-Context Flag (OOC)  : NO (Authentic Context / Non-Deceptive)
-    Judicial Confidence Weight : N/A
+    Assigned Category          : Out-of-Context (Misattributed / Recycled)
+    Out-of-Context Flag (OOC)  : YES (Decontextualized / Misattributed)
+    Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      No Reverse Image Search evidence available (no image provided with news query.). Evaluation will rely entirely on textual and factual evidence.
+      The image shows Algerian protesters and military declarations, not British Muslims campaigning against negative media portrayals of Muslims. It is recycled from unrelated events in Algeria, thus misattributed.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
-    Pipeline Status       : skipped
-    Forensic Category     : N/A
-    Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
-    Confidence Level      : N/A
-    High-Fidelity Matches : 0
-    Forwarded to Judge    : NO
+    Pipeline Status       : success
+    Forensic Category     : Out-of-Context (Misattributed / Recycled)
+    Out-of-Context (OOC)   : YES (Decontextualized / Misattributed)
+    Confidence Level      : High
+    High-Fidelity Matches : 4
+    Forwarded to Judge    : YES
 
 ================================================================================
   END OF REVERSE IMAGE SEARCH FORENSIC LOG

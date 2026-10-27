@@ -1,60 +1,90 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-25  01:35:39
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-27  22:11:17
 ================================================================================
 
 [1]  INPUT CLAIM
 ------------------------------------------------------------
-    Original Claim     : Test claim text for no-image verification
+    Original Claim     : Labour promises full inquiry into 'odious' blacklisting of thousands of workers
     Execution Backend  : Local LLM
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 8
+    Total URLs Retrieved (Pre-Filter) : 3
     All Retrieved URLs (Pre-Filter Status):
-       1. [FILTERED OUT]  https://www.manilatimes.net/2026/10/24/tmt-newswire/globenewswire/jellutide-gummies-introduces-jellu-tide-multi-ingredient-dietary-supplement-formulation/2453282
-       2. [FILTERED OUT]  https://consumer.ftc.gov/consumer-alerts/2026/06/real-ftc-employee-wont-text-you-their-photo-id-verify-their-identity
-       3. [WHITELISTED]   https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
-       4. [WHITELISTED]   https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
-       5. [FILTERED OUT]  https://iowadot.gov/news/2026-03-27/fraudulent-text-messages-and-calls-target-recipients-false-claims-unpaid-traffic-violations-or-tolls
-       6. [FILTERED OUT]  https://gijn.org/resource/guide-detecting-ai-generated-content/
-       7. [WHITELISTED]   https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
-       8. [FILTERED OUT]  https://consumer.ftc.gov/articles/how-recognize-and-report-spam-text-messages
+       1. [WHITELISTED]   https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
+       2. [WHITELISTED]   https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
+       3. [WHITELISTED]   https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
 
     URLs Passing Whitelist : 3
-      1. https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
-      2. https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
-      3. https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
+      1. https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
+      2. https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
+      3. https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
     Articles Successfully Extracted : 2
-      1. Title  : Fact check: Trump’s false claims to the United Nations | CNN Politics
-         Source : https://edition.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
+      1. Title  : On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian
+         Source : https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
          Date   : 
-      2. Title  : Republicans Revive False Miscarriage Statistic, Twist Fauci's Texts About COVID-19 Shots - FactCheck.org
-         Source : https://www.factcheck.org/2026/08/republicans-revive-false-miscarriage-statistic-twist-faucis-texts-about-covid-19-shots/
+      2. Title  : Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian
+         Source : https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
          Date   : 
 
-    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 2
-      1. Title  : Fact check: Trump’s false claims to the United Nations
-         Source : https://www.cnn.com/2026/09/22/politics/fact-check-trump-united-nations
-         Status : Preserved for Supporting Links
-      2. Title  : Fact check: False claim that early suffragettes would eat pizza in swimsuits to annoy men - USA Today
-         Source : https://www.usatoday.com/story/news/factcheck/2021/03/29/fact-check-no-image-doesnt-show-early-suffragettes-eating-pizza/7011551002/
+    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 1
+      1. Title  : Undercover, with Rob Evans and Paul Lewis + UK civil liberties
+         Source : https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 0
+    Snippets Passed : 6
+      Snippet #1:
+        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] To this day, no blacklisting firm has made a public apology to the workers whose lives they ruined.
+      Snippet #2:
+        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] The effect was devastating. The worker had no idea their details were being checked and no way of seeing if the information was accurate. Blacklisting was a secret tool used by companies to keep out people they didn’t like. Those with files were often union members who had raised health-and-safety concerns. There had always been rumours about blacklisting but the files provided evidence.
+      Snippet #3:
+        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] Five years after a blacklist was found that singled out construction site workers for being union activists, the full extent of undercover police surveillance and collusion is still not known, and myriad questions remain
+      Snippet #4:
+        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Miliband has called blacklisting “odious”, adding that a Labour government would launch a full inquiry into the practice.
+      Snippet #5:
+        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Quite what form that inquiry would take is unclear. Labour is promising what it calls a “full inquiry that is transparent and public to examine the issue of blacklisting”.
+      Snippet #6:
+        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Blacklisted workers and trade unions are pressing for the issue to be included in the public inquiry headed by Pitchford. (See this for instance from the Blacklist Support Group).
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      (No summary produced)
+      ### Key-Fact Outline
+      
+      #### 1. Key Entities, Names, and Roles Involved
+      - **Labour Party**: Promises a full inquiry into blacklisting.
+      - **Miliband**: Leader of the Labour Party, referred to as calling blacklisting "odious."
+      - **Blacklist Support Group**: Advocates for the inclusion of blacklisting in the public inquiry.
+      - **Construction Site Workers**: Targeted for blacklisting, often union members who raised health-and-safety concerns.
+      - **Union Members**: Specifically targeted for blacklisting.
+      - **Top Building Firms**: Companies involved in the blacklisting practice.
+      - **Undercover Police**: Involved in surveillance and collusion.
+      - **Pitchford Inquiry**: A public inquiry into the Leveson Inquiry, which may be relevant to the blacklisting issue.
+      
+      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      - **No specific monetary amounts or legal rulings mentioned**.
+      
+      #### 3. Timeline of Events and Corroborating Evidence
+      1. **Date not specified**: Evidence of blacklisting emerged, revealing that companies were using secret information to blacklist workers.
+      2. **Date not specified**: The practice of blacklisting was found to target union activists and those who raised health-and-safety concerns.
+      3. **Date not specified**: Five years after the discovery of the blacklist, the full extent of the practice and the extent of undercover police surveillance and collusion remain unknown.
+      4. **Date not specified**: The Labour Party, through its leader Miliband, publicly denounced blacklisting as "odious."
+      5. **Date not specified**: Labour promised a full inquiry into the practice, emphasizing that it would be transparent and public.
+      6. **Date not specified**: Trade unions and blacklisted workers are advocating for the inclusion of the blacklisting issue in the Pitchford Inquiry.
+      
+      ### Summary
+      - **Key Entities**: Labour Party, Miliband, Blacklist Support Group, construction site workers, top building firms, undercover police, and the Pitchford Inquiry.
+      - **No Monetary Amounts or Legal Rulings**: The snippets do not provide any specific financial details or legal outcomes.
+      - **Timeline**: The timeline is not explicitly dated, but it spans from the initial discovery of blacklisting to the promise of a full inquiry by the Labour Party. The extent of the practice and the involvement of undercover police remain unclear.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------
-    Status : failed - no semantic snippets
+    Status : success
 
 ================================================================================
   END OF KNOWLEDGE RETRIEVAL FORENSIC LOG

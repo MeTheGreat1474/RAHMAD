@@ -26,7 +26,10 @@ class DebaterAgent:
             side_instruction = (
                 "Argue that the news report/claim is FABRICATED, DECEPTIVE, MISLEADING, or UNVERIFIED ('Fake News'). "
                 "Highlight discrepancies, lack of verifiable sourcing, out-of-context quotes, manipulative framing, "
-                "or signs of misinformation indicating the report cannot be trusted as factual truth."
+                "or signs of misinformation indicating the report cannot be trusted as factual truth. "
+                "CRITICAL CHEAPFAKE CHECK: If any photographic or visual context is discussed, examine whether the article "
+                "is deceptively pairing a genuine, real photograph with an unverified, misattributed, or speculative caption/claim "
+                "(Cheapfake / False Connection). Emphasize that an authentic photo alone does NOT prove an uncorroborated story."
             )
 
         speaker_instruction = ""

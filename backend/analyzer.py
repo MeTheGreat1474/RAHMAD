@@ -312,6 +312,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
                     f"Category: {ris_data['category']}\n"
                     f"Out-of-Context Imagery Detected: {ooc_status}\n"
                     f"Confidence: {ris_data.get('confidence', 'Medium')}\n"
+                    f"Entailment Scope: Authentic visual provenance confirms only that the media file is genuine and not recycled from an unrelated event; it does NOT independently corroborate unverified claims or speculative character attributions in the caption/text.\n"
                     f"Executive Evidence Summary for Judge:\n{exec_summary}"
                 )
             ris_runtime = time.perf_counter() - t_ris_start
