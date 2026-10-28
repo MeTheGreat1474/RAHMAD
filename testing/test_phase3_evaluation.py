@@ -231,6 +231,24 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
             print(f"  [RIS Cache] Loaded {len(ris_cache)} cached Reverse Image Search findings from {ris_cache_file.name}")
         except Exception as e:
             print(f"  [RIS Cache] Could not load RIS cache: {e}")
+
+    kr_cache_file = PROJECT_ROOT / "testing" / f".cache_kr_{checkpoint_prefix}.json"
+    kr_cache = {}
+    if kr_cache_file.exists():
+        try:
+            kr_cache = json.loads(kr_cache_file.read_text(encoding="utf-8"))
+            print(f"  [KR Cache] Loaded {len(kr_cache)} cached Knowledge Retrieval summaries from {kr_cache_file.name}")
+        except Exception as e:
+            print(f"  [KR Cache] Could not load KR cache: {e}")
+
+    mad_cache_file = PROJECT_ROOT / "testing" / f".cache_mad_{checkpoint_prefix}.json"
+    mad_cache = {}
+    if mad_cache_file.exists():
+        try:
+            mad_cache = json.loads(mad_cache_file.read_text(encoding="utf-8"))
+            print(f"  [MAD Cache] Loaded {len(mad_cache)} cached Multi-Agent Debate syntheses from {mad_cache_file.name}")
+        except Exception as e:
+            print(f"  [MAD Cache] Could not load MAD cache: {e}")
             
     checkpoint_file = PROJECT_ROOT / "testing" / f".checkpoint_{checkpoint_prefix}.json"
     checkpoint = {
@@ -289,11 +307,20 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
         
         # 2. Knowledge Retrieval (Retrieve real evidence or fallbacks)
         claim_query = text[:300].strip()
-        try:
-            kr_data = kr.retrieve_detailed(claim_query)
-            kr_summary = kr_data.get("summary", "")
-        except Exception as e:
-            kr_summary = f"Knowledge retrieval could not verify claim: {e}"
+        if str(idx) in kr_cache:
+            print(f"    [KR] Loaded verified Knowledge Retrieval summary from cache.")
+            kr_summary = kr_cache[str(idx)]
+        else:
+            try:
+                kr_data = kr.retrieve_detailed(claim_query)
+                kr_summary = kr_data.get("summary", "")
+            except Exception as e:
+                kr_summary = f"Knowledge retrieval could not verify claim: {e}"
+            kr_cache[str(idx)] = kr_summary
+            try:
+                kr_cache_file.write_text(json.dumps(kr_cache, indent=2), encoding="utf-8")
+            except Exception:
+                pass
             
         # 3. Reverse Image Search (Live Pipeline)
         ris_summary = ""
@@ -337,10 +364,19 @@ def run_ablation_and_pipeline(df_ablation: pd.DataFrame, ep: EarlyPredictor, jud
                 print(f"    [!] Could not save RIS cache: {e}")
         
         # 4. Multi-Agent Debate
-        try:
-            mad_summary, _ = mad.run_debate(text, kr_summary)
-        except Exception as e:
-            mad_summary = f"Multi-Agent Debate synthesis: Real and fake perspectives contested factual veracity ({e})."
+        if str(idx) in mad_cache:
+            print(f"    [MAD] Loaded verified Multi-Agent Debate synthesis from cache.")
+            mad_summary = mad_cache[str(idx)]
+        else:
+            try:
+                mad_summary, _ = mad.run_debate(text, kr_summary)
+            except Exception as e:
+                mad_summary = f"Multi-Agent Debate synthesis: Real and fake perspectives contested factual veracity ({e})."
+            mad_cache[str(idx)] = mad_summary
+            try:
+                mad_cache_file.write_text(json.dumps(mad_cache, indent=2), encoding="utf-8")
+            except Exception:
+                pass
             
         cleaned_llm_text = clean_for_llm(text)
         

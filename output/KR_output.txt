@@ -1,86 +1,92 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-27  22:11:17
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-28  08:56:58
 ================================================================================
 
 [1]  INPUT CLAIM
 ------------------------------------------------------------
-    Original Claim     : Labour promises full inquiry into 'odious' blacklisting of thousands of workers
+    Original Claim     : Four kidnapped polio workers are found dead in Pakistan
+
+Taliban militants oppose polio vaccination campaigns in Pakistan
     Execution Backend  : Local LLM
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 3
+    Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [WHITELISTED]   https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
-       2. [WHITELISTED]   https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
-       3. [WHITELISTED]   https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
+       1. [FILTERED OUT]  https://www.dailyexcelsior.com/2-polio-vaccinators-abducted-while-administering-drops-in-pakistans-khyber-pakhtunkhwa/
+       2. [FILTERED OUT]  https://tribune.com.pk/story/2630771/two-cops-guarding-polio-team-martyred-in-balochistans-noshki
+       3. [FILTERED OUT]  https://reliefweb.int/report/world/attacks-health-care-bi-monthly-news-brief-15-28-april-2026
+       4. [WHITELISTED]   https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
+       5. [WHITELISTED]   https://www.bbc.com/news/world-asia-36090891
+       6. [FILTERED OUT]  https://indianewengland.com/policeman-killed-four-injured-in-attack-on-polio-team-security-in-pakistan/
+       7. [WHITELISTED]   https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
+       8. [FILTERED OUT]  https://publicservices.international/resources/news/polio-workers-abducted-beaten-and-assaulted-in-pakistan?id=15405&lang=en
+       9. [FILTERED OUT]  https://ctc.westpoint.edu/the-pakistani-talibans-campaign-against-polio-vaccination/
+      10. [FILTERED OUT]  https://www.state.gov/reports/2023-report-on-international-religious-freedom/pakistan
 
     URLs Passing Whitelist : 3
-      1. https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
-      2. https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
-      3. https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
+      1. https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
+      2. https://www.bbc.com/news/world-asia-36090891
+      3. https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
     Articles Successfully Extracted : 2
-      1. Title  : On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian
-         Source : https://www.theguardian.com/uk-news/2015/feb/27/on-the-blacklist-building-firms-secret-information-on-workers
+      1. Title  : Pakistan polio: Seven killed in anti-vaccination attack - BBC News
+         Source : https://www.bbc.com/news/world-asia-36090891
          Date   : 
-      2. Title  : Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian
-         Source : https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans/2015/apr/30/labour-promise-full-inquiry-into-odious-blacklisting-of-thousands-of-workers
+      2. Title  : Pakistan poses global polio threat as violence against vaccination teams continues | PBS News
+         Source : https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
          Date   : 
 
     Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 1
-      1. Title  : Undercover, with Rob Evans and Paul Lewis + UK civil liberties
-         Source : https://www.theguardian.com/uk-news/undercover-with-paul-lewis-and-rob-evans+law/uk-civil-liberties
+      1. Title  : Suspected militants kill police officer assigned to guard polio team as nationwide campaign begins
+         Source : https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
          Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
     Snippets Passed : 6
       Snippet #1:
-        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] To this day, no blacklisting firm has made a public apology to the workers whose lives they ruined.
+        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] Pakistan is one of only two countries, along with Afghanistan, where polio remains endemic. Militants have repeatedly targeted vaccination programmes, killing nearly 80 people since December 2012.
       Snippet #2:
-        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] The effect was devastating. The worker had no idea their details were being checked and no way of seeing if the information was accurate. Blacklisting was a secret tool used by companies to keep out people they didn’t like. Those with files were often union members who had raised health-and-safety concerns. There had always been rumours about blacklisting but the files provided evidence.
+        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] February 2015: Four kidnapped polio workers found dead near Quetta
       Snippet #3:
-        [On the blacklist: how did the UK’s top building firms get secret information on their workers? | Undercover police and policing | The Guardian] Five years after a blacklist was found that singled out construction site workers for being union activists, the full extent of undercover police surveillance and collusion is still not known, and myriad questions remain
+        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] Pakistan is one of only two countries where polio remains endemic
       Snippet #4:
-        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Miliband has called blacklisting “odious”, adding that a Labour government would launch a full inquiry into the practice.
+        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] The violence has badly affected vaccination efforts. Of the three countries where polio is considered endemic, Afghanistan, Pakistan and Nigeria, more than half of the reported cases in 2013 were in Pakistan. WHO officials fear the Pakistani strains of polio will spread, with cases appearing in Syria.
       Snippet #5:
-        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Quite what form that inquiry would take is unclear. Labour is promising what it calls a “full inquiry that is transparent and public to examine the issue of blacklisting”.
+        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] The announcement came on the heels of one of the deadliest days of violence against vaccination workers. Three vaccination workers were killed Tuesday in the Qayyumabad area of Pakistan's largest city, Karachi. Another four workers were killed and two teams of workers were feared kidnapped in other parts of the city. Six police officers assigned to protect workers were killed when a bomb near a police van exploded, also killing a young boy.
       Snippet #6:
-        [Labour promises full inquiry into ‘odious’ blacklisting of thousands of workers | Undercover police and policing | The Guardian] Blacklisted workers and trade unions are pressing for the issue to be included in the public inquiry headed by Pitchford. (See this for instance from the Blacklist Support Group).
+        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] Following another string of deadly attacks on Polio vaccination teams by Taliban militant groups, the World Health Organization said Wednesday that Pakistan's polio crisis threatens to spread across the globe.
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
       ### Key-Fact Outline
       
-      #### 1. Key Entities, Names, and Roles Involved
-      - **Labour Party**: Promises a full inquiry into blacklisting.
-      - **Miliband**: Leader of the Labour Party, referred to as calling blacklisting "odious."
-      - **Blacklist Support Group**: Advocates for the inclusion of blacklisting in the public inquiry.
-      - **Construction Site Workers**: Targeted for blacklisting, often union members who raised health-and-safety concerns.
-      - **Union Members**: Specifically targeted for blacklisting.
-      - **Top Building Firms**: Companies involved in the blacklisting practice.
-      - **Undercover Police**: Involved in surveillance and collusion.
-      - **Pitchford Inquiry**: A public inquiry into the Leveson Inquiry, which may be relevant to the blacklisting issue.
+      #### Key Entities, Names, and Roles Involved
+      - **Pakistan**: Country where polio remains endemic.
+      - **Afghanistan**: Country where polio remains endemic.
+      - **Nigeria**: Country where polio remains endemic.
+      - **WHO (World Health Organization)**: Organization concerned with the global spread of polio.
+      - **Taliban Militants**: Groups opposing polio vaccination campaigns.
+      - **Polio Workers**: Individuals involved in polio vaccination efforts.
       
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **No specific monetary amounts or legal rulings mentioned**.
+      #### Monetary Amounts, Legal Rulings, or Official Outcomes
+      - None explicitly mentioned in the snippets.
       
-      #### 3. Timeline of Events and Corroborating Evidence
-      1. **Date not specified**: Evidence of blacklisting emerged, revealing that companies were using secret information to blacklist workers.
-      2. **Date not specified**: The practice of blacklisting was found to target union activists and those who raised health-and-safety concerns.
-      3. **Date not specified**: Five years after the discovery of the blacklist, the full extent of the practice and the extent of undercover police surveillance and collusion remain unknown.
-      4. **Date not specified**: The Labour Party, through its leader Miliband, publicly denounced blacklisting as "odious."
-      5. **Date not specified**: Labour promised a full inquiry into the practice, emphasizing that it would be transparent and public.
-      6. **Date not specified**: Trade unions and blacklisted workers are advocating for the inclusion of the blacklisting issue in the Pitchford Inquiry.
+      #### Timeline of Events and Corroborating Evidence
+      1. **Date not specified**: Pakistan is one of only two countries, along with Afghanistan, where polio remains endemic.
+      2. **December 2012 - February 2015**: Militants have repeatedly targeted vaccination programmes, killing nearly 80 people.
+      3. **February 2015**: Four kidnapped polio workers found dead near Quetta.
+      4. **February 2015**: Three vaccination workers were killed in the Qayyumabad area of Karachi.
+      5. **February 2015**: Four workers were killed and two teams of workers were feared kidnapped in other parts of Karachi.
+      6. **February 2015**: Six police officers assigned to protect workers were killed when a bomb near a police van exploded, also killing a young boy.
+      7. **February 2015**: The World Health Organization (WHO) announced that Pakistan's polio crisis threatens to spread across the globe.
       
       ### Summary
-      - **Key Entities**: Labour Party, Miliband, Blacklist Support Group, construction site workers, top building firms, undercover police, and the Pitchford Inquiry.
-      - **No Monetary Amounts or Legal Rulings**: The snippets do not provide any specific financial details or legal outcomes.
-      - **Timeline**: The timeline is not explicitly dated, but it spans from the initial discovery of blacklisting to the promise of a full inquiry by the Labour Party. The extent of the practice and the involvement of undercover police remain unclear.
+      The snippets provide evidence of ongoing violence against polio vaccination workers in Pakistan, particularly by Taliban militants. The attacks have resulted in the deaths of multiple individuals, including polio workers and police officers. The incidents occurred between December 2012 and February 2015, with a notable event being the discovery of four kidnapped polio workers found dead near Quetta in February 2015. The WHO has expressed concern about the spread of polio from Pakistan to other regions.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

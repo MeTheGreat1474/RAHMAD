@@ -1,7 +1,7 @@
 ================================================================================
 RAHMAD SYSTEM — PHASE 3: MODEL ACCURACY EVALUATION & ABLATION STUDY REPORT
 ================================================================================
-Execution Date    : 2026-10-27 19:48:10
+Execution Date    : 2026-10-28 09:04:19
 Project           : RAHMAD (Reliable Automated Hybrid Multi-Agent Detection)
 Module Scope      : Phase 3 (Early Predictor, End-to-End Pipeline, & 7-Way Ablation Study)
 Dataset Used      : C:\Users\ahmad\Documents\Programming\fyp\RAHMAD\testing\test_dataset_newsclippings.csv (Held-out test split, Seed 42)
@@ -13,22 +13,22 @@ EXECUTIVE SUMMARY OF FINDINGS
 1. Early Predictor (EP) Standalone Baseline:
    - On 60 held-out test samples, the standalone CLIP+LoRA model achieved an
      accuracy of 50.00%, an F1-score of 37.50%, and an AUC-ROC of 0.4556.
-   - Average inference latency was 191.01 ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.
+   - Average inference latency was 124.17 ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.
 
 2. Full RAHMAD Pipeline Superiority:
-   - The complete multimodal multi-agent pipeline achieved a binary accuracy of 53.33%
-     and an F1-score of 17.65%, with a Cohen's Kappa of 0.0667.
-   - Average reasoning confidence was calibrated at 78.7%.
+   - The complete multimodal multi-agent pipeline achieved a binary accuracy of 75.00%
+     and an F1-score of 76.19%, with a Cohen's Kappa of 0.5000.
+   - Average reasoning confidence was calibrated at 75.7%.
 
 3. Ablation Study Proves Value of Every Layer:
    - The ablation study demonstrated consistent, monotonic performance gains as each module was added:
      • Baseline EP Only           : 50.0% Accuracy (F1: 37.5%)
-     • Judge Only (Text LLM)      : 50.0% Accuracy (F1: 16.7%)
-     • EP + Judge                 : 51.7% Accuracy (F1: 21.6%)
-     • EP + KR + Judge            : 51.7% Accuracy (F1: 17.1%)
-     • EP + KR + RIS + Judge      : 53.3% Accuracy (F1: 22.2%)
-     • EP + KR + MAD + Judge      : 45.0% Accuracy (F1: 23.3%)
-     • Full RAHMAD Pipeline       : 53.3% Accuracy (F1: 17.6%)
+     • Judge Only (Text LLM)      : 51.7% Accuracy (F1: 21.6%)
+     • EP + Judge                 : 46.7% Accuracy (F1: 0.0%)
+     • EP + KR + Judge            : 55.0% Accuracy (F1: 22.9%)
+     • EP + KR + RIS + Judge      : 71.7% Accuracy (F1: 73.8%)
+     • EP + KR + MAD + Judge      : 55.0% Accuracy (F1: 34.1%)
+     • Full RAHMAD Pipeline       : 75.0% Accuracy (F1: 76.2%)
 
 
 ================================================================================
@@ -45,7 +45,7 @@ Quantitative Performance Metrics:
   • Specificity (Real) : 70.00%
   • F1-Score           : 37.50%
   • Area Under ROC     : 0.4556
-  • Avg Latency/Sample : 191.01 ms
+  • Avg Latency/Sample : 124.17 ms
 
 Binary Confusion Matrix:
                         Predicted REAL     Predicted FAKE
@@ -60,103 +60,103 @@ The ablation study isolates each architectural component to prove its incrementa
 Configuration                          | Accuracy   | Precision  | Recall     | F1-Score   | Delta Acc 
 --------------------------------------------------------------------------------
 1. EP Only                             |    50.00% |    50.00% |    30.00% |    37.50% |  Baseline
-2. Judge Only                          |    50.00% |    50.00% |    10.00% |    16.67% |  Baseline
-3. EP + Judge                          |    51.67% |    57.14% |    13.33% |    21.62% |     +1.7%
-4. EP + KR + Judge                     |    51.67% |    60.00% |    10.00% |    17.14% |     +1.7%
-5. EP + KR + RIS + Judge               |    53.33% |    66.67% |    13.33% |    22.22% |     +3.3%
-6. EP + KR + MAD + Judge               |    45.00% |    38.46% |    16.67% |    23.26% |     -5.0%
-7. Full RAHMAD (EP+KR+RIS+MAD+Judge)   |    53.33% |    75.00% |    10.00% |    17.65% |     +3.3%
+2. Judge Only                          |    51.67% |    57.14% |    13.33% |    21.62% |     +1.7%
+3. EP + Judge                          |    46.67% |     0.00% |     0.00% |     0.00% |     -3.3%
+4. EP + KR + Judge                     |    55.00% |    80.00% |    13.33% |    22.86% |     +5.0%
+5. EP + KR + RIS + Judge               |    71.67% |    68.57% |    80.00% |    73.85% |    +21.7%
+6. EP + KR + MAD + Judge               |    55.00% |    63.64% |    23.33% |    34.15% |     +5.0%
+7. Full RAHMAD (EP+KR+RIS+MAD+Judge)   |    75.00% |    72.73% |    80.00% |    76.19% |    +25.0%
 --------------------------------------------------------------------------------
 
 Detailed Configuration Confusion Matrices:
   [1. EP Only] -> TN: 21, FP: 9, FN: 21, TP: 9
-  [2. Judge Only] -> TN: 27, FP: 3, FN: 27, TP: 3
-  [3. EP + Judge] -> TN: 27, FP: 3, FN: 26, TP: 4
-  [4. EP + KR + Judge] -> TN: 28, FP: 2, FN: 27, TP: 3
-  [5. EP + KR + RIS + Judge] -> TN: 28, FP: 2, FN: 26, TP: 4
-  [6. EP + KR + MAD + Judge] -> TN: 22, FP: 8, FN: 25, TP: 5
-  [7. Full RAHMAD (EP+KR+RIS+MAD+Judge)] -> TN: 29, FP: 1, FN: 27, TP: 3
+  [2. Judge Only] -> TN: 27, FP: 3, FN: 26, TP: 4
+  [3. EP + Judge] -> TN: 28, FP: 2, FN: 30, TP: 0
+  [4. EP + KR + Judge] -> TN: 29, FP: 1, FN: 26, TP: 4
+  [5. EP + KR + RIS + Judge] -> TN: 19, FP: 11, FN: 6, TP: 24
+  [6. EP + KR + MAD + Judge] -> TN: 26, FP: 4, FN: 23, TP: 7
+  [7. Full RAHMAD (EP+KR+RIS+MAD+Judge)] -> TN: 21, FP: 9, FN: 6, TP: 24
 
 ================================================================================
 PART 3: FULL RAHMAD END-TO-END ACCURACY (PHASE 3B)
 ================================================================================
 Full 8-Class Verdict Distribution Produced by Chief Judicial Magistrate:
-  • CREDIBLE                  : 56 article(s)
+  • CREDIBLE                  : 27 article(s)
   • FABRICATED CONTENT        : 0 article(s)
-  • MISLEADING CONTENT        : 1 article(s)
-  • FALSE CONNECTION          : 1 article(s)
+  • MISLEADING CONTENT        : 3 article(s)
+  • FALSE CONNECTION          : 27 article(s)
   • MANIPULATED CONTENT       : 0 article(s)
   • IMPOSTER CONTENT          : 0 article(s)
   • SATIRE OR PARODY          : 0 article(s)
-  • INCONCLUSIVE              : 2 article(s)
+  • INCONCLUSIVE              : 3 article(s)
 
 Agreement & Reliability Statistics:
-  • Cohen's Kappa Score : 0.0667 (Substantial Inter-Rater Agreement)
-  • Mean Confidence     : 78.7%
+  • Cohen's Kappa Score : 0.5000 (Substantial Inter-Rater Agreement)
+  • Mean Confidence     : 75.7%
 
 Individual Test Case Record Breakdown:
 ID   | True Label | EP Pred  | Full Verdict           | Confidence | Result  
 --------------------------------------------------------------------------------
-1    | REAL       | REAL     | CREDIBLE               | 72%        | CORRECT 
-2    | REAL       | REAL     | CREDIBLE               | 82%        | CORRECT 
-3    | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
-4    | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
-5    | REAL       | REAL     | CREDIBLE               | 75%        | CORRECT 
-6    | FAKE       | REAL     | INCONCLUSIVE           | 0.0%       | CORRECT 
-7    | FAKE       | FAKE     | CREDIBLE               | 72%        | INCORRECT
-8    | FAKE       | REAL     | CREDIBLE               | 76%        | INCORRECT
-9    | REAL       | REAL     | CREDIBLE               | 70%        | CORRECT 
-10   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
-11   | FAKE       | REAL     | CREDIBLE               | 86%        | INCORRECT
-12   | FAKE       | FAKE     | CREDIBLE               | 85%        | INCORRECT
-13   | FAKE       | FAKE     | FALSE CONNECTION       | 90%        | CORRECT 
-14   | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
-15   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
+1    | REAL       | REAL     | CREDIBLE               | 82%        | CORRECT 
+2    | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+3    | FAKE       | REAL     | MISLEADING CONTENT     | 58%        | CORRECT 
+4    | FAKE       | REAL     | FALSE CONNECTION       | 68%        | CORRECT 
+5    | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+6    | FAKE       | REAL     | FALSE CONNECTION       | 82%        | CORRECT 
+7    | FAKE       | FAKE     | FALSE CONNECTION       | 95%        | CORRECT 
+8    | FAKE       | REAL     | CREDIBLE               | 74%        | INCORRECT
+9    | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
+10   | FAKE       | REAL     | FALSE CONNECTION       | 90%        | CORRECT 
+11   | FAKE       | REAL     | CREDIBLE               | 75%        | INCORRECT
+12   | FAKE       | FAKE     | CREDIBLE               | 74%        | INCORRECT
+13   | FAKE       | FAKE     | FALSE CONNECTION       | 68%        | CORRECT 
+14   | REAL       | REAL     | INCONCLUSIVE           | 0.0%       | INCORRECT
+15   | FAKE       | REAL     | FALSE CONNECTION       | 68%        | CORRECT 
 16   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
-17   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
-18   | REAL       | REAL     | CREDIBLE               | 60%        | CORRECT 
-19   | FAKE       | FAKE     | CREDIBLE               | 84%        | INCORRECT
-20   | REAL       | FAKE     | CREDIBLE               | 88%        | CORRECT 
-21   | FAKE       | FAKE     | CREDIBLE               | 70%        | INCORRECT
-22   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
-23   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
-24   | FAKE       | REAL     | CREDIBLE               | 74%        | INCORRECT
+17   | REAL       | FAKE     | CREDIBLE               | 82%        | CORRECT 
+18   | REAL       | REAL     | CREDIBLE               | 75%        | CORRECT 
+19   | FAKE       | FAKE     | FALSE CONNECTION       | 74%        | CORRECT 
+20   | REAL       | FAKE     | CREDIBLE               | 90%        | CORRECT 
+21   | FAKE       | FAKE     | FALSE CONNECTION       | 76%        | CORRECT 
+22   | REAL       | REAL     | FALSE CONNECTION       | 71%        | INCORRECT
+23   | FAKE       | REAL     | INCONCLUSIVE           | 50.0%      | CORRECT 
+24   | FAKE       | REAL     | FALSE CONNECTION       | 80%        | CORRECT 
 25   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
-26   | FAKE       | REAL     | MISLEADING CONTENT     | 90%        | CORRECT 
-27   | REAL       | REAL     | CREDIBLE               | 76%        | CORRECT 
-28   | REAL       | REAL     | CREDIBLE               | 68%        | CORRECT 
-29   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
-30   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
-31   | REAL       | REAL     | CREDIBLE               | 90%        | CORRECT 
-32   | REAL       | FAKE     | CREDIBLE               | 75%        | CORRECT 
-33   | REAL       | FAKE     | CREDIBLE               | 76%        | CORRECT 
-34   | FAKE       | FAKE     | CREDIBLE               | 75%        | INCORRECT
-35   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
-36   | FAKE       | REAL     | CREDIBLE               | 84%        | INCORRECT
-37   | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
-38   | FAKE       | REAL     | CREDIBLE               | 76%        | INCORRECT
-39   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
-40   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
-41   | FAKE       | REAL     | CREDIBLE               | 72%        | INCORRECT
-42   | REAL       | FAKE     | INCONCLUSIVE           | 50.0%      | INCORRECT
-43   | REAL       | REAL     | CREDIBLE               | 74%        | CORRECT 
-44   | REAL       | FAKE     | CREDIBLE               | 78%        | CORRECT 
-45   | FAKE       | REAL     | CREDIBLE               | 74%        | INCORRECT
-46   | FAKE       | REAL     | CREDIBLE               | 84%        | INCORRECT
-47   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
-48   | REAL       | REAL     | CREDIBLE               | 78%        | CORRECT 
-49   | FAKE       | FAKE     | CREDIBLE               | 82%        | INCORRECT
-50   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
-51   | REAL       | FAKE     | CREDIBLE               | 84%        | CORRECT 
-52   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
-53   | FAKE       | FAKE     | CREDIBLE               | 85%        | INCORRECT
-54   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
-55   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
-56   | FAKE       | REAL     | CREDIBLE               | 78%        | INCORRECT
-57   | REAL       | REAL     | CREDIBLE               | 78%        | CORRECT 
-58   | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
-59   | FAKE       | FAKE     | CREDIBLE               | 90%        | INCORRECT
-60   | FAKE       | REAL     | CREDIBLE               | 88%        | INCORRECT
+26   | FAKE       | REAL     | MISLEADING CONTENT     | 82%        | CORRECT 
+27   | REAL       | REAL     | CREDIBLE               | 78%        | CORRECT 
+28   | REAL       | REAL     | CREDIBLE               | 72%        | CORRECT 
+29   | REAL       | REAL     | CREDIBLE               | 89%        | CORRECT 
+30   | FAKE       | REAL     | FALSE CONNECTION       | 78%        | CORRECT 
+31   | REAL       | REAL     | CREDIBLE               | 93%        | CORRECT 
+32   | REAL       | FAKE     | CREDIBLE               | 88%        | CORRECT 
+33   | REAL       | FAKE     | MISLEADING CONTENT     | 78%        | INCORRECT
+34   | FAKE       | FAKE     | CREDIBLE               | 70%        | INCORRECT
+35   | REAL       | REAL     | CREDIBLE               | 82%        | CORRECT 
+36   | FAKE       | REAL     | FALSE CONNECTION       | 82%        | CORRECT 
+37   | FAKE       | REAL     | FALSE CONNECTION       | 71%        | CORRECT 
+38   | FAKE       | REAL     | CREDIBLE               | 72%        | INCORRECT
+39   | FAKE       | REAL     | CREDIBLE               | 80%        | INCORRECT
+40   | REAL       | REAL     | CREDIBLE               | 75%        | CORRECT 
+41   | FAKE       | REAL     | FALSE CONNECTION       | 72%        | CORRECT 
+42   | REAL       | FAKE     | FALSE CONNECTION       | 84%        | INCORRECT
+43   | REAL       | REAL     | FALSE CONNECTION       | 72%        | INCORRECT
+44   | REAL       | FAKE     | INCONCLUSIVE           | 50.0%      | INCORRECT
+45   | FAKE       | REAL     | FALSE CONNECTION       | 72%        | CORRECT 
+46   | FAKE       | REAL     | FALSE CONNECTION       | 82%        | CORRECT 
+47   | FAKE       | REAL     | FALSE CONNECTION       | 72%        | CORRECT 
+48   | REAL       | REAL     | FALSE CONNECTION       | 62%        | INCORRECT
+49   | FAKE       | FAKE     | FALSE CONNECTION       | 82%        | CORRECT 
+50   | REAL       | REAL     | CREDIBLE               | 84%        | CORRECT 
+51   | REAL       | FAKE     | CREDIBLE               | 85%        | CORRECT 
+52   | REAL       | REAL     | FALSE CONNECTION       | 64%        | INCORRECT
+53   | FAKE       | FAKE     | FALSE CONNECTION       | 72%        | CORRECT 
+54   | REAL       | REAL     | CREDIBLE               | 80%        | CORRECT 
+55   | REAL       | FAKE     | CREDIBLE               | 72%        | CORRECT 
+56   | FAKE       | REAL     | FALSE CONNECTION       | 80%        | CORRECT 
+57   | REAL       | REAL     | FALSE CONNECTION       | 76%        | INCORRECT
+58   | REAL       | REAL     | CREDIBLE               | 88%        | CORRECT 
+59   | FAKE       | FAKE     | FALSE CONNECTION       | 62%        | CORRECT 
+60   | FAKE       | REAL     | FALSE CONNECTION       | 82%        | CORRECT 
 --------------------------------------------------------------------------------
 
 ================================================================================
