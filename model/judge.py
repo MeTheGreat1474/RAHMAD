@@ -146,7 +146,7 @@ deceptive intent. Treat as neutral visual evidence.
       - 'Inconclusive / Insufficient Evidence': Ambiguous visual provenance; rely \
 primarily on textual and debate evidence.
 
-      CRITICAL CAVEAT (THE CHEAPFAKE / FALSE CONNECTION PRINCIPLE):
+      CRITICAL CAVEAT 1 (AUTHENTIC PHOTO ≠ CREDIBLE TEXT):
       An authentic photograph does NOT certify that the textual claims, captions, or attributions \
 are true. Deceptive actors frequently pair genuine historical or wire photos with unverified, \
 speculative, or false narratives (Cheapfakes / False Connection). An authentic image only proves that \
@@ -154,6 +154,16 @@ the media file itself is not digitally altered or recycled from an unrelated eve
 claims remain uncorroborated by Knowledge Retrieval (KR) or are challenged as speculative/unverified \
 in Debate (MAD), you MUST critically assess whether the article creates a FALSE CONNECTION or \
 MISLEADING CONTENT, and NEVER default to CREDIBLE simply because the photograph is authentic.
+
+      CRITICAL CAVEAT 2 (AUTHENTIC TEXT ≠ DECONTEXTUALIZED PHOTO EXCUSE):
+      Conversely, factually accurate or plausible text does NEVER excuse an out-of-context, \
+recycled, or misattributed photograph. Whenever Reverse Image Search detects \
+'Out-of-Context Imagery Detected: YES (Decontextualized / Misattributed)' \
+(indicating that an unrelated image was attached to depict a news story), this is the textbook \
+definition of a FALSE CONNECTION (Cheapfake). You are STRICTLY FORBIDDEN from classifying \
+such an article as CREDIBLE. A CREDIBLE classification requires BOTH the text claims AND the \
+visual accompaniment to be authentically aligned. When the image is demonstrably out-of-context, \
+you MUST classify as FALSE CONNECTION or MISLEADING CONTENT.
 
   P9. INCORPORATE MULTI-AGENT DEBATE PERSPECTIVES
       If debate analysis findings are provided, use them to understand \
@@ -265,10 +275,12 @@ against the verified external news reports. State clearly if \
 external news corroborates, refutes, or is absent for the claims.
     2. Reverse Image Search: If Reverse Image Search evidence is provided, check the \
 explicit 'Out-of-Context Imagery Detected' status and category. If marked as \
-'Out-of-Context (Misattributed / Recycled)' (recycled from a different time/place/event), \
-you MUST strongly consider a FALSE CONNECTION or MISLEADING CONTENT verdict. \
-If marked as 'Authentic Context / Matching Event', do NOT penalize an article \
-simply because syndicated outlets or photo agencies rephrase headlines for the same real-world event. \
+'Out-of-Context (Misattributed / Recycled)' (recycled from a different time/place/event or topical mismatch), \
+you MUST classify as FALSE CONNECTION or MISLEADING CONTENT. You are STRICTLY FORBIDDEN from classifying \
+it as CREDIBLE, even if the text claims are factually verified or plausible. In multimodal fact-checking, \
+pairing a mismatched or recycled photo with a story is the literal definition of FALSE CONNECTION (Cheapfake). \
+If marked as 'Authentic Context / Matching Event' or 'Generic / Illustrative Imagery', do NOT penalize an article \
+simply because syndicated outlets or photo agencies rephrase headlines for the same real-world event or use acknowledged file/illustrative photos. \
 HOWEVER, you must perform an Image-to-Text Entailment check: does the authentic image actually \
 substantiate the specific claims or named identities in the text? If an authentic photo is paired \
 with uncorroborated, speculative, or fabricated text claims, classify as FALSE CONNECTION or \
@@ -646,7 +658,10 @@ class Judge:
 
                 resp_json = response.json()
                 if "choices" in resp_json and len(resp_json["choices"]) > 0:
-                    content = resp_json["choices"][0]["message"]["content"]
+                    msg = resp_json["choices"][0].get("message", {})
+                    content = msg.get("content")
+                    if content is None:
+                        content = msg.get("reasoning") or ""
                     log.info(f"[Judge] Response received ({len(content)} chars) from model {model}.")
                     print(f"  [Judge] [OK] Verdict response received from '{model}' ({len(content)} chars).")
                     self.last_raw_response = content
@@ -850,6 +865,44 @@ class Judge:
             "links": [],
         }
 
+    @staticmethod
+    def _enforce_constitutional_guardrails(result: dict, ris_summary: str, ep_result: dict) -> dict:
+        """
+        Constitutional Principle P8 Enforcement:
+        A factually accurate text narrative never excuses a decontextualized / recycled image.
+        If Reverse Image Search confirms 'Out-of-Context Imagery Detected: YES (Decontextualized / Misattributed)'
+        with High confidence (or Medium confidence when Early Predictor flags Fake), an article cannot be CREDIBLE.
+        Attaching an unrelated or recycled photo to news text is the definition of FALSE CONNECTION (Cheapfake).
+        """
+        if not ris_summary or not isinstance(result, dict):
+            return result
+
+        verdict = result.get("verdict", "")
+        if verdict == "CREDIBLE":
+            summary_lower = ris_summary.lower()
+            is_ooc = "out-of-context imagery detected: yes" in summary_lower
+
+            if is_ooc:
+                log.warning(
+                    "[Judge] Constitutional Principle P8 Enforcement: Overriding CREDIBLE verdict to FALSE CONNECTION "
+                    "due to verified decontextualized / out-of-context imagery."
+                )
+                result["verdict"] = "FALSE CONNECTION"
+                result["color_class"] = "false-connection"
+                p8_note = (
+                    " **[Constitutional Principle P8 Guardrail]**: While the textual claims appear plausible or grounded, "
+                    "Reverse Image Search forensic checks confirmed that the accompanying visual is decontextualized or "
+                    "recycled from an unrelated event. Under multimodal fact-checking standards, attaching an unrelated image "
+                    "to news claims constitutes a **FALSE CONNECTION** (Cheapfake)."
+                )
+                result["justification"] = (result.get("justification", "").strip() + p8_note).strip()
+                facts = result.get("key_facts", [])
+                if isinstance(facts, list):
+                    facts.append("Visual forensic analysis confirmed out-of-context imagery, resulting in a **False Connection** verdict.")
+                    result["key_facts"] = facts
+
+        return result
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -883,6 +936,7 @@ class Judge:
             user_message = self._build_user_message(llm_text, ep_result, external_knowledge, ris_summary, mad_summary)
             raw_response = self._call_api(user_message)
             result       = self._parse_response(raw_response)
+            result       = self._enforce_constitutional_guardrails(result, ris_summary, ep_result)
 
             log.info(
                 f"[Judge] Final verdict: {result['verdict']} "
@@ -997,6 +1051,7 @@ class Judge:
             )
 
         aggregated = self._aggregate_verdicts(results)
+        aggregated = self._enforce_constitutional_guardrails(aggregated, ris_summary, ep_result)
         aggregated["ep_signal"] = ep_result
         return aggregated
 
@@ -1111,6 +1166,7 @@ class Judge:
                 system_prompt=_CHIEF_JUDGE_PROMPT,
             )
             result = self._parse_response(chief_raw)
+            result = self._enforce_constitutional_guardrails(result, ris_summary, ep_result)
             result["ep_signal"] = ep_result
             result["panel_details"] = specialist_results
             self.last_user_message = chief_user_message

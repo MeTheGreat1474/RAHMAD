@@ -484,19 +484,22 @@ class ReverseImageSearchPipeline:
             "You are an expert fact-checker and visual forensic analyst specializing in reverse image search and media authenticity verification.\n"
             "Your task is to determine whether an image found online is being used in an AUTHENTIC context or a DECONTEXTUALIZED (Out-of-Context / Misattributed) manner.\n\n"
             "CRITICAL JOURNALISTIC & FACT-CHECKING RULES:\n"
-            "1. REAL-WORLD PHOTOJOURNALISM STANDARDS:\n"
-            "   - News articles frequently pair broad event headlines (e.g. 'Wildfire emissions surge in Indonesia') with authentic on-the-ground photos of that event (e.g. 'Firefighters douse flames in Sumatra', 'Peatland smoke over Borneo'). This is AUTHENTIC editorial coverage of the event, NOT out-of-context deception!\n"
+            "1. REAL-WORLD PHOTOJOURNALISM & ACKNOWLEDGED FILE/STOCK PHOTOS:\n"
+            "   - News articles frequently pair broad event headlines (e.g. 'Wildfire emissions surge in Indonesia') with authentic on-the-ground photos of that event (e.g. 'Firefighters douse flames in Sumatra'). This is AUTHENTIC editorial coverage of the event, NOT out-of-context deception!\n"
             "   - Syndication & Rephrasing: Outlets (Reuters, SCMP, CNN, AP, local news) routinely rephrase headlines or license the same wire photo from agencies (Reuters Connect, Getty Images, AFP). This represents the SAME authentic event.\n"
-            "   - Do NOT be pedantic about phrasing differences. If the image depicts the same incident, disaster, subject matter, or news event described in the claim, it is MATCHING.\n\n"
-            "2. TRUE OUT-OF-CONTEXT (DECONTEXTUALIZED) CRITERIA:\n"
-            "   - Mark as 'Out-of-Context (Misattributed / Recycled)' ONLY if the image is demonstrably recycled from a COMPLETELY DIFFERENT event, a DIFFERENT historical year/time period (e.g. using a 2015 or 2017 fire photo to represent a 2026 event), or an entirely DIFFERENT geographic location/incident (e.g. showing California fires and claiming it is Indonesia).\n\n"
-            "3. WEIGHING EVIDENCE (SOURCE COUNTING):\n"
+            "   - Acknowledged File / Illustrative Photos: Mainstream news outlets (e.g. The Guardian, BBC, Reuters) routinely use file photos, archival pictures, or illustrative scenes when the caption or text explicitly acknowledges what the photo portrays (e.g. 'file photo', 'Gambling tables at Venetian Macau', 'People wave flags at handover party', 'Demonstrators during People's Climate March', 'Calendar Girls which was filmed in Yorkshire') or depicts the general setting (e.g. a French town/park for a French story, filming camera for a film studio story). If the caption or text explicitly acknowledges the visual context or uses it as a standard non-deceptive scene illustration, classify as 'Generic / Illustrative Imagery' or 'Authentic Context / Matching Event' with 'is_out_of_context': false.\n\n"
+            "2. TOPICAL ENTITY MISMATCH vs GENERIC ILLUSTRATION (CHEAPFAKES):\n"
+            "   - An image qualifies as 'Generic / Illustrative Imagery' ONLY IF its subject matter corresponds to the conceptual theme of the article (e.g., banknotes for banking, generic hospital for healthcare, smoke for wildfire reports).\n"
+            "   - If the image depicts an entity, animal, or domain completely foreign and unrelated to the story (e.g. an adder snake for a TV awards or big-cat story; Japanese pachinko machines for Android updates or Australian casino legislation; an auto manufacturing plant for climate change reports), this is NOT a generic illustration for that article! It is a TOPICAL MISMATCH / CHEAPFAKE, and MUST be classified as 'Out-of-Context (Misattributed / Recycled)' with 'is_out_of_context': true.\n\n"
+            "3. TRUE OUT-OF-CONTEXT (DECONTEXTUALIZED) CRITERIA:\n"
+            "   - Mark as 'Out-of-Context (Misattributed / Recycled)' when the image is demonstrably recycled from a completely different event, unrelated year/time period, or different geographic incident to fabricate or mislead readers about an event, or when an unrelated entity/photo is attached as a cheapfake.\n\n"
+            "4. WEIGHING EVIDENCE (SOURCE COUNTING):\n"
             "   - Explicitly count and evaluate the number of retrieved contexts that support the image being Authentic vs. those that suggest it is Out-Of-Context.\n"
-            "   - If the majority of sources align with the claim's event, heavily weight this toward 'Authentic Context', even if a minority of sources show it used elsewhere (which could be due to other outlets misusing it or loose search filtering).\n\n"
-            "4. CATEGORIES (Choose EXACTLY ONE):\n"
+            "   - If the majority of sources align with the claim's event, heavily weight this toward 'Authentic Context', even if a minority of sources show it used elsewhere.\n\n"
+            "5. CATEGORIES (Choose EXACTLY ONE):\n"
             "   - 'Authentic Context / Matching Event': The image depicts the actual event, disaster, location, or subject matter discussed in the claim, including syndicated reporting, photo agency catalog listings, and on-the-ground photojournalism of that event.\n"
-            "   - 'Out-of-Context (Misattributed / Recycled)': The image is recycled from a different historical time, different event, or unrelated location to fabricate or distort the current claim.\n"
-            "   - 'Generic / Illustrative Imagery': The image is a generic stock photo, symbolic graphic, or general illustration (e.g. generic forest, flame silhouette) with no deceptive intent about a specific historical event.\n"
+            "   - 'Out-of-Context (Misattributed / Recycled)': The image is recycled from a different historical time, different event, unrelated location, or foreign entity to fabricate or distort the current claim.\n"
+            "   - 'Generic / Illustrative Imagery': The image is a relevant thematic stock photo, symbolic graphic, or acknowledged file/archival photo with no deceptive intent.\n"
             "   - 'Inconclusive / Insufficient Evidence': The retrieved image matches provide insufficient contextual details to definitively determine provenance.\n\n"
             "Output your response strictly in valid JSON format with keys:\n"
             "{\n"
@@ -564,12 +567,12 @@ class ReverseImageSearchPipeline:
                         raw_cat = parsed.get("category", "")
                         cat_lower = str(raw_cat).lower()
                         
-                        if "authentic" in cat_lower or "matching" in cat_lower or "identical source" in cat_lower:
-                            category = "Authentic Context / Matching Event"
-                            is_ooc = False
-                        elif "out-of-context" in cat_lower or "recycled" in cat_lower or "misattributed" in cat_lower or "different context" in cat_lower:
+                        if "out-of-context" in cat_lower or "recycled" in cat_lower or "misattributed" in cat_lower or "different context" in cat_lower:
                             category = "Out-of-Context (Misattributed / Recycled)"
                             is_ooc = True
+                        elif "authentic" in cat_lower or "matching" in cat_lower or "identical source" in cat_lower:
+                            category = "Authentic Context / Matching Event"
+                            is_ooc = False
                         elif "generic" in cat_lower or "illustrative" in cat_lower:
                             category = "Generic / Illustrative Imagery"
                             is_ooc = False
@@ -577,8 +580,14 @@ class ReverseImageSearchPipeline:
                             category = "Inconclusive / Insufficient Evidence"
                             is_ooc = False
                             
+                        # If LLM explicitly specified a boolean that is consistent
                         if "is_out_of_context" in parsed and isinstance(parsed["is_out_of_context"], bool):
-                            is_ooc = parsed["is_out_of_context"]
+                            if category == "Out-of-Context (Misattributed / Recycled)":
+                                is_ooc = True
+                            elif category in ("Authentic Context / Matching Event", "Generic / Illustrative Imagery"):
+                                is_ooc = False
+                            else:
+                                is_ooc = parsed["is_out_of_context"]
                             
                         confidence = parsed.get("confidence", "High" if "authentic" in cat_lower or is_ooc else "Medium")
                         summary = parsed.get("summary", content.strip())

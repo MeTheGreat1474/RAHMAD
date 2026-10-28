@@ -1,0 +1,167 @@
+[
+  {
+    "id": 8,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "74%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "80%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article pairs a **plausible-sounding Black Friday price claim** (**Roku SE at $25**) with a **recycled, misattributed image** \u2014 Reverse Image Search shows the photo actually depicts a **Roku box from a Google Chromecast launch context**, not a Black Friday tech deal. This visual-to-text mismatch is the textbook definition of a **FALSE CONNECTION (Cheapfake)**. Compounding this, the article provides **no named retailer, no date, and no sourcing** for the $25 figure, and the headline promises a broad deals roundup while the body delivers only a single fragmentary line. Debate shows the price is historically plausible, and external knowledge retrieval confirms Black Friday Roku discounts exist, but neither corroborates the **specific $25 claim or the attached image**. The Early Predictor signal was essentially neutral (6.7% confidence), so the verdict rests on the clear **image decontextualization** and weak attribution."
+  },
+  {
+    "id": 11,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "75%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "82%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article's core claim \u2014 that **Campbell Newman** advocated for up to **three new mega casinos in Queensland** to attract high-rolling Asian tourists \u2014 is corroborated by verified external news reports, so the text itself is not fabricated. However, **Reverse Image Search shows the accompanying gambling-tables photograph is out-of-context and misattributed**: the same generic casino-floor image appears in unrelated articles about **pachinko in Japan** and a manufacturing guide, and the caption itself labels it as **'Gambling tables at Venetian Macau'** while the story is about Queensland. Pairing a recycled, unrelated casino photo with a Queensland policy story is the textbook definition of a **false connection**, designed to make a thin headline look visually substantiated. Debate analysis likewise rated the piece **'Mixed'**, noting credible core claims but no verifiable sourcing or original imagery in the article itself, and the Early Predictor's REAL label carried only **9% confidence**, offering no meaningful counterweight."
+  },
+  {
+    "id": 12,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "74%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "88%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article's text about a **young male jaguar born on April 26 in San Diego** is plausible and debate shows some support from **San Diego Zoo records** and expert testimony. However, Reverse Image Search shows the accompanying image is **out-of-context, misattributed, and recycled**, repeatedly appearing in unrelated contexts about **adders in Europe**. Because the visual does not authentically document the specific San Diego jaguar story, this is a **false connection**. External knowledge retrieval found verified reporting but could not extract full text, and the Early Predictor signal was near-uncertain, so the visual mismatch is the decisive factor."
+  },
+  {
+    "id": 14,
+    "true_label": "REAL",
+    "old_verdict": "INCONCLUSIVE",
+    "old_conf": "0.0%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "76%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The written claims in this article are largely **corroborated by verified external news reports**, which confirm that a woman working as door staff at the **Slug and Lettuce pub in Woking** was shot in the eye with a **BB gun pellet** and that the incident was **referred to the Independent Police Complaints Commission**. However, **Reverse Image Search shows the accompanying BB gun photograph is out-of-context and recycled**, appearing across multiple unrelated sources with no link to the Woking/Knaphill incident. Pairing a genuine but unrelated image with a real news story is the textbook pattern of a **FALSE CONNECTION (cheapfake)**, which prevents a CREDIBLE classification. The **Early Predictor signal was near-random (0.4933, 1.3% confidence)** and the **debate was split**, with one side noting the lack of direct official documentation for the BB gun's recovery. The verdict therefore rests on the demonstrable mismatch between the article's visual and its subject matter."
+  },
+  {
+    "id": 22,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "71%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "78%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The article's core textual claim \u2014 that **Campbell Newman** planned new casinos in **Queensland** to attract **Asian high-rollers** \u2014 is genuinely corroborated by verified independent news reporting, so this is not fabricated content. However, **Reverse Image Search shows the gambling-tables photo is out-of-context**, a generic casino image used across unrelated sources with **no demonstrated link to Newman, Brisbane, or Queensland's casino plan**, while the caption implies it depicts something directly relevant to that story. Pairing a substantively accurate headline with a **decontextualized visual** is the textbook definition of a **FALSE CONNECTION**. The **headline also overstates** the scale (\"three\" casinos versus verified reporting of \"up to three\"), compounding the mismatch between what is shown and what is claimed. The Debate is split, with the Real News side citing government strategy documents and corporate filings, and the Fake News side correctly flagging the unverified imagery."
+  },
+  {
+    "id": 33,
+    "true_label": "REAL",
+    "old_verdict": "MISLEADING CONTENT",
+    "old_conf": "78%",
+    "new_verdict": "CREDIBLE",
+    "new_conf": "82%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article reports a specific, verifiable award win by **BBC3** for **\"Murdered By My Boyfriend\"** at the **RTS awards**. Debate analysis shows the Real News side confirmed this through official announcements and multiple reputable outlets, while the Fake News side only questioned the contextual **\"threat of closure\"** framing without disproving the core claim. The writing is **neutral and factual**, the headline and body align, and Reverse Image Search shows the accompanying image is **generic/illustrative with authentic context**, not recycled or deceptive. The Early Predictor signal is essentially a **coin flip** and provides no meaningful evidence of misinformation. No misinformation patterns were detected across style, sourcing, framing, or visual provenance."
+  },
+  {
+    "id": 34,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "70%",
+    "new_verdict": "INCONCLUSIVE",
+    "new_conf": "50.0%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": ""
+  },
+  {
+    "id": 38,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "72%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "80%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article's written claims are well-corroborated: verified external news reports confirm that **Toyota Australia** sought to change its enterprise agreement, that the **union** contested it, that Treasurer **Joe Hockey** said the union was 'at war' with Toyota, and that the **Coalition government** joined the federal court appeal. The headline, body, and named sources are internally consistent, and the Early Predictor signal is a near-neutral **REAL** reading with only 2.5% confidence. However, Reverse Image Search shows the accompanying photograph is **out-of-context and recycled** \u2014 a Toyota Australia plant image lifted from coverage of the **VW emissions scandal** \u2014 meaning the visual does not authentically document the enterprise-agreement dispute it is attached to. Pairing a decontextualised image with an otherwise accurate story is the defining pattern of a **FALSE CONNECTION**, so the article cannot be rated CREDIBLE despite its sound text."
+  },
+  {
+    "id": 39,
+    "true_label": "FAKE",
+    "old_verdict": "CREDIBLE",
+    "old_conf": "80%",
+    "new_verdict": "CREDIBLE",
+    "new_conf": "78%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "This reads as a genuine **Guardian climate report** built on a specific, documented event \u2014 the **November 2010 flooding of Lostwithiel, Cornwall** \u2014 to illustrate the broader, evidence-backed warning that **climate change is increasing UK flood risk and hitting the poorest hardest**. External knowledge retrieval shows the underlying claims align with verified reporting: **Met Office** records, **\u00a3800m** in farmer losses, and climate-driven inflation and food-price effects. Reverse Image Search shows the accompanying flood photograph is **generic/illustrative with no out-of-context use**, so there is no deceptive visual pairing. The tone, framing, sourcing, and headline-to-caption alignment are all consistent with legitimate news reporting, and the debate's 'Fake News' arguments relied on premises contradicted by the historical record. The Early Predictor signal also leaned toward **Real**. Minor defects (a duplicated 'on on') are editorial, not deceptive."
+  },
+  {
+    "id": 42,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "84%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "82%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The article's **headline ('Olympics closing ceremony')** does not match its own caption or its image, which Reverse Image Search shows is a genuine photograph from the **2008 Olympics handover party outside Buckingham Palace** \u2014 a different event from the closing ceremony. This headline-to-image mismatch is the defining pattern of a **false connection**, where an authentic photo is paired with an inaccurate event label to shape reader assumptions. Debate shows the flag-waving scene itself is real, but the **Fake News side correctly identifies the caption and headline as out of context**, and no verified external news reports corroborate the 'official handover party' framing. The Early Predictor signal leans fake but only weakly, so the verdict rests primarily on the visual-provenance mismatch and the internal inconsistency between headline and body."
+  },
+  {
+    "id": 43,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "72%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "82%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The article's headline promises a specific local story \u2014 a **Peterhead firm losing an order** \u2014 but the body never names the firm, the order, the buyer, or any official source, reducing the piece to a generic statement that **Russia sanctioned EU producers**. Most decisively, Reverse Image Search shows the accompanying photograph is **out-of-context imagery**, depicting **Russian government meetings and Vladimir Putin** with no demonstrable link to any Peterhead business or lost contract. Pairing an unrelated, recycled photo with an unverified local claim is the textbook pattern of a **FALSE CONNECTION (Cheapfake)**. Debate analysis likewise concluded the report lacks the specifics needed for verification, and the Early Predictor signal was near-neutral and low-confidence, adding no support. Because the visual accompaniment is demonstrably misattributed, a CREDIBLE classification is precluded regardless of the plausibility of the broader sanctions narrative."
+  },
+  {
+    "id": 44,
+    "true_label": "REAL",
+    "old_verdict": "INCONCLUSIVE",
+    "old_conf": "50.0%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "78%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The article's text is largely plausible \u2014 the **~40% 'not too worried' statistic** is attributed to the reputable **Pew Research Center**, and the tone is measured and non-sensational. However, **Reverse Image Search shows the photograph is Out-of-Context (Misattributed / Recycled)**: it depicts the **2014 People's Climate March**, not a current event, yet it is paired with a headline about **present-day** American climate sentiment. This temporal mismatch creates a misleading visual-to-text connection, which is the defining characteristic of a **FALSE CONNECTION**. Debate analysis further highlights that the 2014 image and the polling data may be **outdated relative to current opinion**, reinforcing the misleading framing. Because the visual is demonstrably decontextualized, the article cannot be classified as credible despite the plausibility of its text."
+  },
+  {
+    "id": 48,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "62%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "82%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The article pairs a serious crime report \u2014 a **French care worker charged with killing six pensioners** at the **Cesalet retirement home in JacobBellecombette** \u2014 with a photograph that Reverse Image Search shows is **Out-of-Context (Misattributed / Recycled)** with high confidence, depicting an **esplanade along Lake du Bouget** that has nothing to do with the case. This mismatch between the visual and the story is the textbook definition of a **FALSE CONNECTION (Cheapfake)**. While the Debate shows the underlying incident may be genuine and the Early Predictor signal weakly leans REAL, the decontextualized image is decisive and prevents a CREDIBLE classification. External knowledge retrieval returned no verified corroborating reports, further weakening the article's evidentiary basis."
+  },
+  {
+    "id": 52,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "64%",
+    "new_verdict": "FALSE CONNECTION",
+    "new_conf": "76%",
+    "status": "STILL INCORRECT",
+    "is_correct": false,
+    "justification": "The **textual claims are genuinely corroborated** \u2014 verified external news reports confirm that **Australian authorities rescued survivors** from a boat believed to have carried around **150 asylum seekers**, with **Indonesian ships, merchant vessels, and Australian military boats and planes** joining the search. However, **Reverse Image Search shows the accompanying photograph is a recycled Getty Images stock photo** that has appeared in unrelated articles and is explicitly flagged as **Out-of-Context (Misattributed / Recycled)** \u2014 no source ties it to this specific rescue. Pairing a decontextualized stock image with a specific real-world event is the textbook definition of a **False Connection (Cheapfake)**: the reader is led to believe the photo documents this rescue when it does not. Because fact-checking standards require both the text **and** the visuals to be authentically aligned for a CREDIBLE rating, the article cannot be classified as credible despite the accuracy of its reporting."
+  },
+  {
+    "id": 57,
+    "true_label": "REAL",
+    "old_verdict": "FALSE CONNECTION",
+    "old_conf": "76%",
+    "new_verdict": "CREDIBLE",
+    "new_conf": "74%",
+    "status": "FIXED (NOW CORRECT)",
+    "is_correct": true,
+    "justification": "The article reads as a **straightforward regional news announcement** about plans for a new film studio in **Yorkshire**, using the 2003 hit **Calendar Girls** as a local success precedent. **No misinformation signals** were found: the headline matches the body, the tone is promotional but not sensationalist, and there is no impersonation, manipulation, or fabricated sourcing. Debate shows the **Real News arguments carried more evidential weight**, with the opposing side raising only incompleteness concerns (missing cost, location, and schedules) rather than any demonstrated falsehood. Reverse Image Search shows the accompanying visual is **generic, thematically aligned imagery with no out-of-context recycling**, and the Early Predictor's initial screening leaned **REAL**. External knowledge retrieval returned no whitelisted sources, so the studio plan itself remains uncorroborated \u2014 which caps confidence at moderate rather than high."
+  }
+]
