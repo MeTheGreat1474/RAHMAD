@@ -1,14 +1,12 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-28  11:36:27
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-29  14:04:09
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
 ------------------------------------------------------------
-    Original Claim     : Leeds, camera, action! Plans unveiled for a major new film studio in Yorkshire
-
-Calendar Girls which was filmed in Yorkshire and made 63m when it was released in 2003
-    Target Image Source: Local Image File (C:\Users\ahmad\Documents\Programming\fyp\Dataset\news_clippings\images\nc_925009.jpg)
-    Public Search URL  : https://i.ibb.co/RpBRJPqg/5b134224e2e5.jpg
+    Original Claim     : A photograph shows the mouth of an adult suffering from hyperdontia.
+    Target Image Source: Local Image File (C:\Users\ahmad\Documents\Programming\fyp\Dataset\images_fauxtography\070_hyperdontia-supernumerary-teeth.jpg)
+    Public Search URL  : https://i.ibb.co/nqsYmG8X/5eed9b2e2f0f.jpg
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
@@ -18,113 +16,149 @@ Calendar Girls which was filmed in Yorkshire and made 63m when it was released i
     Search Status      : Retrieved 10 candidate matches via Google Lens.
 
       Match #1:
-        Title    : Leeds, camera, action! Plans unveiled for a major new film ...
-        Source   : The Guardian
-        Link     : https://www.theguardian.com/film/2015/jun/05/leeds-camera-action-plans-unveiled-for-a-major-new-film-studio-in-yorkshire
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSHCbCmREN3M8_0EyCxWl8qUnTV8T8uaYhSCON7dcNVUghCX98y
+        Title    : Does This Picture Show a Case of Hyperdontia? | Snopes.com
+        Source   : Snopes
+        Link     : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjEuHpZ62SRxghIheqI5BRw9y1zv3TmrB1h2YQ7g0-VuySzP9w
       Match #2:
-        Title    : Calendar Girls Celia Imrie Julie Walters Editorial Stock Photo ...
-        Source   : Shutterstock
-        Link     : https://www.shutterstock.com/editorial/image-editorial/calendar-girls-celia-imrie-julie-walters-penelope-1554483a
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTawmI9i0FDX3aRl09Pg2TrDDJHskJasGI-ZFx93s3QE0U2Gmd6
+        Title    : These extra set of teeth are part of a dental anomaly called ...
+        Source   : Facebook
+        Link     : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRhTXxaeCspV32_1tZvrQ2RiEDclWXpijidWg3mgltr9Px5cO7D
       Match #3:
-        Title    : Calendar girls julie walters hi-res stock photography and ...
-        Source   : Alamy
-        Link     : https://www.alamy.com/stock-photo/calendar-girls-julie-walters.html?pseudoid=8D972D6A-3ED5-42E0-BAEA-381321F206D1
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM0kqc9xIg-VrtdlzFpMdYHKD61opReMDgIyKPjDcAJuipNDVZ
+        Title    : As a hopeful future dentist, this makes me cringe and will ...
+        Source   : Reddit
+        Link     : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSNdeC0e6QrET0RYC562Hxv2TY5xeQvLk9f1f4CJbKPcPr0PJ_d
       Match #4:
-        Title    : Linda bassett penelope wilton hi-res stock photography and ...
-        Source   : Alamy
-        Link     : https://www.alamy.com/stock-photo/linda-bassett-penelope-wilton.html?pseudoid=AAAB9C7F-F587-4B38-AF4C-78ED0C718A2D
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-iSkKUWc_1Pj5TSAZHeiNc4o0aoKfIUphJQ8yt-4B5gxFphFc
+        Title    : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
+        Source   : Restorative Dentistry
+        Link     : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTmnXAw8dbO26rfnnYN_M7vVySO9vADOEwG4MRq3VMVic2Vb2p
       Match #5:
-        Title    : Georgie Glen Movies & TV Shows List | Rotten Tomatoes ...
-        Source   : Rotten Tomatoes
-        Link     : https://www.rottentomatoes.com/celebrity/georgie-glen
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTHBmDA5lDo-5NEr46nw7nfICYBfwekBnas9QUqn_sGRgXU6xPR
+        Title    : What is the medical condition comment below
+        Source   : Facebook
+        Link     : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
+        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTlI4yOQZ2FjKzfUI3VgMl7nX2m0bTj85Ghp8DXIVboM2AyA65e
       Match #6:
-        Title    : Film Fest Gent | Calendar Girls
-        Source   : Film Fest Gent
-        Link     : https://www.filmfestival.be/en/film/calendar-girls
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQVKMJR3Y3gcDs7TcY73ukJXtd7yxucyqCS1PUtQduZBphuChPK
+        Title    : SCP-478 "Tooth Fairies"
+        Source   : YouTube
+        Link     : https://www.youtube.com/watch?v=9Y79xcOEmm4
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbftjth8bhGzkjFUvs7Z6RijGP1KIa6sieuafJBumkWP_XWgAC
       Match #7:
-        Title    : Best British Countryside Comedy Films | Countryfile.com
-        Source   : Countryfile.com
-        Link     : https://www.countryfile.com/reviews/best-british-countryside-comedy-films
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcScM7h6_TN4VfNfYqKxMPCAqeyJ0o1PTQbF-XNsKzAmR15Ghe35
+        Title    : Thừa răng - YouTube
+        Source   : YouTube
+        Link     : https://www.youtube.com/watch?v=kE_e_svHuDs
+        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRumSNXJB8Wbuyfv1NRVym6oGJvsyNRMuiYIxA3HK98rnGmd8HA
       Match #8:
-        Title    : May 2014 – Ellen And Jim Have A Blog, Two
-        Source   : Ellen And Jim Have A Blog, Two - WordPress.com
-        Link     : https://ellenandjim.wordpress.com/2014/05/
-        Thumbnail: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTxTkUKQBjI3HWfb7uTVHb99pykfl_i7Lx5_LiqdgjMQUXChmIT
+        Title    : "Hyperdontia" - MEDizzy
+        Source   : MEDizzy
+        Link     : https://medizzy.com/feed/141791
+        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTvHOmnyM12AtY7ZAsLMdMD5eCnzEbRiYRlVT90JIUP0QVgRRwb
       Match #9:
-        Title    : Helen Mirren Performs Tai Chi In Calendar Girls
-        Source   : Slanted Flying
-        Link     : https://slantedflying.com/helen-mirren-performs-tai-chi-in-calendar-girls/
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIOJhl6Hux71Us3g6g2yQ3ngSjvRWFKoaE3UxeprM6ecklHvFn
+        Title    : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+        Source   : Instagram
+        Link     : https://www.instagram.com/p/CHr5xTxFAcO/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSssYlY5TdcPiLZlEPTCZLd_H1Ldi8z0g7Con71Jb2DaoFJbpnr
       Match #10:
-        Title    : El Punt Avui - Las chicas del calendario
-        Source   : El Punt Avui
-        Link     : https://www.elpuntavui.cat/cinema/cercar/cinema-peli/22745-las-chicas-del-calendario.html
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRv9dhMHdL6XtD9LBU2GslYBPpxlpD6nZc9NTA5WrRyH-9D8zhY
+        Title    : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
+        Source   : Lead Stories
+        Link     : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCK9lhOmQBekw8LRd09PeY9PUZgIvCRcEm7lez5aIj_-lilX4p
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
     Filter Criterion   : Visual embedding cosine similarity >= 0.68
     Evaluated Candidates (10):
-      1. [PASSED] Visual Similarity: 0.7416 (Threshold: >=0.68)
-         Title  : Leeds, camera, action! Plans unveiled for a major new film ...
-         Source : The Guardian
-         Link   : https://www.theguardian.com/film/2015/jun/05/leeds-camera-action-plans-unveiled-for-a-major-new-film-studio-in-yorkshire
-      2. [FAILED] Visual Similarity: 0.6565 (Threshold: >=0.68)
-         Title  : Calendar Girls Celia Imrie Julie Walters Editorial Stock Photo ...
-         Source : Shutterstock
-         Link   : https://www.shutterstock.com/editorial/image-editorial/calendar-girls-celia-imrie-julie-walters-penelope-1554483a
-      3. [FAILED] Visual Similarity: 0.6385 (Threshold: >=0.68)
-         Title  : Calendar girls julie walters hi-res stock photography and ...
-         Source : Alamy
-         Link   : https://www.alamy.com/stock-photo/calendar-girls-julie-walters.html?pseudoid=8D972D6A-3ED5-42E0-BAEA-381321F206D1
-      4. [FAILED] Visual Similarity: 0.5867 (Threshold: >=0.68)
-         Title  : Linda bassett penelope wilton hi-res stock photography and ...
-         Source : Alamy
-         Link   : https://www.alamy.com/stock-photo/linda-bassett-penelope-wilton.html?pseudoid=AAAB9C7F-F587-4B38-AF4C-78ED0C718A2D
-      5. [FAILED] Visual Similarity: 0.5948 (Threshold: >=0.68)
-         Title  : Georgie Glen Movies & TV Shows List | Rotten Tomatoes ...
-         Source : Rotten Tomatoes
-         Link   : https://www.rottentomatoes.com/celebrity/georgie-glen
-      6. [FAILED] Visual Similarity: 0.6422 (Threshold: >=0.68)
-         Title  : Film Fest Gent | Calendar Girls
-         Source : Film Fest Gent
-         Link   : https://www.filmfestival.be/en/film/calendar-girls
-      7. [FAILED] Visual Similarity: 0.6629 (Threshold: >=0.68)
-         Title  : Best British Countryside Comedy Films | Countryfile.com
-         Source : Countryfile.com
-         Link   : https://www.countryfile.com/reviews/best-british-countryside-comedy-films
-      8. [FAILED] Visual Similarity: 0.5164 (Threshold: >=0.68)
-         Title  : May 2014 – Ellen And Jim Have A Blog, Two
-         Source : Ellen And Jim Have A Blog, Two - WordPress.com
-         Link   : https://ellenandjim.wordpress.com/2014/05/
-      9. [FAILED] Visual Similarity: 0.5163 (Threshold: >=0.68)
-         Title  : Helen Mirren Performs Tai Chi In Calendar Girls
-         Source : Slanted Flying
-         Link   : https://slantedflying.com/helen-mirren-performs-tai-chi-in-calendar-girls/
-      10. [FAILED] Visual Similarity: 0.6774 (Threshold: >=0.68)
-         Title  : El Punt Avui - Las chicas del calendario
-         Source : El Punt Avui
-         Link   : https://www.elpuntavui.cat/cinema/cercar/cinema-peli/22745-las-chicas-del-calendario.html
+      1. [PASSED] Visual Similarity: 0.9145 (Threshold: >=0.68)
+         Title  : Does This Picture Show a Case of Hyperdontia? | Snopes.com
+         Source : Snopes
+         Link   : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
+      2. [PASSED] Visual Similarity: 0.8682 (Threshold: >=0.68)
+         Title  : These extra set of teeth are part of a dental anomaly called ...
+         Source : Facebook
+         Link   : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
+      3. [PASSED] Visual Similarity: 0.7876 (Threshold: >=0.68)
+         Title  : As a hopeful future dentist, this makes me cringe and will ...
+         Source : Reddit
+         Link   : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
+      4. [PASSED] Visual Similarity: 0.8856 (Threshold: >=0.68)
+         Title  : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
+         Source : Restorative Dentistry
+         Link   : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
+      5. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.68)
+         Title  : What is the medical condition comment below
+         Source : Facebook
+         Link   : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
+      6. [PASSED] Visual Similarity: 0.9186 (Threshold: >=0.68)
+         Title  : SCP-478 "Tooth Fairies"
+         Source : YouTube
+         Link   : https://www.youtube.com/watch?v=9Y79xcOEmm4
+      7. [PASSED] Visual Similarity: 0.9391 (Threshold: >=0.68)
+         Title  : Thừa răng - YouTube
+         Source : YouTube
+         Link   : https://www.youtube.com/watch?v=kE_e_svHuDs
+      8. [PASSED] Visual Similarity: 0.8242 (Threshold: >=0.68)
+         Title  : "Hyperdontia" - MEDizzy
+         Source : MEDizzy
+         Link   : https://medizzy.com/feed/141791
+      9. [PASSED] Visual Similarity: 0.9044 (Threshold: >=0.68)
+         Title  : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+         Source : Instagram
+         Link   : https://www.instagram.com/p/CHr5xTxFAcO/
+      10. [PASSED] Visual Similarity: 0.8184 (Threshold: >=0.68)
+         Title  : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
+         Source : Lead Stories
+         Link   : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
 
-    Outcome: 1 of 10 candidates passed visual filter.
+    Outcome: 10 of 10 candidates passed visual filter.
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
     Filter Criterion   : Contextual semantic embedding similarity >= 0.00
-    Evaluated Contexts (1):
-      1. [PASSED] Semantic Similarity: 0.7789 (Threshold: >=0.00)
-         Title  : Leeds, camera, action! Plans unveiled for a major new film ...
-         Source : The Guardian
-         Link   : https://www.theguardian.com/film/2015/jun/05/leeds-camera-action-plans-unveiled-for-a-major-new-film-studio-in-yorkshire
+    Evaluated Contexts (10):
+      1. [PASSED] Semantic Similarity: 0.7571 (Threshold: >=0.00)
+         Title  : Does This Picture Show a Case of Hyperdontia? | Snopes.com
+         Source : Snopes
+         Link   : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
+      2. [PASSED] Semantic Similarity: 0.3343 (Threshold: >=0.00)
+         Title  : These extra set of teeth are part of a dental anomaly called ...
+         Source : Facebook
+         Link   : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
+      3. [PASSED] Semantic Similarity: 0.4297 (Threshold: >=0.00)
+         Title  : As a hopeful future dentist, this makes me cringe and will ...
+         Source : Reddit
+         Link   : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
+      4. [PASSED] Semantic Similarity: 0.0585 (Threshold: >=0.00)
+         Title  : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
+         Source : Restorative Dentistry
+         Link   : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
+      5. [PASSED] Semantic Similarity: 0.3629 (Threshold: >=0.00)
+         Title  : What is the medical condition comment below
+         Source : Facebook
+         Link   : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
+      6. [PASSED] Semantic Similarity: 0.2450 (Threshold: >=0.00)
+         Title  : SCP-478 "Tooth Fairies"
+         Source : YouTube
+         Link   : https://www.youtube.com/watch?v=9Y79xcOEmm4
+      7. [PASSED] Semantic Similarity: 0.0624 (Threshold: >=0.00)
+         Title  : Thừa răng - YouTube
+         Source : YouTube
+         Link   : https://www.youtube.com/watch?v=kE_e_svHuDs
+      8. [PASSED] Semantic Similarity: 0.5989 (Threshold: >=0.00)
+         Title  : "Hyperdontia" - MEDizzy
+         Source : MEDizzy
+         Link   : https://medizzy.com/feed/141791
+      9. [PASSED] Semantic Similarity: 0.0631 (Threshold: >=0.00)
+         Title  : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+         Source : Instagram
+         Link   : https://www.instagram.com/p/CHr5xTxFAcO/
+      10. [PASSED] Semantic Similarity: 0.5920 (Threshold: >=0.00)
+         Title  : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
+         Source : Lead Stories
+         Link   : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
 
-    Outcome: 1 of 1 candidates passed semantic filter.
+    Outcome: 10 of 10 candidates passed semantic filter.
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
@@ -134,10 +168,19 @@ Calendar Girls which was filmed in Yorkshire and made 63m when it was released i
     Confidence Level   : High
 
     Context Sent to Visual Agent:
-      - Leeds, camera, action! Plans unveiled for a major new film ... (Source: The Guardian)
+      - Does This Picture Show a Case of Hyperdontia? | Snopes.com (Source: Snopes)
+      - These extra set of teeth are part of a dental anomaly called ... (Source: Facebook)
+      - As a hopeful future dentist, this makes me cringe and will ... (Source: Reddit)
+      - f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ... (Source: Restorative Dentistry)
+      - What is the medical condition comment below (Source: Facebook)
+      - SCP-478 "Tooth Fairies" (Source: YouTube)
+      - Thừa răng - YouTube (Source: YouTube)
+      - "Hyperdontia" - MEDizzy (Source: MEDizzy)
+      - زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ... (Source: Instagram)
+      - Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ... (Source: Lead Stories)
 
     Visual Agent Forensic Synthesis:
-      The image depicts a generic camera and action scene, which is used as a thematic illustration for the article about the film studio plans in Yorkshire. The majority of sources (1 out of 1) align with the article's theme, making it a generic illustration rather than out-of-context. The Calendar Girls film, mentioned in the article, is a relevant thematic reference, but the image itself is not specific to the event.
+      The images found online are consistent with the theme of hyperdontia, which is a dental condition. They are likely stock photos or file images used to illustrate articles about the condition. The presence of multiple sources discussing hyperdontia and the consistent subject matter across these sources indicate that the images are relevant and not out of context.
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
@@ -146,7 +189,7 @@ Calendar Girls which was filmed in Yorkshire and made 63m when it was released i
     Judicial Confidence Weight : High
 
     Executive Visual Evidence Summary for Judge:
-      The image shows a generic camera and action scene, used as a thematic illustration for the article about film studio plans in Yorkshire. It aligns with the Calendar Girls film mentioned, making it a generic illustration, not out-of-context. Verify media integrity but do not independently prove the claims about the film studio.
+      The images depict a case of hyperdontia, a dental condition, and are found across multiple sources discussing the topic. They are not out of context and are used to illustrate articles about hyperdontia, verifying media integrity but not independently proving unverified claims.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
@@ -154,7 +197,7 @@ Calendar Girls which was filmed in Yorkshire and made 63m when it was released i
     Forensic Category     : Generic / Illustrative Imagery
     Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
     Confidence Level      : High
-    High-Fidelity Matches : 1
+    High-Fidelity Matches : 10
     Forwarded to Judge    : YES
 
 ================================================================================

@@ -14,6 +14,7 @@ output/KR_output.txt
 output/RIS_output.txt
 output/MAD_output.txt
 output/JUDGE_output.txt
+/output
 
 # Python/env clutter
 __pycache__/
@@ -27,3 +28,4 @@ venv/
 
 # dataset
 testing/test_dataset.csv
+/testing

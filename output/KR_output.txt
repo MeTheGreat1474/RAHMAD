@@ -1,92 +1,80 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-28  08:56:58
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-29  07:48:47
 ================================================================================
 
 [1]  INPUT CLAIM
 ------------------------------------------------------------
-    Original Claim     : Four kidnapped polio workers are found dead in Pakistan
-
-Taliban militants oppose polio vaccination campaigns in Pakistan
+    Original Claim     : A photograph shows the mouth of an adult suffering from hyperdontia.
     Execution Backend  : Local LLM
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 10
+    Total URLs Retrieved (Pre-Filter) : 5
     All Retrieved URLs (Pre-Filter Status):
-       1. [FILTERED OUT]  https://www.dailyexcelsior.com/2-polio-vaccinators-abducted-while-administering-drops-in-pakistans-khyber-pakhtunkhwa/
-       2. [FILTERED OUT]  https://tribune.com.pk/story/2630771/two-cops-guarding-polio-team-martyred-in-balochistans-noshki
-       3. [FILTERED OUT]  https://reliefweb.int/report/world/attacks-health-care-bi-monthly-news-brief-15-28-april-2026
-       4. [WHITELISTED]   https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
-       5. [WHITELISTED]   https://www.bbc.com/news/world-asia-36090891
-       6. [FILTERED OUT]  https://indianewengland.com/policeman-killed-four-injured-in-attack-on-polio-team-security-in-pakistan/
-       7. [WHITELISTED]   https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
-       8. [FILTERED OUT]  https://publicservices.international/resources/news/polio-workers-abducted-beaten-and-assaulted-in-pakistan?id=15405&lang=en
-       9. [FILTERED OUT]  https://ctc.westpoint.edu/the-pakistani-talibans-campaign-against-polio-vaccination/
-      10. [FILTERED OUT]  https://www.state.gov/reports/2023-report-on-international-religious-freedom/pakistan
+       1. [FILTERED OUT]  https://africacheck.org/fact-checks/meta-programme-fact-checks/yes-boy-had-526-teeth-removed-image-manipulated
+       2. [WHITELISTED]   https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
+       3. [WHITELISTED]   https://www.snopes.com/fact-check/x-rays-81-teeth/
+       4. [FILTERED OUT]  https://www.vishvasnews.com/english/health/fact-check-x-ray-shown-in-viral-post-is-a-health-condition-not-a-general-toddler-scan/
+       5. [FILTERED OUT]  https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
 
-    URLs Passing Whitelist : 3
-      1. https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
-      2. https://www.bbc.com/news/world-asia-36090891
-      3. https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
+    URLs Passing Whitelist : 2
+      1. https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
+      2. https://www.snopes.com/fact-check/x-rays-81-teeth/
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
     Articles Successfully Extracted : 2
-      1. Title  : Pakistan polio: Seven killed in anti-vaccination attack - BBC News
-         Source : https://www.bbc.com/news/world-asia-36090891
+      1. Title  : Real X-rays of person with 81 teeth? | Snopes.com
+         Source : https://www.snopes.com/fact-check/x-rays-81-teeth/
          Date   : 
-      2. Title  : Pakistan poses global polio threat as violence against vaccination teams continues | PBS News
-         Source : https://www.pbs.org/newshour/health/pakistan-poses-global-polio-threat-as-violence-against-vaccination-teams-continues
+      2. Title  : Fact check: X-ray shows hyperdontia, not generic toddler scan | Reuters
+         Source : https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
          Date   : 
-
-    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 1
-      1. Title  : Suspected militants kill police officer assigned to guard polio team as nationwide campaign begins
-         Source : https://apnews.com/article/pakistan-polio-campaign-police-killed-northwest-3b943774a27e3dfe67c2d6191cc66f53
-         Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 6
+    Snippets Passed : 3
       Snippet #1:
-        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] Pakistan is one of only two countries, along with Afghanistan, where polio remains endemic. Militants have repeatedly targeted vaccination programmes, killing nearly 80 people since December 2012.
+        [Real X-rays of person with 81 teeth? | Snopes.com] "Hyperdontia: What To Know If You Have Extra Teeth." Cleveland Clinic, https://my.clevelandclinic.org/health/diseases/hyperdontia. Accessed 19 Sep. 2025.
       Snippet #2:
-        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] February 2015: Four kidnapped polio workers found dead near Quetta
+        [Real X-rays of person with 81 teeth? | Snopes.com] Pereira, Marilia Nalon, et al. "Multiple Hyperdontia: Report of an Unusual Case." American Journal of Orthodontics and Dentofacial Orthopedics: Official Publication of the American Association of Orthodontists, Its Constituent Societies, and the American Board of Orthodontics, vol. 140, no. 4, Oct. 2011, pp. 580–84. PubMed, https://doi.org/10.1016/j.ajodo.2010.02.038.
       Snippet #3:
-        [Pakistan polio: Seven killed in anti-vaccination attack - BBC News] Pakistan is one of only two countries where polio remains endemic
-      Snippet #4:
-        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] The violence has badly affected vaccination efforts. Of the three countries where polio is considered endemic, Afghanistan, Pakistan and Nigeria, more than half of the reported cases in 2013 were in Pakistan. WHO officials fear the Pakistani strains of polio will spread, with cases appearing in Syria.
-      Snippet #5:
-        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] The announcement came on the heels of one of the deadliest days of violence against vaccination workers. Three vaccination workers were killed Tuesday in the Qayyumabad area of Pakistan's largest city, Karachi. Another four workers were killed and two teams of workers were feared kidnapped in other parts of the city. Six police officers assigned to protect workers were killed when a bomb near a police van exploded, also killing a young boy.
-      Snippet #6:
-        [Pakistan poses global polio threat as violence against vaccination teams continues | PBS News] Following another string of deadly attacks on Polio vaccination teams by Taliban militant groups, the World Health Organization said Wednesday that Pakistan's polio crisis threatens to spread across the globe.
+        [Real X-rays of person with 81 teeth? | Snopes.com] An x-ray of a patient with hyperdontia (the condition of having more teeth than average). Usually adults have 32 teeth. This person had 81.byu/Parge-leniss ininterestingasf***
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      ### Key-Fact Outline
+      ### Comprehensive Key-Fact Outline
       
-      #### Key Entities, Names, and Roles Involved
-      - **Pakistan**: Country where polio remains endemic.
-      - **Afghanistan**: Country where polio remains endemic.
-      - **Nigeria**: Country where polio remains endemic.
-      - **WHO (World Health Organization)**: Organization concerned with the global spread of polio.
-      - **Taliban Militants**: Groups opposing polio vaccination campaigns.
-      - **Polio Workers**: Individuals involved in polio vaccination efforts.
+      #### 1. Key Entities, Names, and Roles Involved
+      - **Marilia Nalon Pereira**: Author of the case report.
+      - **Cleveland Clinic**: Source of the information on hyperdontia.
+      - **American Journal of Orthodontics and Dentofacial Orthopedics**: Journal where the case report was published.
+      - **Case Patient**: An individual with hyperdontia, having 81 teeth.
       
-      #### Monetary Amounts, Legal Rulings, or Official Outcomes
-      - None explicitly mentioned in the snippets.
+      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
+      - **None explicitly mentioned**.
       
-      #### Timeline of Events and Corroborating Evidence
-      1. **Date not specified**: Pakistan is one of only two countries, along with Afghanistan, where polio remains endemic.
-      2. **December 2012 - February 2015**: Militants have repeatedly targeted vaccination programmes, killing nearly 80 people.
-      3. **February 2015**: Four kidnapped polio workers found dead near Quetta.
-      4. **February 2015**: Three vaccination workers were killed in the Qayyumabad area of Karachi.
-      5. **February 2015**: Four workers were killed and two teams of workers were feared kidnapped in other parts of Karachi.
-      6. **February 2015**: Six police officers assigned to protect workers were killed when a bomb near a police van exploded, also killing a young boy.
-      7. **February 2015**: The World Health Organization (WHO) announced that Pakistan's polio crisis threatens to spread across the globe.
+      #### 3. Timeline of Events and Corroborating Evidence
+      - **Date not specified**: The case report by Pereira et al. was published in the American Journal of Orthodontics and Dentofacial Orthopedics in October 2011.
+        - **Publication Details**: 
+          - **Journal**: American Journal of Orthodontics and Dentofacial Orthopedics.
+          - **Volume and Issue**: Volume 140, Number 4.
+          - **Pages**: 580–84.
+          - **DOI**: 10.1016/j.ajodo.2010.02.038.
+        - **Content of the Report**: 
+          - **Title**: "Multiple Hyperdontia: Report of an Unusual Case."
+          - **Description**: The report details a case of hyperdontia, where the patient had 81 teeth, significantly more than the usual 32 teeth found in adults.
+        - **X-ray Evidence**: 
+          - **Source**: Cleveland Clinic.
+          - **Description**: X-rays of the patient with hyperdontia are mentioned, showing the condition visually.
       
-      ### Summary
-      The snippets provide evidence of ongoing violence against polio vaccination workers in Pakistan, particularly by Taliban militants. The attacks have resulted in the deaths of multiple individuals, including polio workers and police officers. The incidents occurred between December 2012 and February 2015, with a notable event being the discovery of four kidnapped polio workers found dead near Quetta in February 2015. The WHO has expressed concern about the spread of polio from Pakistan to other regions.
+      #### Summary of Evidence
+      - **Photograph**: The photograph in question is described as showing the mouth of an adult with hyperdontia, having 81 teeth.
+      - **Case Report**: A case report by Pereira et al. in 2011 details a patient with 81 teeth, confirming the existence of such a condition.
+      - **X-ray Evidence**: X-rays from Cleveland Clinic support the visual evidence of hyperdontia.
+      
+      This outline provides a structured summary of the key facts, entities, and evidence presented in the verified article snippets without adding any inferred or external information.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

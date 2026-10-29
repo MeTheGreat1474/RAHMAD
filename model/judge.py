@@ -155,15 +155,17 @@ claims remain uncorroborated by Knowledge Retrieval (KR) or are challenged as sp
 in Debate (MAD), you MUST critically assess whether the article creates a FALSE CONNECTION or \
 MISLEADING CONTENT, and NEVER default to CREDIBLE simply because the photograph is authentic.
 
-      CRITICAL CAVEAT 2 (AUTHENTIC TEXT ≠ DECONTEXTUALIZED PHOTO EXCUSE):
-      Conversely, factually accurate or plausible text does NEVER excuse an out-of-context, \
-recycled, or misattributed photograph. Whenever Reverse Image Search detects \
-'Out-of-Context Imagery Detected: YES (Decontextualized / Misattributed)' \
-(indicating that an unrelated image was attached to depict a news story), this is the textbook \
-definition of a FALSE CONNECTION (Cheapfake). You are STRICTLY FORBIDDEN from classifying \
-such an article as CREDIBLE. A CREDIBLE classification requires BOTH the text claims AND the \
-visual accompaniment to be authentically aligned. When the image is demonstrably out-of-context, \
-you MUST classify as FALSE CONNECTION or MISLEADING CONTENT.
+      CRITICAL CAVEAT 2 (EVIDENTIARY HIERARCHY — FACT-CHECKING OUTRANKS AUTOMATED VISUAL HEURISTICS):
+      Multimodal fact-checking requires distinguishing between genuine cheapfakes (unrelated images maliciously attached to stories) \
+and authentic archival/historical photos resurfacing online:
+      - PRIMARY GROUND TRUTH: Verified external news reports and fact-checking archives (Knowledge Retrieval from Snopes, Reuters, AP, etc.) \
+represent authoritative ground truth. If verified external knowledge confirms that the photograph genuinely documents the subject, event, \
+or historical person described, this authoritative factual evidence OUTRANKS automated Reverse Image Search heuristics. Automated image \
+search algorithms can misinterpret authentic archival photographs, historical videos, or viral event clips as 'recycled' when they re-circulate \
+on modern social media. In such cases, you MUST NOT penalize the article as a FALSE CONNECTION.
+      - DECONTEXTUALIZED CHEAPFAKES: However, when external knowledge does NOT corroborate the visual match, or when a demonstrably unrelated \
+photograph is attached to depict a separate news event, this is a genuine FALSE CONNECTION (Cheapfake). When the image is demonstrably \
+out-of-context and unsupported by verified news reporting, classify as FALSE CONNECTION or MISLEADING CONTENT.
 
   P9. INCORPORATE MULTI-AGENT DEBATE PERSPECTIVES
       If debate analysis findings are provided, use them to understand \
@@ -274,17 +276,15 @@ with a known outlet while showing signs of impersonation \
 against the verified external news reports. State clearly if \
 external news corroborates, refutes, or is absent for the claims.
     2. Reverse Image Search: If Reverse Image Search evidence is provided, check the \
-explicit 'Out-of-Context Imagery Detected' status and category. If marked as \
-'Out-of-Context (Misattributed / Recycled)' (recycled from a different time/place/event or topical mismatch), \
-you MUST classify as FALSE CONNECTION or MISLEADING CONTENT. You are STRICTLY FORBIDDEN from classifying \
-it as CREDIBLE, even if the text claims are factually verified or plausible. In multimodal fact-checking, \
-pairing a mismatched or recycled photo with a story is the literal definition of FALSE CONNECTION (Cheapfake). \
+explicit 'Out-of-Context Imagery Detected' status and category. Apply the Evidentiary Hierarchy: \
+If marked as 'Out-of-Context (Misattributed / Recycled)', first check whether verified External Knowledge (KR) \
+explicitly corroborates that the claim accurately describes this authentic photograph/event. If KR corroborates the \
+authenticity of the photo/event, treat the visual provenance as authentic context (the automated visual agent likely flagged \
+archival re-circulation). If KR does NOT corroborate the photo or confirms a mismatch/hoax, classify as FALSE CONNECTION (Cheapfake). \
 If marked as 'Authentic Context / Matching Event' or 'Generic / Illustrative Imagery', do NOT penalize an article \
-simply because syndicated outlets or photo agencies rephrase headlines for the same real-world event or use acknowledged file/illustrative photos. \
-HOWEVER, you must perform an Image-to-Text Entailment check: does the authentic image actually \
-substantiate the specific claims or named identities in the text? If an authentic photo is paired \
-with uncorroborated, speculative, or fabricated text claims, classify as FALSE CONNECTION or \
-MISLEADING CONTENT, NOT CREDIBLE.
+simply because syndicated outlets rephrase headlines or use illustrative photos. \
+Perform an Image-to-Text Entailment check: does the authentic image actually substantiate the specific claims or named identities in the text? \
+If an authentic photo is paired with uncorroborated, speculative, or fabricated text claims, classify as FALSE CONNECTION or MISLEADING CONTENT, NOT CREDIBLE.
     3. Multi-Agent Debate: If debate findings are provided, leverage \
 the structured arguments generated by the domain experts. Synthesize \
 their findings regarding the article's credibility.
@@ -644,6 +644,7 @@ class Judge:
                 ],
                 "temperature": temperature if temperature is not None else self.temperature,
                 "max_tokens":  self.max_tokens,
+                "reasoning":   {"effort": "low"},
             }
 
             log.info(f"[Judge] Sending request to OpenRouter — model: {model}")
@@ -679,8 +680,8 @@ class Judge:
     def _parse_response(raw: str) -> dict:
         """
         Extract and validate the JSON verdict from the LLM response.
-        Handles cases where the model wraps JSON in markdown code fences.
-        Now also extracts the 'reasoning' field added by the enhanced prompt.
+        Handles cases where the model wraps JSON in markdown code fences,
+        emits chain-of-thought preambles, or suffers partial truncation.
         """
         # Remove <think>...</think> reasoning blocks common in modern LLMs
         cleaned = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
@@ -688,47 +689,92 @@ class Judge:
         # Remove markdown code fences and whitespace
         cleaned = re.sub(r"```(?:json)?\s*", "", cleaned).strip().rstrip("`").strip()
 
-        # Try parsing directly
         data = None
+
+        # 1. Try parsing directly
         try:
             data = json.loads(cleaned)
         except json.JSONDecodeError:
-            # First attempt: find first '{' and matching/last '}'
-            match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-            if match:
-                json_str = match.group()
+            pass
+
+        # 2. Search for candidate JSON object containing "verdict"
+        if data is None or not isinstance(data, dict) or "verdict" not in data:
+            v_matches = list(re.finditer(r'\{[^{}]*"verdict"[^{}]*\}', cleaned, re.DOTALL))
+            for m in reversed(v_matches):
                 try:
-                    data = json.loads(json_str)
+                    candidate = json.loads(m.group(0))
+                    if isinstance(candidate, dict) and "verdict" in candidate:
+                        data = candidate
+                        break
                 except json.JSONDecodeError:
                     pass
 
-            if data is None:
-                # Second attempt: handle potential truncated JSON (e.g. max_tokens reached or unclosed quotes/brackets)
-                start_idx = cleaned.find("{")
+        # 3. Greedy balanced-brace extraction around "verdict"
+        if data is None:
+            v_pos = cleaned.rfind('"verdict"')
+            if v_pos != -1:
+                start_idx = cleaned.rfind("{", 0, v_pos)
                 if start_idx != -1:
-                    substring = cleaned[start_idx:]
-                    # Attempt to salvage truncated JSON by removing unclosed strings and closing brackets/braces
-                    # Try truncating up to last quote or comma and auto-closing braces
-                    for cutoff in range(len(substring), 0, -1):
-                        candidate = substring[:cutoff].rstrip(", \n\r\t")
-                        # count braces
-                        open_braces = candidate.count("{") - candidate.count("}")
-                        if open_braces > 0:
-                            # Close string if inside an unclosed string quote
-                            quotes = candidate.count('"') - candidate.count(r'\"')
-                            if quotes % 2 != 0:
-                                candidate += '"'
-                            candidate += "}" * open_braces
-                        try:
-                            data = json.loads(candidate)
-                            break
-                        except json.JSONDecodeError:
-                            continue
+                    sub = cleaned[start_idx:]
+                    for end in range(len(sub), 0, -1):
+                        if sub[end - 1] == '}':
+                            try:
+                                candidate = json.loads(sub[:end])
+                                if isinstance(candidate, dict) and "verdict" in candidate:
+                                    data = candidate
+                                    break
+                            except json.JSONDecodeError:
+                                pass
 
-            if data is None:
-                raise ValueError(
-                    f"[Judge] Could not extract valid JSON from LLM response:\n{raw}"
+        # 4. Salvage auto-close truncated JSON
+        if data is None:
+            start_idx = cleaned.find("{")
+            if start_idx != -1:
+                substring = cleaned[start_idx:]
+                for cutoff in range(len(substring), 0, -1):
+                    candidate = substring[:cutoff].rstrip(", \n\r\t")
+                    open_braces = candidate.count("{") - candidate.count("}")
+                    if open_braces > 0:
+                        quotes = candidate.count('"') - candidate.count(r'\"')
+                        if quotes % 2 != 0:
+                            candidate += '"'
+                        candidate += "}" * open_braces
+                    try:
+                        cand_data = json.loads(candidate)
+                        if isinstance(cand_data, dict) and "verdict" in cand_data:
+                            data = cand_data
+                            break
+                    except json.JSONDecodeError:
+                        continue
+
+        # 5. Regex field extraction fallback (handles conversational responses or severe truncation)
+        if data is None or not isinstance(data, dict) or "verdict" not in data:
+            verdict_m = re.search(r'"verdict"\s*:\s*"([^"]+)"', raw, re.IGNORECASE)
+            if not verdict_m:
+                prose_v = re.search(
+                    r'(?:final answer|verdict|conclusion|classify as)[:\s*]+(CREDIBLE|FALSE CONNECTION|MISLEADING CONTENT|FABRICATED CONTENT|SATIRE OR PARODY|IMPOSTER CONTENT|MANIPULATED CONTENT)',
+                    raw, re.IGNORECASE
                 )
+                v_val = prose_v.group(1).upper() if prose_v else None
+            else:
+                v_val = verdict_m.group(1).upper()
+
+            if v_val:
+                conf_m = re.search(r'"confidence"\s*:\s*"([^"]+)"', raw, re.IGNORECASE)
+                just_m = re.search(r'"justification"\s*:\s*"([^"]+)"', raw, re.IGNORECASE)
+                reason_m = re.search(r'"reasoning"\s*:\s*"([^"]+)"', raw, re.IGNORECASE)
+                data = {
+                    "verdict": v_val,
+                    "confidence": conf_m.group(1) if conf_m else "75.0%",
+                    "justification": just_m.group(1) if just_m else raw[-500:].strip(),
+                    "reasoning": reason_m.group(1) if reason_m else "",
+                    "key_facts": []
+                }
+
+        if data is None or not isinstance(data, dict):
+            raise ValueError(
+                f"[Judge] Could not extract valid JSON from LLM response:\n{raw}"
+            )
 
         raw_verdict = str(data.get("verdict", "")).upper()
 
@@ -866,13 +912,16 @@ class Judge:
         }
 
     @staticmethod
-    def _enforce_constitutional_guardrails(result: dict, ris_summary: str, ep_result: dict) -> dict:
+    def _enforce_constitutional_guardrails(result: dict, ris_summary: str, ep_result: dict, external_knowledge: str = "") -> dict:
         """
         Constitutional Principle P8 Enforcement:
         A factually accurate text narrative never excuses a decontextualized / recycled image.
         If Reverse Image Search confirms 'Out-of-Context Imagery Detected: YES (Decontextualized / Misattributed)'
         with High confidence (or Medium confidence when Early Predictor flags Fake), an article cannot be CREDIBLE.
         Attaching an unrelated or recycled photo to news text is the definition of FALSE CONNECTION (Cheapfake).
+
+        Exception/Guard: If the Judge explicitly acknowledged the visual ambiguity and cited verified external knowledge
+        corroborating the claim and authentic photo, trust the deliberate judicial reasoning.
         """
         if not ris_summary or not isinstance(result, dict):
             return result
@@ -883,23 +932,71 @@ class Judge:
             is_ooc = "out-of-context imagery detected: yes" in summary_lower
 
             if is_ooc:
-                log.warning(
-                    "[Judge] Constitutional Principle P8 Enforcement: Overriding CREDIBLE verdict to FALSE CONNECTION "
-                    "due to verified decontextualized / out-of-context imagery."
+                reasoning     = str(result.get("reasoning", "")).lower()
+                justification = str(result.get("justification", "")).lower()
+                combined_text = reasoning + " " + justification
+
+                # 1) Did the Judge acknowledge the RIS out-of-context finding?
+                ris_ack_phrases = [
+                    "reverse image search", "visual verification",
+                    "image provenance", "out-of-context", "out of context",
+                    "recycled", "misattributed", "decontextualized",
+                    "ris", "visual forensic",
+                ]
+                judge_acknowledged_ris = any(
+                    phrase in combined_text for phrase in ris_ack_phrases
                 )
-                result["verdict"] = "FALSE CONNECTION"
-                result["color_class"] = "false-connection"
-                p8_note = (
-                    " **[Constitutional Principle P8 Guardrail]**: While the textual claims appear plausible or grounded, "
-                    "Reverse Image Search forensic checks confirmed that the accompanying visual is decontextualized or "
-                    "recycled from an unrelated event. Under multimodal fact-checking standards, attaching an unrelated image "
-                    "to news claims constitutes a **FALSE CONNECTION** (Cheapfake)."
+
+                # 2) Did the Judge cite external knowledge / fact-checks that confirmed authenticity?
+                kr_confirm_phrases = [
+                    "external knowledge", "knowledge retrieval",
+                    "verified news", "confirms", "confirmed",
+                    "corroborated", "fact-check", "fact check",
+                    "snopes", "reuters", "associated press",
+                    "verified", "authentic", "genuine",
+                    "credible source", "reliable source",
+                    "news reports", "documented", "well-documented",
+                ]
+                judge_cited_kr_confirmation = any(
+                    phrase in combined_text for phrase in kr_confirm_phrases
                 )
-                result["justification"] = (result.get("justification", "").strip() + p8_note).strip()
-                facts = result.get("key_facts", [])
-                if isinstance(facts, list):
-                    facts.append("Visual forensic analysis confirmed out-of-context imagery, resulting in a **False Connection** verdict.")
-                    result["key_facts"] = facts
+
+                if judge_acknowledged_ris and judge_cited_kr_confirmation:
+                    log.info(
+                        "[Judge] Constitutional Principle P8: Judge explicitly "
+                        "considered RIS out-of-context finding but concluded "
+                        "CREDIBLE based on stronger verified external evidence. "
+                        "Trusting deliberate judicial reasoning."
+                    )
+                else:
+                    log.warning(
+                        "[Judge] Constitutional Principle P8 Enforcement: "
+                        "Overriding CREDIBLE to FALSE CONNECTION — Judge did "
+                        "not explicitly address the RIS out-of-context finding "
+                        "with countervailing verified evidence."
+                    )
+                    result["verdict"] = "FALSE CONNECTION"
+                    result["color_class"] = "false-connection"
+                    p8_note = (
+                        " **[Constitutional Principle P8 Guardrail]**: While "
+                        "the textual claims appear plausible or grounded, "
+                        "Reverse Image Search forensic checks confirmed that "
+                        "the accompanying visual is decontextualized or "
+                        "recycled from an unrelated event. Under multimodal "
+                        "fact-checking standards, attaching an unrelated image "
+                        "to news claims constitutes a **FALSE CONNECTION** "
+                        "(Cheapfake)."
+                    )
+                    result["justification"] = (
+                        result.get("justification", "").strip() + p8_note
+                    ).strip()
+                    facts = result.get("key_facts", [])
+                    if isinstance(facts, list):
+                        facts.append(
+                            "Visual forensic analysis confirmed out-of-context "
+                            "imagery, resulting in a **False Connection** verdict."
+                        )
+                        result["key_facts"] = facts
 
         return result
 
