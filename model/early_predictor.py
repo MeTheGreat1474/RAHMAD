@@ -25,7 +25,7 @@ Usage:
     result["probability"]   # float  e.g. 0.87
     result["label"]         # str    "FAKE" | "REAL"
     result["confidence"]    # str    e.g. "87.0%"
-    result["pass_to_agents"]  # bool — True if uncertain (triggers MAD pipeline)
+    result["pass_to_agents"]  # bool — Always True; EP is an advisory signal and does not filter/gate downstream modules
 """
 
 import re
@@ -357,7 +357,7 @@ class EarlyPredictor:
             label          : str     — "FAKE" | "REAL" | "UNCERTAIN"
             confidence     : str     — formatted percentage
             color_class    : str     — "manipulated" | "real" | "inconclusive"
-            pass_to_agents : bool    — True when UNCERTAIN; triggers MAD pipeline
+            pass_to_agents : bool    — Always True; advisory prior passed to Judge (EP does not filter/gate)
         """
         log.info("[EarlyPredictor] Preparing inputs…")
         inputs = self._prepare_inputs(raw_text, raw_image)

@@ -13,7 +13,7 @@ EXECUTIVE SUMMARY OF FINDINGS
 1. Early Predictor (EP) Standalone Baseline:
    - On 60 held-out test samples, the standalone CLIP+LoRA model achieved an
      accuracy of 50.00%, an F1-score of 37.50%, and an AUC-ROC of 0.4556.
-   - Average inference latency was 124.17 ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.
+   - Average inference latency was 124.17 ms/sample, confirming its efficacy as an ultra-fast preliminary assessment baseline.
 
 2. Full RAHMAD Pipeline Superiority:
    - The complete multimodal multi-agent pipeline achieved a binary accuracy of 75.00%

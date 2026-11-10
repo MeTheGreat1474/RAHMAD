@@ -517,7 +517,7 @@ def generate_report(results_3a, ablation_metrics, full_metrics, dataset_name: st
         "1. Early Predictor (EP) Standalone Baseline:\n"
         f"   - On {results_3a['total_samples']} held-out test samples, the standalone CLIP+LoRA model achieved an\n"
         f"     accuracy of {results_3a['accuracy']*100:.2f}%, an F1-score of {results_3a['f1']*100:.2f}%, and an AUC-ROC of {results_3a['auc_roc']:.4f}.\n"
-        f"   - Average inference latency was {results_3a['avg_latency_ms']:.2f} ms/sample, confirming its efficacy as an ultra-fast first-stage triage filter.\n\n"
+        f"   - Average inference latency was {results_3a['avg_latency_ms']:.2f} ms/sample, confirming its efficacy as an ultra-fast preliminary assessment baseline.\n\n"
         "2. Full RAHMAD Pipeline Superiority:\n"
         f"   - The complete multimodal multi-agent pipeline achieved a binary accuracy of {full_metrics['binary_accuracy']*100:.2f}%\n"
         f"     and an F1-score of {full_metrics['binary_f1']*100:.2f}%, with a Cohen's Kappa of {full_metrics['cohen_kappa']:.4f}.\n"

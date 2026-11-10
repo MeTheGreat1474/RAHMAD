@@ -229,8 +229,6 @@ Test the system with modules disabled one-by-one to measure each module's contri
 | **Full RAHMAD**           | ✅  | ✅  | ✅  | ✅  | ✅    | Complete pipeline         |
 
 > [!NOTE]
-> The ablation study is the strongest evidence for your FYP thesis — it proves that each module adds measurable value.
->
 > **Multimodal Forensic Nuance (Cheapfakes & Text-Visual Independence):**
 > In multimodal misinformation, deceptive actors frequently attach authentic, unedited historical photos to unverified, speculative, or fabricated text claims (*Cheapfakes*). While Reverse Image Search (RIS) confirms the visual media is not manipulated or recycled, this visual validity must not create a "visual halo effect" that overrides unverified text. Under RAHMAD's **Text-Visual Independence Principle (Judge Principle P8)**, an authentic photo confirms image integrity only — the textual veracity is independently evaluated by Knowledge Retrieval and Multi-Agent Debate to accurately classify miscaptioned real images as `FALSE CONNECTION` or `MISLEADING CONTENT`.
 

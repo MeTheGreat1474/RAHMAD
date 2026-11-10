@@ -204,6 +204,35 @@ To support rigorous empirical evaluation and ablation studies, the Judge module 
 
 ---
 
+#### Constitutional Principles, Evidentiary Hierarchy & Judicial Guardrails:
+
+##### 1. The Evidentiary Hierarchy (KR > Automated RIS Heuristics):
+Multimodal misinformation detection requires resolving friction between external fact-checking and visual provenance. In previous versions of RAHMAD, the Judge prompt treated Reverse Image Search (RIS) flags with absolute veto power (*"STRICTLY FORBIDDEN from classifying as CREDIBLE if RIS detects Out-of-Context: YES"*). While effective for synthetic cheapfake benchmarks like *NewsCLIPpings* (where unrelated photos are arbitrarily paired with text), this rigid rule caused catastrophic false-positive errors on archival and historical benchmarks like *Fauxtography* (where authentic historical photographs resurfacing on modern social media or YouTube were mistakenly flagged by local vision models as "recycled").
+
+RAHMAD resolves this by formalizing an **Epistemic Evidentiary Hierarchy**:
+- **Primary Ground Truth (Knowledge Retrieval):** Verified journalistic reporting and archival fact-checks (Snopes, Reuters, AP, verified Wikipedia) represent authoritative ground truth. If KR conclusively verifies that the photograph and text accurately document the authentic event, person, or historical context described, this authoritative factual evidence **strictly outranks** automated visual provenance flags.
+- **Automated Visual Heuristics (Reverse Image Search):** Automated image search algorithms operate on metadata timestamps and web scrape clusters, frequently confusing archival recirculation or viral clips with deceptive recycling. When KR corroborates the event, the Judge treats the image as authentic context rather than a deceptive cheapfake.
+- **Cheapfake Preservation:** If KR is absent, silent, uncorroborated, or confirms an image-to-text mismatch, RIS retains full forensic authority. Attaching an unrelated photo to news text remains classified as `FALSE CONNECTION` (Cheapfake).
+
+##### 2. Reasoning-Aware Constitutional Principle P8 Guardrail:
+To prevent silent LLM hallucinations or judicial negligence, `Judge._enforce_constitutional_guardrails()` implements a Python-level safety net:
+- **Previous Implementation Flaw:** In earlier versions, Python code searched for hardcoded Snopes rating strings (e.g. `"rating: true"`) inside KR outlines. Because KR produces rich, structured key-fact outlines rather than literal rating strings, the guardrail always failed to detect verified KR confirmation, forcibly overriding valid judicial `CREDIBLE` decisions to `FALSE CONNECTION`.
+- **Reasoning-Aware Implementation:** The updated P8 guardrail inspects the Judge's own chain-of-thought scratchpad and justification:
+  1. *Visual Acknowledgment:* Verifies whether the Judge explicitly acknowledged the RIS visual finding (`"reverse image search"`, `"out-of-context"`, `"recycled"`).
+  2. *Corroborating Evidence:* Verifies whether the Judge cited external fact-checking corroboration (`"external knowledge"`, `"confirms"`, `"snopes"`, `"verified news"`, `"genuine"`).
+- If **both** signals are present, Python trusts the Judge's deliberate, evidence-weighted decision. If the Judge ignored the visual warning without citing verified knowledge, P8 intervenes to override the verdict to `FALSE CONNECTION`.
+
+##### 3. Resilient JSON Output & OpenRouter Reasoning Optimization:
+- **Reasoning Parameter Tuning (`reasoning: {"effort": "low"}`):** Modern reasoning LLMs (such as `deepseek/deepseek-v4.1-flash`) allocate tokens dynamically between internal chain-of-thought scratchpads and final answer content. Under default configurations, models could exhaust their token budget entirely within `message["reasoning"]`, returning `message["content"] = None` and triggering JSON parse failures. Passing `reasoning: {"effort": "low"}` guarantees that token allocation prioritizes generating the clean, final JSON object in `content`.
+- **Multi-Pass Balanced-Brace & Regex Parser:** `_parse_response()` features a 5-stage resilient parsing pipeline:
+  1. Direct `json.loads` parsing.
+  2. Candidate JSON extraction via balanced braces scanning around `"verdict"`.
+  3. Reverse greedy brace extraction.
+  4. Truncated JSON auto-repair (closing open quotes and unclosed braces).
+  5. Fallback regex field extraction for conversational preambles or severe truncation, ensuring the Judge never crashes to `INCONCLUSIVE (0.0%)` when a verdict was generated.
+
+---
+
 #### Output Format & Contract:
 Regardless of the active mode, the Judge module guarantees an identical JSON schema to the frontend contract:
 ```json
@@ -238,3 +267,75 @@ Automatically logs the end-to-end judicial reasoning session to `output/JUDGE_ou
 - **Server API (`app.py`):** Exposes the `/api/analyze` route which consumes the analyzer's generator and streams the output directly to the client as an NDJSON (Newline Delimited JSON) response. This enables real-time progress tracking without waiting for the full pipeline to finish.
 - **Pipeline Logger (`pipeline_logger.py`):** Captures intermediate states, LLM prompts, tensor shapes, and tracks the LLM backend utilized, logging them to the terminal and saving them to `output_log.txt`.
 - **Frontend App (`script.js`):** A sleek vanilla JS/CSS web app that renders the analysis dynamically. It leverages the modern `Fetch` API's `response.body.getReader()` to continuously read the NDJSON stream chunks. This drives a live, real-time process tracker in the UI, updating the status of each pipeline stage exactly in sync with the backend. It also securely handles DOM creation so special characters and quotes render cleanly, and parses Markdown bolding tags into HTML `<strong>`.
+
+---
+
+### 7. Multilingual Capability & Cross-Lingual Fallback Architecture
+
+RAHMAD incorporates defense-in-depth architectural provisions to process non-English media (e.g., Bahasa Melayu, Indonesian) without requiring total model retraining. Because real-world misinformation frequently involves cross-lingual decontextualization (e.g., local vernacular text paired with sensational foreign photography), the pipeline operates across multiple language-agnostic and multilingual fail-safes.
+
+```
+[Non-English / Malay Article & Media]
+                  │
+  ┌───────────────┴───────────────┐
+  ▼                               ▼
+[Pixel-Level Visual Provenance]  [Multilingual Search & Scraping]
+  • Language-agnostic CLIP         • Google / DDG queries in native tongue
+  • Pure image-to-image matching   • Regional whitelisted news sources
+  │                               │
+  └───────────────┬───────────────┘
+                  ▼
+[Semantic Filter & Automatic Visual Fallback]
+  • If text transformer produces depressed similarity on non-English text,
+    system automatically bypasses threshold to retain all visual matches:
+    candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered
+                  ▼
+[Multilingual Visual Agent & Debate (Qwen 2.5 / DeepSeek)]
+  • Cross-lingual entity alignment (e.g., Malay claim vs. English wire provenance)
+  • Constitutional reasoning & factual synthesis in native tongue
+```
+
+#### 1. Layer-by-Layer Multilingual Behavior:
+
+1. **Input Preprocessing (`input_processing.py`):**
+   - Pure UTF-8 normalization and character-level sanitization; language-agnostic across Latin-script and international alphabets.
+
+2. **Early Predictor (`model/early_predictor.py`):**
+   - *Baseline:* OpenAI CLIP (`openai/clip-vit-base-patch32`) text encoder is predominantly English-trained.
+   - *Graceful Fallback (Principle P6):* If non-English syntax yields ambiguous or neutral probability (~0.50), the system never fails or halts. Under Constitutional Principle P6 (*"Treat Early Predictor as Evidence, Not Authority"*), the Judge recognizes low-confidence triage signals and defers to retrieved external evidence.
+
+3. **Knowledge Retrieval (`model/knowledge_retrieval.py`):**
+   - *Search Engine Multilingualism:* Google Search and DuckDuckGo query APIs natively handle Bahasa Melayu claims and regional entity searches.
+   - *Regional Whitelist Ingestion:* The verification whitelist (`backend/domain_whitelist.py`) explicitly includes major national news agencies and accredited publishers across Malaysia and Southeast Asia:
+     - `bernama.com` (National News Agency of Malaysia)
+     - `astroawani.com`
+     - `malaysiakini.com`
+     - `thestar.com.my`
+     - `nst.com.my`
+     - `freemalaysiatoday.com`
+     - `theedgemalaysia.com` / `theedgemarkets.com`
+     - Regional neighbors: `kompas.com`, `tempo.co`, `antaranews.com`, `thejakartapost.com`, `straitstimes.com`.
+
+4. **Reverse Image Search & The Semantic Fallback Mechanism (`model/reverse_image_search.py`):**
+   - *Image-to-Image Matching (CLIP Vision):* Visual similarity verification (`filter_visually`) operates purely on raw image feature tensors extracted from the target and retrieved thumbnails. This stage is **100% language-agnostic**.
+   - *Semantic Filter Automatic Fallback:* While `all-MiniLM-L6-v2` is an English-specialized sentence embedder, non-English claims will produce lower cosine scores against international image metadata. To prevent valid evidence from being discarded, RAHMAD implements an architectural fallback in `ReverseImageSearchPipeline.execute()`:
+     ```python
+     candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered
+     ```
+     If language divergence causes zero candidates to exceed the semantic threshold, the pipeline automatically falls back to all verified visual matches, preserving complete visual provenance for the LLM Visual Agent.
+
+5. **Cross-Lingual Forensic Synthesis (Visual Agent & Chief Judicial Magistrate):**
+   - Powered by large multilingual foundation models (`deepseek/deepseek-v4.1-flash` and `qwen2.5:7b`), which are pre-trained on tens of trillions of multilingual tokens.
+   - The Visual Agent and Judge seamlessly perform cross-lingual reasoning: evaluating a local vernacular claim (e.g. Bahasa Melayu) against foreign wire provenance (e.g. English, French, or Spanish image archives), detecting cross-modal decontextualization without requiring manual translation.
+
+#### 2. Comparison: English vs. Multilingual Sentence Transformers:
+
+| Dimension | Default: `all-MiniLM-L6-v2` | Multilingual Alternative: `paraphrase-multilingual-MiniLM-L12-v2` |
+| :--- | :--- | :--- |
+| **Primary Language** | English-specialized | 50+ Languages (Native Malay, Indonesian, Chinese, etc.) |
+| **Model Size / Weights** | ~90 MB (6 Transformer Layers) | ~470 MB (12 Transformer Layers) |
+| **Inference Latency** | ~10–15 ms / sample | ~25–35 ms / sample |
+| **English Benchmark STS** | Slightly higher (~0.5–1% edge on pure English NLI) | Strong general performance across all languages |
+| **Cross-Lingual Alignment** | Near-zero cosine alignment across language boundaries | High cross-lingual vector alignment (Malay text maps to English vector) |
+| **Production Recommendation** | Recommended for English benchmarks; relies on RAHMAD visual fallback for other languages | Recommended for dedicated Southeast Asian multi-lingual deployment |
+
