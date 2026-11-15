@@ -30,3 +30,7 @@ venv/
 # dataset
 testing/test_dataset.csv
 /testing
+
+# agents
+/.opencode
+/.claude

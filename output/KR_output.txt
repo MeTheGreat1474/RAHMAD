@@ -1,80 +1,136 @@
 ================================================================================
-  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-10-29  07:48:47
+  KNOWLEDGE RETRIEVAL (KR) FORENSIC LOG  —  2026-11-12  16:22:46
 ================================================================================
 
 [1]  INPUT CLAIM
 ------------------------------------------------------------
-    Original Claim     : A photograph shows the mouth of an adult suffering from hyperdontia.
+    Original Claim     : Indonesian wildfire emissions surge to world's highest, data shows
+
+SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland ​on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+Fire emissions from ‌Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, opens new tab, a portal developed by the European Union's Copernicus climate monitoring service.
+
+Stay up to date on the key companies, data, and decisions in the ESG world with the Reuters Sustainable Finance newsletter. Sign up here.
+In
     Execution Backend  : Local LLM
 
 [2]  LINK RETRIEVAL & DOMAIN FILTERING
 ------------------------------------------------------------
-    Total URLs Retrieved (Pre-Filter) : 5
+    Total URLs Retrieved (Pre-Filter) : 10
     All Retrieved URLs (Pre-Filter Status):
-       1. [FILTERED OUT]  https://africacheck.org/fact-checks/meta-programme-fact-checks/yes-boy-had-526-teeth-removed-image-manipulated
-       2. [WHITELISTED]   https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
-       3. [WHITELISTED]   https://www.snopes.com/fact-check/x-rays-81-teeth/
-       4. [FILTERED OUT]  https://www.vishvasnews.com/english/health/fact-check-x-ray-shown-in-viral-post-is-a-health-condition-not-a-general-toddler-scan/
-       5. [FILTERED OUT]  https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
+       1. [WHITELISTED]   https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
+       2. [FILTERED OUT]  https://dailytimes.com.pk/1575626/wildfire-smoke-kills-over-3500-people-in-indonesia-during-september-crea-report-reveals/
+       3. [FILTERED OUT]  https://wildfiretoday.com/over-3500-killed-from-indonesia-wildfires-air-pollution/
+       4. [WHITELISTED]   https://www.cnn.com/2026/09/09/climate/super-el-nino-fires-indonesia-peatland
+       5. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-15/indonesias-choking-wildfire-haze-worsen-breathing-woes-on-borneo
+       6. [WHITELISTED]   https://www.nbcnews.com/world/indonesia/indonesian-wildfires-respiratory-infections-rcna596989
+       7. [WHITELISTED]   https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+       8. [WHITELISTED]   https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+       9. [WHITELISTED]   https://www.msn.com/en-ae/weather/extreme-weather-events/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bRvWD
+      10. [WHITELISTED]   https://www.dawn.com/news/2028791
 
-    URLs Passing Whitelist : 2
-      1. https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
-      2. https://www.snopes.com/fact-check/x-rays-81-teeth/
+    URLs Passing Whitelist : 8
+      1. https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
+      2. https://www.cnn.com/2026/09/09/climate/super-el-nino-fires-indonesia-peatland
+      3. https://www.usnews.com/news/world/articles/2026-09-15/indonesias-choking-wildfire-haze-worsen-breathing-woes-on-borneo
+      4. https://www.nbcnews.com/world/indonesia/indonesian-wildfires-respiratory-infections-rcna596989
+      5. https://www.usnews.com/news/world/articles/2026-09-09/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      6. https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      7. https://www.msn.com/en-ae/weather/extreme-weather-events/indonesian-wildfire-emissions-surge-to-world-s-highest-data-shows/ar-AA2bRvWD
+      8. https://www.dawn.com/news/2028791
 
 [3]  METADATA EXTRACTION
 ------------------------------------------------------------
-    Articles Successfully Extracted : 2
-      1. Title  : Real X-rays of person with 81 teeth? | Snopes.com
-         Source : https://www.snopes.com/fact-check/x-rays-81-teeth/
+    Articles Successfully Extracted : 5
+      1. Title  : Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says
+         Source : https://www.nbcnews.com/world/indonesia/indonesian-wildfires-respiratory-infections-rcna596989
          Date   : 
-      2. Title  : Fact check: X-ray shows hyperdontia, not generic toddler scan | Reuters
-         Source : https://www.reuters.com/article/world/fact-check-x-ray-shows-hyperdontia-not-generic-toddler-scan-idUSKBN2342O3/
+      2. Title  : Indonesian wildfire emissions surge to world's highest, data shows
+         Source : https://www.yahoo.com/news/science/articles/indonesian-wildfire-emissions-surge-worlds-080353495.html
          Date   : 
+      3. Title  : Bangkok Post - Indonesian wildfire emissions surge to world's highest
+         Source : https://www.bangkokpost.com/world/3316709/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+         Date   : 
+      4. Title  : How a super-sized El Niño is fueling huge fires in Indonesia | CNN
+         Source : https://edition.cnn.com/2026/09/09/climate/super-el-nino-fires-indonesia-peatland
+         Date   : 
+      5. Title  : Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo
+         Source : https://www.usnews.com/news/world/articles/2026-09-15/indonesias-choking-wildfire-haze-worsen-breathing-woes-on-borneo
+         Date   : 
+
+    Whitelisted Supporting References (Unextractable / Anti-Bot Protected) : 2
+      1. Title  : Super El Niño-fueled fires destroyed huge tracts of this country before. They're happening again
+         Source : https://www.cnn.com/2026/09/09/climate/super-el-nino-fires-indonesia-peatland
+         Status : Preserved for Supporting Links
+      2. Title  : Indonesian wildfire emissions surge to world's highest
+         Source : https://www.dawn.com/news/2028791
+         Status : Preserved for Supporting Links
 
 [4]  SEMANTIC VERIFICATION (all-MiniLM-L6-v2) - Threshold >= 0.35
 ------------------------------------------------------------
-    Snippets Passed : 3
+    Snippets Passed : 15
       Snippet #1:
-        [Real X-rays of person with 81 teeth? | Snopes.com] "Hyperdontia: What To Know If You Have Extra Teeth." Cleveland Clinic, https://my.clevelandclinic.org/health/diseases/hyperdontia. Accessed 19 Sep. 2025.
+        [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] Fires have been blazing across vast stretches of forest and peatland throughout the Indonesian archipelago, causing hazardous emissions to ⁠surge, particularly in the hardest-hit provinces on the islands of Sumatra and Borneo.
       Snippet #2:
-        [Real X-rays of person with 81 teeth? | Snopes.com] Pereira, Marilia Nalon, et al. "Multiple Hyperdontia: Report of an Unusual Case." American Journal of Orthodontics and Dentofacial Orthopedics: Official Publication of the American Association of Orthodontists, Its Constituent Societies, and the American Board of Orthodontics, vol. 140, no. 4, Oct. 2011, pp. 580–84. PubMed, https://doi.org/10.1016/j.ajodo.2010.02.038.
+        [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] JAKARTA, Indonesia — Respiratory infections caused by hazardous wildfire pollution in Indonesia have ​more than doubled in just over a week, data from the country’s Health Ministry showed on Thursday.
       Snippet #3:
-        [Real X-rays of person with 81 teeth? | Snopes.com] An x-ray of a patient with hyperdontia (the condition of having more teeth than average). Usually adults have 32 teeth. This person had 81.byu/Parge-leniss ininterestingasf***
+        [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] Indonesia’s Environment Ministry told Reuters ‌in a statement that it viewed the hazardous air quality readings in Kalimantan and elsewhere “with concern.”
+      Snippet #4:
+        [Indonesian wildfire emissions surge to world's highest, data shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      Snippet #5:
+        [Indonesian wildfire emissions surge to world's highest, data shows] Fire ‌emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of ‌the global total, according to Fire Emissions Watch, a portal developed by the European Union's Copernicus climate monitoring service.
+      Snippet #6:
+        [Indonesian wildfire emissions surge to world's highest, data shows] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+      Snippet #7:
+        [Bangkok Post - Indonesian wildfire emissions surge to world's highest] SINGAPORE/JAKARTA — Indonesia is facing a surge ​in emissions from wildfires burning through parched stretches of forest and peatland ‌on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      Snippet #8:
+        [Bangkok Post - Indonesian wildfire emissions surge to world's highest] Fire emissions from Indonesia from Sept 1 to 7 reached 19.7 million metric tonnes, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union's (EU) Copernicus climate monitoring service.
+      Snippet #9:
+        [Bangkok Post - Indonesian wildfire emissions surge to world's highest] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+      Snippet #10:
+        [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Indonesia’s fire emissions last month were the highest recorded in August for the past 24 years, according to Copernicus, the European Union’s climate change service.
+      Snippet #11:
+        [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Already the fires have eaten through more than 200,000 hectares of land and the fire season is likely to continue into October and November. Over 23,000 “fire hotspots” have been detected by satellites in the last eight months, according to BKMG, the Indonesian government agency for meteorology, climatology and geophysics. This means “2026 is already surpassing 2015 in terms of fire activity,” a BKMG spokesperson said.
+      Snippet #12:
+        [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Wildfires are ripping across parts of Indonesia, destroying precious peatland and smothering the country in a toxic smoke so thick, people are struggling to breathe. With months of wildfire season still remaining, experts warn this could end up as one of the country’s worst.
+      Snippet #13:
+        [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] Indonesia's emissions of 19.7 million metric tons during the week to September 7 made up more than a third of the global total, says the Fire Emissions Watch portal of the European Union's Copernicus climate monitoring service.
+      Snippet #14:
+        [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo
+      Snippet #15:
+        [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] The province ⁠of West Kalimantan on Borneo, home to Pontianak, is one of the areas worst ​hit by Indonesia's most intense wildfires in 11 years as "super-El Niño" weather conditions drive up temperatures and cause punishing droughts.
 
 [5]  LLM SYNTHESIS & CONDENSED SUMMARY
 ------------------------------------------------------------
     Generated Key-Facts Summary:
-      ### Comprehensive Key-Fact Outline
+      [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] Fires have been blazing across vast stretches of forest and peatland throughout the Indonesian archipelago, causing hazardous emissions to ⁠surge, particularly in the hardest-hit provinces on the islands of Sumatra and Borneo.
       
-      #### 1. Key Entities, Names, and Roles Involved
-      - **Marilia Nalon Pereira**: Author of the case report.
-      - **Cleveland Clinic**: Source of the information on hyperdontia.
-      - **American Journal of Orthodontics and Dentofacial Orthopedics**: Journal where the case report was published.
-      - **Case Patient**: An individual with hyperdontia, having 81 teeth.
+      [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] JAKARTA, Indonesia — Respiratory infections caused by hazardous wildfire pollution in Indonesia have ​more than doubled in just over a week, data from the country’s Health Ministry showed on Thursday.
       
-      #### 2. Monetary Amounts, Legal Rulings, or Official Outcomes
-      - **None explicitly mentioned**.
+      [Indonesian wildfires cause respiratory infections to double in a week, Health Ministry says] Indonesia’s Environment Ministry told Reuters ‌in a statement that it viewed the hazardous air quality readings in Kalimantan and elsewhere “with concern.”
       
-      #### 3. Timeline of Events and Corroborating Evidence
-      - **Date not specified**: The case report by Pereira et al. was published in the American Journal of Orthodontics and Dentofacial Orthopedics in October 2011.
-        - **Publication Details**: 
-          - **Journal**: American Journal of Orthodontics and Dentofacial Orthopedics.
-          - **Volume and Issue**: Volume 140, Number 4.
-          - **Pages**: 580–84.
-          - **DOI**: 10.1016/j.ajodo.2010.02.038.
-        - **Content of the Report**: 
-          - **Title**: "Multiple Hyperdontia: Report of an Unusual Case."
-          - **Description**: The report details a case of hyperdontia, where the patient had 81 teeth, significantly more than the usual 32 teeth found in adults.
-        - **X-ray Evidence**: 
-          - **Source**: Cleveland Clinic.
-          - **Description**: X-rays of the patient with hyperdontia are mentioned, showing the condition visually.
+      [Indonesian wildfire emissions surge to world's highest, data shows] SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
       
-      #### Summary of Evidence
-      - **Photograph**: The photograph in question is described as showing the mouth of an adult with hyperdontia, having 81 teeth.
-      - **Case Report**: A case report by Pereira et al. in 2011 details a patient with 81 teeth, confirming the existence of such a condition.
-      - **X-ray Evidence**: X-rays from Cleveland Clinic support the visual evidence of hyperdontia.
+      [Indonesian wildfire emissions surge to world's highest, data shows] Fire ‌emissions from Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of ‌the global total, according to Fire Emissions Watch, a portal developed by the European Union's Copernicus climate monitoring service.
       
-      This outline provides a structured summary of the key facts, entities, and evidence presented in the verified article snippets without adding any inferred or external information.
+      [Indonesian wildfire emissions surge to world's highest, data shows] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+      
+      [Bangkok Post - Indonesian wildfire emissions surge to world's highest] SINGAPORE/JAKARTA — Indonesia is facing a surge ​in emissions from wildfires burning through parched stretches of forest and peatland ‌on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+      
+      [Bangkok Post - Indonesian wildfire emissions surge to world's highest] Fire emissions from Indonesia from Sept 1 to 7 reached 19.7 million metric tonnes, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, a portal developed by the European Union's (EU) Copernicus climate monitoring service.
+      
+      [Bangkok Post - Indonesian wildfire emissions surge to world's highest] Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+      
+      [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Indonesia’s fire emissions last month were the highest recorded in August for the past 24 years, according to Copernicus, the European Union’s climate change service.
+      
+      [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Already the fires have eaten through more than 200,000 hectares of land and the fire season is likely to continue into October and November. Over 23,000 “fire hotspots” have been detected by satellites in the last eight months, according to BKMG, the Indonesian government agency for meteorology, climatology and geophysics. This means “2026 is already surpassing 2015 in terms of fire activity,” a BKMG spokesperson said.
+      
+      [How a super-sized El Niño is fueling huge fires in Indonesia | CNN] Wildfires are ripping across parts of Indonesia, destroying precious peatland and smothering the country in a toxic smoke so thick, people are struggling to breathe. With months of wildfire season still remaining, experts warn this could end up as one of the country’s worst.
+      
+      [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] Indonesia's emissions of 19.7 million metric tons during the week to September 7 made up more than a third of the global total, says the Fire Emissions Watch portal of the European Union's Copernicus climate monitoring service.
+      
+      [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo
+      
+      [Indonesia's Choking Wildfire, Haze Worsen Breathing Woes on Borneo] The province ⁠of West Kalimantan on Borneo, home to Pontianak, is one of the areas worst ​hit by Indonesia's most intense wildfires in 11 years as "super-El Niño" weather conditions drive up temperatures and cause punishing droughts.
 
 [6]  FINAL PIPELINE STATUS
 ------------------------------------------------------------

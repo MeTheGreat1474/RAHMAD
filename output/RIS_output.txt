@@ -1,12 +1,39 @@
 ================================================================================
-  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-10-29  14:04:09
+  REVERSE IMAGE SEARCH (RIS) FORENSIC LOG  —  2026-11-12  16:23:12
 ================================================================================
 
 [1]  INPUT CLAIM & VISUAL TARGET
 ------------------------------------------------------------
-    Original Claim     : A photograph shows the mouth of an adult suffering from hyperdontia.
-    Target Image Source: Local Image File (C:\Users\ahmad\Documents\Programming\fyp\Dataset\images_fauxtography\070_hyperdontia-supernumerary-teeth.jpg)
-    Public Search URL  : https://i.ibb.co/nqsYmG8X/5eed9b2e2f0f.jpg
+    Original Claim     : Indonesian wildfire emissions surge to world's highest, data shows
+
+SINGAPORE/JAKARTA, Sept 9 (Reuters) - Indonesia is facing a surge in emissions from wildfires burning through parched stretches of forest and peatland ​on the islands of Borneo and Sumatra, with carbon dioxide readings currently the highest in the world, data showed on Wednesday.
+Fire emissions from ‌Indonesia from September 1 to September 7 reached 19.7 million metric tons, overtaking Russia this week and making up more than a third of the global total, according to Fire Emissions Watch, opens new tab, a portal developed by the European Union's Copernicus climate monitoring service.
+
+Stay up to date on the key companies, data, and decisions in the ESG world with the Reuters Sustainable Finance newsletter. Sign up here.
+Indonesia is one of the world's most fire-prone countries, but as "super-El Niño" weather conditions drive up temperatures and cause punishing droughts, the country is ​battling what authorities say is its most intense wildfire season in 11 years.
+"We do expect to see some fires across the region at this time of year, ​but with El Niño, it clearly just gives a big enhancement to them," said Mark Parrington, senior scientist at the Copernicus ⁠Atmosphere Monitoring Service in Bonn.
+"It's much drier, it's hotter, and when there's ignition, these fires burn in a far more extreme way."
+From September 1 to September 7, ​fire emission intensity exceeded 1,500 kg/sq km, more than 10 times the Russian level, with the highest concentrations in Kalimantan in Indonesia's part of Borneo and eastern parts of Sumatra, ​Copernicus data showed on Wednesday.
+Emissions were 273% higher than the seasonal average, though still lower than the 21.7 million tons emitted in the same week of 2015, when Indonesia was battling similarly intense El Niño conditions.
+Among the hardest hit areas has been the city of Pontianak in West Kalimantan, where the air quality index was 394 on Wednesday, according to Swiss air quality monitoring firm ​IQAir. A reading of 300 is considered hazardous.
+Indonesia's environment ministry told Reuters in a statement that it viewed the hazardous air quality readings in Kalimantan and elsewhere "with ​concern".
+It said it was monitoring Copernicus's data, but added it "does not directly reflect air quality conditions in a specific area", and other factors needed to be taken into account.
+
+'BELOW THE DETECTION LIMIT'
+From ‌January to July ⁠this year, fires burned around 202,000 hectares (780 square miles) of Indonesian land, about a third the amount over the same period in 2015, said Nisa Novita of the environmental group YKAN, which helps communities tackle fires.
+"However, August data are estimated to show a significant increase of around 600,000 hectares, particularly in Kalimantan, Sumatra and South Papua," she said.
+Indonesia lost a total of 2.6 million hectares to fire in the whole of 2015, an area bigger than Wales.
+The number of recorded hotspots from August 1 to September 8 ​reached 13,443, compared to 9,454 over the ​same period of 2015, according to ⁠Indonesian forest ministry monitoring platform Sipongi, based on data from NASA's Terra and Aqua satellites.
+A record monthly high for hotspots was recorded in October 2015, Sipongi data showed.
+Fire Emissions Watch uses satellite observations to estimate concentrations of particulate matter, volatile organic compounds, ​greenhouse gases and other fire-fuelled pollutants, but Parrington said it could actually be underestimating the extent of the problem.
+"One of the aspects ​with peat fires is ⁠if they're burning at low temperatures or underground, they'd be below the detection limit of the sensors, which means we're not actually seeing them," he said.
+Studies have shown that fires in Indonesia in 2015 produced more emissions per day than the whole of the EU, and caused more than 100,000 excess deaths throughout Indonesia, Malaysia and Singapore.
+"We have to remember that ⁠this is ​still the beginning of the season, and we expect the fires to continue and the emissions to ​keep increasing, potentially through to the end of October, which is what we saw in 2015," said Parrington.
+"In two months we'll know how extreme this year has been, but the early indications are that ​it is at pace, if not slightly above those previous El Niño years."
+
+Reporting by David Stanway in Singapore, Fransiska Nangoy and Dewi Kurniawati in Jakarta; Editing by Kate Mayberry
+    Target Image Source: Base64 Inline Image (data:image/jpeg;base64, length: 94,595 chars)
+    Public Search URL  : https://i.ibb.co/FkzyBFFs/2cb1a1c87dc2.jpg
     Execution Backend  : Local LLM (qwen2.5:7b)
 
 [2]  GOOGLE LENS SEARCH RETRIEVAL (SERPAPI)
@@ -16,188 +43,183 @@
     Search Status      : Retrieved 10 candidate matches via Google Lens.
 
       Match #1:
-        Title    : Does This Picture Show a Case of Hyperdontia? | Snopes.com
-        Source   : Snopes
-        Link     : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjEuHpZ62SRxghIheqI5BRw9y1zv3TmrB1h2YQ7g0-VuySzP9w
+        Title    : Indonesian wildfires cause respiratory infections to double ...
+        Source   : Reuters
+        Link     : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTj6vhMJSMFTFQ9jFg5SqitpUZ50e9Cwo-oNA&s
       Match #2:
-        Title    : These extra set of teeth are part of a dental anomaly called ...
-        Source   : Facebook
-        Link     : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRhTXxaeCspV32_1tZvrQ2RiEDclWXpijidWg3mgltr9Px5cO7D
+        Title    : Indonesian wildfire emissions surge to world's highest, data ...
+        Source   : Reuters
+        Link     : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiKprVFOVuhGAvu-7WAX9r47eAAKH6QJQoFQ&s
       Match #3:
-        Title    : As a hopeful future dentist, this makes me cringe and will ...
-        Source   : Reddit
-        Link     : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSNdeC0e6QrET0RYC562Hxv2TY5xeQvLk9f1f4CJbKPcPr0PJ_d
+        Title    : Photos of the week - September 10, 2026 | Reuters
+        Source   : Reuters
+        Link     : https://www.reuters.com/pictures/photos-week-2026-09-10/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb7PqFtYPOo3HUPNFmuHmo17MO88XRxRf6Aw&s
       Match #4:
-        Title    : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
-        Source   : Restorative Dentistry
-        Link     : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTmnXAw8dbO26rfnnYN_M7vVySO9vADOEwG4MRq3VMVic2Vb2p
+        Title    : Photos of the week - September 10, 2026 | Reuters
+        Source   : Photos of the week - September 10, 2026 | Reuters
+        Link     : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT45UmBhtcVSf7oN9xHAAEXh9rfcAbl5AL9uw&s
       Match #5:
-        Title    : What is the medical condition comment below
-        Source   : Facebook
-        Link     : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTlI4yOQZ2FjKzfUI3VgMl7nX2m0bTj85Ghp8DXIVboM2AyA65e
+        Title    : Indonesia's wildfire emissions surge to world's highest, data ...
+        Source   : South China Morning Post
+        Link     : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAzDjgw6UaouV3ZyUqRlxhR4hv5HNCU_AVBQ&s
       Match #6:
-        Title    : SCP-478 "Tooth Fairies"
-        Source   : YouTube
-        Link     : https://www.youtube.com/watch?v=9Y79xcOEmm4
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbftjth8bhGzkjFUvs7Z6RijGP1KIa6sieuafJBumkWP_XWgAC
+        Title    : Indonesian wildfire emissions surge to world's highest, data ...
+        Source   : KSL
+        Link     : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVZ-qBQyEnsmlz0mAP9t-R85z1-o6rsxQxww&s
       Match #7:
-        Title    : Thừa răng - YouTube
-        Source   : YouTube
-        Link     : https://www.youtube.com/watch?v=kE_e_svHuDs
-        Thumbnail: https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRumSNXJB8Wbuyfv1NRVym6oGJvsyNRMuiYIxA3HK98rnGmd8HA
+        Title    : Fires in Indonesia Blanket Islands and Cities in Smog ...
+        Source   : The Atlantic
+        Link     : https://www.theatlantic.com/photo/2019/09/fires-indonesia-blanket-islands-and-cities-smog-photos/598105/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgSXrxl_TV61Bky3ADs6MG5Q9qcdGjUIzMbQ&s
       Match #8:
-        Title    : "Hyperdontia" - MEDizzy
-        Source   : MEDizzy
-        Link     : https://medizzy.com/feed/141791
-        Thumbnail: https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTvHOmnyM12AtY7ZAsLMdMD5eCnzEbRiYRlVT90JIUP0QVgRRwb
-      Match #9:
-        Title    : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+        Title    : Indonesia is facing a surge in emissions from wildfires ...
         Source   : Instagram
-        Link     : https://www.instagram.com/p/CHr5xTxFAcO/
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSssYlY5TdcPiLZlEPTCZLd_H1Ldi8z0g7Con71Jb2DaoFJbpnr
+        Link     : https://www.instagram.com/p/DdGTqddjdDD/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-jGrsB0PZf1TczLm9s1fWzOcDUfBryAzFBg&s
+      Match #9:
+        Title    : Indonesia is facing a surge in emissions from wildfire now ...
+        Source   : Facebook
+        Link     : https://www.facebook.com/Reuters/posts/indonesia-is-facing-a-surge-in-emissions-from-wildfire-now-blazing-through-stret/1665526535438072/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTndQZ__YeoApHshNJXrAM9FO9OV3Rfy12sQ&s
       Match #10:
-        Title    : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
-        Source   : Lead Stories
-        Link     : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
-        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCK9lhOmQBekw8LRd09PeY9PUZgIvCRcEm7lez5aIj_-lilX4p
+        Title    : Why does it take months to subdue some wildfires? - OPB
+        Source   : OPB
+        Link     : https://www.opb.org/article/2021/08/21/explainer-why-it-takes-months-to-subdue-some-wildfires/
+        Thumbnail: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWtYYfnKDUDeKA_LQQ106noDKmgetuOsjALw&s
 
 [3]  VISUAL SIMILARITY FILTERING (CLIP: openai/clip-vit-base-patch32)
 ------------------------------------------------------------
     Filter Criterion   : Visual embedding cosine similarity >= 0.68
     Evaluated Candidates (10):
-      1. [PASSED] Visual Similarity: 0.9145 (Threshold: >=0.68)
-         Title  : Does This Picture Show a Case of Hyperdontia? | Snopes.com
-         Source : Snopes
-         Link   : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
-      2. [PASSED] Visual Similarity: 0.8682 (Threshold: >=0.68)
-         Title  : These extra set of teeth are part of a dental anomaly called ...
-         Source : Facebook
-         Link   : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
-      3. [PASSED] Visual Similarity: 0.7876 (Threshold: >=0.68)
-         Title  : As a hopeful future dentist, this makes me cringe and will ...
-         Source : Reddit
-         Link   : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
-      4. [PASSED] Visual Similarity: 0.8856 (Threshold: >=0.68)
-         Title  : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
-         Source : Restorative Dentistry
-         Link   : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
-      5. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.68)
-         Title  : What is the medical condition comment below
-         Source : Facebook
-         Link   : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
-      6. [PASSED] Visual Similarity: 0.9186 (Threshold: >=0.68)
-         Title  : SCP-478 "Tooth Fairies"
-         Source : YouTube
-         Link   : https://www.youtube.com/watch?v=9Y79xcOEmm4
-      7. [PASSED] Visual Similarity: 0.9391 (Threshold: >=0.68)
-         Title  : Thừa răng - YouTube
-         Source : YouTube
-         Link   : https://www.youtube.com/watch?v=kE_e_svHuDs
-      8. [PASSED] Visual Similarity: 0.8242 (Threshold: >=0.68)
-         Title  : "Hyperdontia" - MEDizzy
-         Source : MEDizzy
-         Link   : https://medizzy.com/feed/141791
-      9. [PASSED] Visual Similarity: 0.9044 (Threshold: >=0.68)
-         Title  : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+      1. [PASSED] Visual Similarity: 0.9288 (Threshold: >=0.68)
+         Title  : Indonesian wildfires cause respiratory infections to double ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
+      2. [PASSED] Visual Similarity: 0.9278 (Threshold: >=0.68)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      3. [PASSED] Visual Similarity: 0.9215 (Threshold: >=0.68)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/
+      4. [PASSED] Visual Similarity: 0.9253 (Threshold: >=0.68)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Photos of the week - September 10, 2026 | Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+      5. [PASSED] Visual Similarity: 0.7697 (Threshold: >=0.68)
+         Title  : Indonesia's wildfire emissions surge to world's highest, data ...
+         Source : South China Morning Post
+         Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
+      6. [PASSED] Visual Similarity: 0.9258 (Threshold: >=0.68)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : KSL
+         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      7. [PASSED] Visual Similarity: 0.8862 (Threshold: >=0.68)
+         Title  : Fires in Indonesia Blanket Islands and Cities in Smog ...
+         Source : The Atlantic
+         Link   : https://www.theatlantic.com/photo/2019/09/fires-indonesia-blanket-islands-and-cities-smog-photos/598105/
+      8. [PASSED] Visual Similarity: 0.9301 (Threshold: >=0.68)
+         Title  : Indonesia is facing a surge in emissions from wildfires ...
          Source : Instagram
-         Link   : https://www.instagram.com/p/CHr5xTxFAcO/
-      10. [PASSED] Visual Similarity: 0.8184 (Threshold: >=0.68)
-         Title  : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
-         Source : Lead Stories
-         Link   : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
+         Link   : https://www.instagram.com/p/DdGTqddjdDD/
+      9. [FAILED] Visual Similarity: 0.6436 (Threshold: >=0.68)
+         Title  : Indonesia is facing a surge in emissions from wildfire now ...
+         Source : Facebook
+         Link   : https://www.facebook.com/Reuters/posts/indonesia-is-facing-a-surge-in-emissions-from-wildfire-now-blazing-through-stret/1665526535438072/
+      10. [PASSED] Visual Similarity: 0.8971 (Threshold: >=0.68)
+         Title  : Why does it take months to subdue some wildfires? - OPB
+         Source : OPB
+         Link   : https://www.opb.org/article/2021/08/21/explainer-why-it-takes-months-to-subdue-some-wildfires/
 
-    Outcome: 10 of 10 candidates passed visual filter.
+    Outcome: 9 of 10 candidates passed visual filter.
 
 [4]  SEMANTIC CONTEXT FILTERING (MiniLM: all-MiniLM-L6-v2)
 ------------------------------------------------------------
     Filter Criterion   : Contextual semantic embedding similarity >= 0.00
-    Evaluated Contexts (10):
-      1. [PASSED] Semantic Similarity: 0.7571 (Threshold: >=0.00)
-         Title  : Does This Picture Show a Case of Hyperdontia? | Snopes.com
-         Source : Snopes
-         Link   : https://www.snopes.com/fact-check/hyperdontia-supernumerary-teeth/
-      2. [PASSED] Semantic Similarity: 0.3343 (Threshold: >=0.00)
-         Title  : These extra set of teeth are part of a dental anomaly called ...
-         Source : Facebook
-         Link   : https://www.facebook.com/HowardFarran/posts/these-extra-set-of-teeth-are-part-of-a-dental-anomaly-called-hyperdontia-which-i/1859567244085653/
-      3. [PASSED] Semantic Similarity: 0.4297 (Threshold: >=0.00)
-         Title  : As a hopeful future dentist, this makes me cringe and will ...
-         Source : Reddit
-         Link   : https://www.reddit.com/r/Dentistry/comments/j8mfa/as_a_hopeful_future_dentist_this_makes_me_cringe/
-      4. [PASSED] Semantic Similarity: 0.0585 (Threshold: >=0.00)
-         Title  : f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ...
-         Source : Restorative Dentistry
-         Link   : https://restorativedentistry.org/f9d7d79db3f95d4a75b98700c5e18ff0/
-      5. [PASSED] Semantic Similarity: 0.3629 (Threshold: >=0.00)
-         Title  : What is the medical condition comment below
-         Source : Facebook
-         Link   : https://www.facebook.com/groups/295023985976263/posts/1418040300341287/
-      6. [PASSED] Semantic Similarity: 0.2450 (Threshold: >=0.00)
-         Title  : SCP-478 "Tooth Fairies"
-         Source : YouTube
-         Link   : https://www.youtube.com/watch?v=9Y79xcOEmm4
-      7. [PASSED] Semantic Similarity: 0.0624 (Threshold: >=0.00)
-         Title  : Thừa răng - YouTube
-         Source : YouTube
-         Link   : https://www.youtube.com/watch?v=kE_e_svHuDs
-      8. [PASSED] Semantic Similarity: 0.5989 (Threshold: >=0.00)
-         Title  : "Hyperdontia" - MEDizzy
-         Source : MEDizzy
-         Link   : https://medizzy.com/feed/141791
-      9. [PASSED] Semantic Similarity: 0.0631 (Threshold: >=0.00)
-         Title  : زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ...
+    Evaluated Contexts (9):
+      1. [PASSED] Semantic Similarity: 0.5839 (Threshold: >=0.00)
+         Title  : Indonesian wildfires cause respiratory infections to double ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfires-cause-respiratory-infections-double-week-health-ministry-2026-09-10/
+      2. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.00)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : Reuters
+         Link   : https://www.reuters.com/business/environment/indonesian-wildfire-emissions-surge-worlds-highest-data-shows-2026-09-09/
+      3. [PASSED] Semantic Similarity: 0.2075 (Threshold: >=0.00)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/
+      4. [PASSED] Semantic Similarity: 0.2075 (Threshold: >=0.00)
+         Title  : Photos of the week - September 10, 2026 | Reuters
+         Source : Photos of the week - September 10, 2026 | Reuters
+         Link   : https://www.reuters.com/pictures/photos-week-2026-09-10/MYWR2ZXLQNN7FB6PCSWLXHABYA/
+      5. [PASSED] Semantic Similarity: 0.8037 (Threshold: >=0.00)
+         Title  : Indonesia's wildfire emissions surge to world's highest, data ...
+         Source : South China Morning Post
+         Link   : https://www.scmp.com/news/asia/southeast-asia/article/3366962/indonesias-wildfire-emissions-surge-worlds-highest-data-shows
+      6. [PASSED] Semantic Similarity: 0.8222 (Threshold: >=0.00)
+         Title  : Indonesian wildfire emissions surge to world's highest, data ...
+         Source : KSL
+         Link   : https://www.ksl.com/article/51621758/indonesian-wildfire-emissions-surge-to-worlds-highest-data-shows
+      7. [PASSED] Semantic Similarity: 0.6424 (Threshold: >=0.00)
+         Title  : Fires in Indonesia Blanket Islands and Cities in Smog ...
+         Source : The Atlantic
+         Link   : https://www.theatlantic.com/photo/2019/09/fires-indonesia-blanket-islands-and-cities-smog-photos/598105/
+      8. [PASSED] Semantic Similarity: 0.7843 (Threshold: >=0.00)
+         Title  : Indonesia is facing a surge in emissions from wildfires ...
          Source : Instagram
-         Link   : https://www.instagram.com/p/CHr5xTxFAcO/
-      10. [PASSED] Semantic Similarity: 0.5920 (Threshold: >=0.00)
-         Title  : Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ...
-         Source : Lead Stories
-         Link   : https://leadstories.com/hoax-alert/2022/02/fact-check-no-evidence-hyperdontia-photo-is-real.html
+         Link   : https://www.instagram.com/p/DdGTqddjdDD/
+      9. [PASSED] Semantic Similarity: 0.4439 (Threshold: >=0.00)
+         Title  : Why does it take months to subdue some wildfires? - OPB
+         Source : OPB
+         Link   : https://www.opb.org/article/2021/08/21/explainer-why-it-takes-months-to-subdue-some-wildfires/
 
-    Outcome: 10 of 10 candidates passed semantic filter.
+    Outcome: 9 of 9 candidates passed semantic filter.
 
 [5]  VISUAL AGENT DECONTEXTUALIZATION ANALYSIS
 ------------------------------------------------------------
-    Model Employed     : qwen2.5:7b
-    Assigned Category  : Generic / Illustrative Imagery
+    Model Employed     : None (Failed)
+    Assigned Category  : Inconclusive / Insufficient Evidence
     Out-of-Context (OOC): NO (Authentic Context / Non-Deceptive)
-    Confidence Level   : High
+    Confidence Level   : Low
 
     Context Sent to Visual Agent:
-      - Does This Picture Show a Case of Hyperdontia? | Snopes.com (Source: Snopes)
-      - These extra set of teeth are part of a dental anomaly called ... (Source: Facebook)
-      - As a hopeful future dentist, this makes me cringe and will ... (Source: Reddit)
-      - f9d7d79db3f95d4a75b98700c5e18ff0 | Key Topics in Restorative ... (Source: Restorative Dentistry)
-      - What is the medical condition comment below (Source: Facebook)
-      - SCP-478 "Tooth Fairies" (Source: YouTube)
-      - Thừa răng - YouTube (Source: YouTube)
-      - "Hyperdontia" - MEDizzy (Source: MEDizzy)
-      - زيادة عدد الأسنان يُعرف امتلاك عدد أسنان زائد عن العدد ... (Source: Instagram)
-      - Fact Check: NO Evidence 'Hyperdontia' Photo Is Real | Lead ... (Source: Lead Stories)
+      - Indonesian wildfires cause respiratory infections to double ... (Source: Reuters)
+      - Indonesian wildfire emissions surge to world's highest, data ... (Source: Reuters)
+      - Photos of the week - September 10, 2026 | Reuters (Source: Reuters)
+      - Photos of the week - September 10, 2026 | Reuters (Source: Photos of the week - September 10, 2026 | Reuters)
+      - Indonesia's wildfire emissions surge to world's highest, data ... (Source: South China Morning Post)
+      - Indonesian wildfire emissions surge to world's highest, data ... (Source: KSL)
+      - Fires in Indonesia Blanket Islands and Cities in Smog ... (Source: The Atlantic)
+      - Indonesia is facing a surge in emissions from wildfires ... (Source: Instagram)
+      - Why does it take months to subdue some wildfires? - OPB (Source: OPB)
 
     Visual Agent Forensic Synthesis:
-      The images found online are consistent with the theme of hyperdontia, which is a dental condition. They are likely stock photos or file images used to illustrate articles about the condition. The presence of multiple sources discussing hyperdontia and the consistent subject matter across these sources indicate that the images are relevant and not out of context.
+      Visual Agent Error: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError("HTTPConnection(host='localhost', port=11434): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
 
 [6]  EVIDENTIARY SUMMARY FORWARDED TO JUDGE MODULE
 ------------------------------------------------------------
-    Assigned Category          : Generic / Illustrative Imagery
+    Assigned Category          : Inconclusive / Insufficient Evidence
     Out-of-Context Flag (OOC)  : NO (Authentic Context / Non-Deceptive)
-    Judicial Confidence Weight : High
+    Judicial Confidence Weight : Low
 
     Executive Visual Evidence Summary for Judge:
-      The images depict a case of hyperdontia, a dental condition, and are found across multiple sources discussing the topic. They are not out of context and are used to illustrate articles about hyperdontia, verifying media integrity but not independently proving unverified claims.
+      Reverse Image Search analysis unavailable due to an error: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError("HTTPConnection(host='localhost', port=11434): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it")). Evaluation will proceed using textual facts.
 
 [7]  FINAL VERDICT & PIPELINE SUMMARY
 ------------------------------------------------------------
     Pipeline Status       : success
-    Forensic Category     : Generic / Illustrative Imagery
+    Forensic Category     : Inconclusive / Insufficient Evidence
     Out-of-Context (OOC)   : NO (Authentic Context / Non-Deceptive)
-    Confidence Level      : High
-    High-Fidelity Matches : 10
+    Confidence Level      : Low
+    High-Fidelity Matches : 9
     Forwarded to Judge    : YES
 
 ================================================================================
