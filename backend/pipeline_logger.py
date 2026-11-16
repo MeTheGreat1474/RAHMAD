@@ -124,6 +124,20 @@ class PipelineLogger:
     # Public logging methods  (call in pipeline order)
     # ------------------------------------------------------------------
 
+    def log_preflight(self, backends: list[dict]) -> None:
+        """
+        Record the local-LLM preflight health check as section [0].
+
+        backends : list of {"url": str, "reachable": bool, "detail": str}
+        """
+        self._section(0, "LOCAL LLM BACKEND PREFLIGHT")
+        for b in backends:
+            state = "REACHABLE" if b["reachable"] else "UNREACHABLE  (degraded mode: pipeline will continue)"
+            self._kv(b["url"], state)
+            if not b["reachable"]:
+                self._w(f"      → {b['detail']}")
+        self._w()
+
     def log_preprocessing_input(
         self,
         raw_text: str,

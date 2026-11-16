@@ -30,7 +30,9 @@ import base64
 import io
 import logging
 import os
+import socket
 import urllib.request
+from urllib.parse import urlsplit
 
 from PIL import Image
 
@@ -140,6 +142,52 @@ _NO_IMAGE_EP = {
 
 
 # ---------------------------------------------------------------------------
+# Local-LLM backend preflight (Ollama health check)
+# ---------------------------------------------------------------------------
+
+def _tcp_reachable(url: str, timeout: float = 1.5) -> tuple[bool, str]:
+    """
+    Cheap TCP health probe for a base URL such as http://localhost:11434.
+    Returns (reachable, detail). Never raises.
+    """
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname or "localhost"
+        port = parts.port or (443 if parts.scheme == "https" else 80)
+        with socket.create_connection((host, port), timeout=timeout):
+            return True, f"TCP connect to {host}:{port} OK"
+    except Exception as exc:
+        return False, f"{type(exc).__name__}: {exc}"
+
+
+def _preflight_local_llm() -> tuple[bool, list[dict]]:
+    """
+    Check every Ollama endpoint the pipeline depends on.
+
+    MAD always runs on local Ollama (OLLAMA_BASE_URL). When USE_LOCAL_LLM=true
+    the KR synthesiser and RIS Visual Agent also call it (LOCAL_LLM_URL).
+
+    Returns (all_ok, per-backend results) — results are dicts of
+    {url, reachable, detail}.
+    """
+    use_local = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
+    ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+
+    urls = [("Ollama (MAD)" + (" + KR/RIS" if use_local else ""), ollama_url)]
+    if use_local:
+        kr_ris_url = os.environ.get("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
+        # Skip duplicates — same host:port as OLLAMA_BASE_URL is one server.
+        if urlsplit(kr_ris_url).netloc != urlsplit(ollama_url).netloc:
+            urls.append(("Local LLM (KR/RIS)", kr_ris_url))
+
+    results = []
+    for label, url in urls:
+        ok, detail = _tcp_reachable(url)
+        results.append({"label": label, "url": url, "reachable": ok, "detail": detail})
+    return all(r["reachable"] for r in results), results
+
+
+# ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
 
@@ -184,6 +232,24 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         }
 }
         return
+
+    # ── Preflight: local-LLM backend health check ─────────────────────────
+    # MAD always needs Ollama; with USE_LOCAL_LLM=true so do KR and RIS.
+    # A down backend degrades the run silently — surface it up-front.
+    yield {"type": "status", "step": "CHECKING LLM BACKEND...", "status": "IN PROGRESS"}
+    llm_backend_ok, llm_backend_results = _preflight_local_llm()
+    plog.log_preflight(llm_backend_results)
+    if llm_backend_ok:
+        for r in llm_backend_results:
+            print(f"  [Preflight] {r['label']}: REACHABLE ({r['url']})")
+    else:
+        for r in llm_backend_results:
+            if not r["reachable"]:
+                print(f"  [Preflight] [X] {r['label']} UNREACHABLE: {r['url']} — {r['detail']}")
+                print("             Start Ollama (e.g. `ollama serve`) — MAD/KR/RIS will be degraded this run.")
+        log.warning("[analyzer] Ollama unreachable — MAD/KR/RIS will run in degraded mode.")
+    yield {"type": "status", "step": "CHECKING LLM BACKEND...", "status": "OK" if llm_backend_ok else "FAIL"}
+
     yield {"type": "status", "step": "PRE-PROCESSING INPUT...", "status": "IN PROGRESS"}
     # ── 1. Decode image & 2. Pre-process inputs ────────────────────────────
     t_prep_start = time.perf_counter()

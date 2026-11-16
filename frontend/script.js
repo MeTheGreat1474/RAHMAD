@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ────────────────────────────────────────────────────────────
 
     const streamSteps = [
+        { text: "CHECKING LLM BACKEND...", status: "OK", delay: 500 },
         { text: "PRE-PROCESSING INPUT...", status: "OK", delay: 500 },
         { text: "RUNNING EARLY PREDICTOR...", status: "OK", delay: 1000 },
         { text: "FETCHING EVIDENCE...", status: "OK", delay: 1000 },
