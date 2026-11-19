@@ -1,0 +1,220 @@
+{
+  "app.py": {
+    "mtime": 1791251451.9136667,
+    "seen": 1795013600.5203872,
+    "ast_hash": "017f27b505c6b4d8657b41b1666aef18",
+    "semantic_hash": "017f27b505c6b4d8657b41b1666aef18"
+  },
+  "archive/data_processing/download_news_clippings.py": {
+    "mtime": 1793074694.6443553,
+    "seen": 1795013600.520626,
+    "ast_hash": "df50e5f67b579a15d8d17dc8925f2992",
+    "semantic_hash": "df50e5f67b579a15d8d17dc8925f2992"
+  },
+  "archive/data_processing/fix.py": {
+    "mtime": 1791251451.9183297,
+    "seen": 1795013600.5207808,
+    "ast_hash": "a3d23a10587fa4201a19095cd6d43938",
+    "semantic_hash": "a3d23a10587fa4201a19095cd6d43938"
+  },
+  "archive/data_processing/prepare_news_dataset.py": {
+    "mtime": 1793072487.7812383,
+    "seen": 1795013600.5208948,
+    "ast_hash": "cbe430644164cdf70d64ba98373e2b2f",
+    "semantic_hash": "cbe430644164cdf70d64ba98373e2b2f"
+  },
+  "archive/data_processing/test_dataset.py": {
+    "mtime": 1792902024.429495,
+    "seen": 1795013600.521034,
+    "ast_hash": "5a90061884f2cecad3d1bc3fc3ce1c25",
+    "semantic_hash": "5a90061884f2cecad3d1bc3fc3ce1c25"
+  },
+  "archive/data_processing/train_early_predictor.py": {
+    "mtime": 1792654553.5534873,
+    "seen": 1795013600.521151,
+    "ast_hash": "2d99d7c75d1911a0816586a6aac44734",
+    "semantic_hash": "2d99d7c75d1911a0816586a6aac44734"
+  },
+  "backend/analyzer.py": {
+    "mtime": 1794811718.9641106,
+    "seen": 1795013600.5212712,
+    "ast_hash": "05db06b225d95ea083751b5d80c0894a",
+    "semantic_hash": "05db06b225d95ea083751b5d80c0894a"
+  },
+  "backend/analyzer_new.py": {
+    "mtime": 1792920820.0894022,
+    "seen": 1795013600.5213912,
+    "ast_hash": "a92709b336fe332b293f46c18ab1e627",
+    "semantic_hash": "a92709b336fe332b293f46c18ab1e627"
+  },
+  "backend/domain_whitelist.py": {
+    "mtime": 1791954784.465079,
+    "seen": 1795013600.5215142,
+    "ast_hash": "fc8ac68bcc17df3b1d96acba1b4f161f",
+    "semantic_hash": "fc8ac68bcc17df3b1d96acba1b4f161f"
+  },
+  "backend/input_processing.py": {
+    "mtime": 1780566119.3308957,
+    "seen": 1795013600.5216382,
+    "ast_hash": "675822c329491c0cc1fd3684f749555c",
+    "semantic_hash": "675822c329491c0cc1fd3684f749555c"
+  },
+  "backend/input_retrieval.py": {
+    "mtime": 1780566119.331899,
+    "seen": 1795013600.5217505,
+    "ast_hash": "19ab9f928a2614457b2f634998bc1776",
+    "semantic_hash": "19ab9f928a2614457b2f634998bc1776"
+  },
+  "backend/news_spider.py": {
+    "mtime": 1791251451.9231331,
+    "seen": 1795013600.5218697,
+    "ast_hash": "a8343ffa7293aee88cf22362c1969c9a",
+    "semantic_hash": "a8343ffa7293aee88cf22362c1969c9a"
+  },
+  "backend/pipeline_logger.py": {
+    "mtime": 1794811678.9393334,
+    "seen": 1795013600.5219784,
+    "ast_hash": "e0f92b6f146dcda3f71dadd6829146d5",
+    "semantic_hash": "e0f92b6f146dcda3f71dadd6829146d5"
+  },
+  "frontend/script.js": {
+    "mtime": 1794811755.5569787,
+    "seen": 1795013600.5220842,
+    "ast_hash": "a54609facc17b33b95113302eb72147f",
+    "semantic_hash": "a54609facc17b33b95113302eb72147f"
+  },
+  "model/early_predictor.py": {
+    "mtime": 1794299428.9240327,
+    "seen": 1795013600.522197,
+    "ast_hash": "3b6293fd9c3491ce9f52c012e07e09dc",
+    "semantic_hash": "3b6293fd9c3491ce9f52c012e07e09dc"
+  },
+  "model/judge.py": {
+    "mtime": 1793252978.2399185,
+    "seen": 1795013600.5223093,
+    "ast_hash": "93f3ab27a1b72296ed16bc97d3f2f86a",
+    "semantic_hash": "93f3ab27a1b72296ed16bc97d3f2f86a"
+  },
+  "model/knowledge_retrieval.py": {
+    "mtime": 1792771310.4506695,
+    "seen": 1795013600.5224292,
+    "ast_hash": "f5d573f19920d1142ee899673caba0a0",
+    "semantic_hash": "f5d573f19920d1142ee899673caba0a0"
+  },
+  "model/llm_client.py": {
+    "mtime": 1792856879.2573657,
+    "seen": 1795013600.5225885,
+    "ast_hash": "c8c9520c0fe8c50b06045102bf031e4e",
+    "semantic_hash": "c8c9520c0fe8c50b06045102bf031e4e"
+  },
+  "model/mad_agent.py": {
+    "mtime": 1794850660.161866,
+    "seen": 1795013600.522701,
+    "ast_hash": "8694bda525b1c9428568005ff2ec168c",
+    "semantic_hash": "8694bda525b1c9428568005ff2ec168c"
+  },
+  "model/mad_orchestrator.py": {
+    "mtime": 1791251451.9291308,
+    "seen": 1795013600.522814,
+    "ast_hash": "b31e6947155537458c297e47e2f856c6",
+    "semantic_hash": "b31e6947155537458c297e47e2f856c6"
+  },
+  "model/reverse_image_search.py": {
+    "mtime": 1793247934.8120298,
+    "seen": 1795013600.522923,
+    "ast_hash": "f0243a72c0b49f2a9e8d5c0d76a0101d",
+    "semantic_hash": "f0243a72c0b49f2a9e8d5c0d76a0101d"
+  },
+  "model/shared_memory.py": {
+    "mtime": 1791251451.9306374,
+    "seen": 1795013600.52306,
+    "ast_hash": "3fa53b8b3789f092f939a26ea3319a50",
+    "semantic_hash": "3fa53b8b3789f092f939a26ea3319a50"
+  },
+  "testing/.cache_kr_ablation_test_dataset_newsclippings_60.json": {
+    "mtime": 1793149048.4551632,
+    "seen": 1795013600.5231736,
+    "ast_hash": "e07e1b4561b0464a81565354cb453c45",
+    "semantic_hash": "e07e1b4561b0464a81565354cb453c45",
+    "ast_empty": true
+  },
+  "testing/.cache_mad_ablation_test_dataset_newsclippings_60.json": {
+    "mtime": 1793149416.6502516,
+    "seen": 1795013600.5231764,
+    "ast_hash": "18ad3500afb3d35d566fc3590d8bc9f3",
+    "semantic_hash": "18ad3500afb3d35d566fc3590d8bc9f3",
+    "ast_empty": true
+  },
+  "testing/.cache_phase3a.json": {
+    "mtime": 1792924337.7140622,
+    "seen": 1795013600.5231788,
+    "ast_hash": "da256fbfab98e76113e117e45c77823f",
+    "semantic_hash": "da256fbfab98e76113e117e45c77823f",
+    "ast_empty": true
+  },
+  "testing/.cache_ris_ablation_test_dataset_newsclippings_60.json": {
+    "mtime": 1793149069.2173693,
+    "seen": 1795013600.5231805,
+    "ast_hash": "3ff3376e9bc7ebc10517924bc5b9e76b",
+    "semantic_hash": "3ff3376e9bc7ebc10517924bc5b9e76b",
+    "ast_empty": true
+  },
+  "testing/.checkpoint_ablation_60.json": {
+    "mtime": 1793065057.7724571,
+    "seen": 1795013600.5231826,
+    "ast_hash": "4474c277b06dd42be3c3bc40cb47e0cc",
+    "semantic_hash": "4474c277b06dd42be3c3bc40cb47e0cc",
+    "ast_empty": true
+  },
+  "testing/.checkpoint_ablation_test_dataset_newsclippings_60.json": {
+    "mtime": 1793149459.6270988,
+    "seen": 1795013600.5231843,
+    "ast_hash": "3f9b8e5524949f82b2c17ed1f3bc8528",
+    "semantic_hash": "3f9b8e5524949f82b2c17ed1f3bc8528",
+    "ast_empty": true
+  },
+  "testing/.checkpoint_ablation_test_dataset_newsclippings_60.old.json": {
+    "mtime": 1793101690.252058,
+    "seen": 1795013600.5231862,
+    "ast_hash": "6a9dba7bfa79df4a6f1525b7006c923e",
+    "semantic_hash": "6a9dba7bfa79df4a6f1525b7006c923e",
+    "ast_empty": true
+  },
+  "testing/download_fauxtography.py": {
+    "mtime": 1793175223.7332113,
+    "seen": 1795013600.5231879,
+    "ast_hash": "476a75ced23eac8f14e72f65a05735c2",
+    "semantic_hash": "476a75ced23eac8f14e72f65a05735c2"
+  },
+  "testing/phase3_failure_reevaluation_results.json": {
+    "mtime": 1793158618.3124444,
+    "seen": 1795013600.5232992,
+    "ast_hash": "f71546b675d7c47e3084248a15d9912e",
+    "semantic_hash": "f71546b675d7c47e3084248a15d9912e",
+    "ast_empty": true
+  },
+  "testing/rerun_failure_samples.py": {
+    "mtime": 1793157984.585843,
+    "seen": 1795013600.5233011,
+    "ast_hash": "fbc5cfd7254bd1467e60eb6a7d21d5bb",
+    "semantic_hash": "fbc5cfd7254bd1467e60eb6a7d21d5bb"
+  },
+  "testing/test_phase1_unit.py": {
+    "mtime": 1792505472.5199938,
+    "seen": 1795013600.5234072,
+    "ast_hash": "bedcef8e0a28a0cf79165863f4d45a1d",
+    "semantic_hash": "bedcef8e0a28a0cf79165863f4d45a1d"
+  },
+  "testing/test_phase2_integration.py": {
+    "mtime": 1792863199.4091556,
+    "seen": 1795013600.5235124,
+    "ast_hash": "8726334012a3243c55f272b6af896b3b",
+    "semantic_hash": "8726334012a3243c55f272b6af896b3b"
+  },
+  "testing/test_phase3_evaluation.py": {
+    "mtime": 1794299415.1728315,
+    "seen": 1795013600.5236166,
+    "ast_hash": "69c327b99cd2d0b072f858993ce8a911",
+    "semantic_hash": "69c327b99cd2d0b072f858993ce8a911"
+  }
+}

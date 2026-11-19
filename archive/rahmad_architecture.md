@@ -1,341 +1,672 @@
-# RAHMAD: Retrieval-Augmented Hybrid Multi-Agent Debate
-## System Architecture Documentation
+# RAHMAD — Architecture Reference
 
-The RAHMAD framework is a modular, AI-driven pipeline designed for comprehensive fake news and misinformation detection. It combines lightweight multimodal early prediction with heavyweight Retrieval-Augmented Generation (RAG), external visual search, and a constitutional LLM reasoning layer to arrive at a final verdict.
+RAHMAD (**R**etrieval-**A**ugmented **H**ybrid **M**ulti-**A**gent **D**ebate) is a fake-news detection system: a Flask backend plus a single-page dashboard that classifies a news article (optionally with an image) into one of eight misinformation categories and returns a confidence score, a justification, key facts, and supporting links.
 
-Below is the detailed architectural breakdown of each core module in the system.
+This document is the architecture reference for an engineer taking over the codebase. It covers layers, module contracts, data flow, configuration, failure behaviour, observability, the evaluation harness, and known limitations.
 
-Note: The LLM local model and OpenRouter model use in this system can be changed in the env file. 
+Companion documents, deliberately not duplicated here:
 
----
+| Document | Purpose |
+|---|---|
+| `README.md` | Install, configure, and run the app |
+| `docs/RAHMAD_COMPREHENSIVE_SYSTEM_DOCUMENTATION.md` | Exhaustive capability and operations narrative (prompt-level detail, full per-stage prose) |
 
-### 1. Early Predictor Module
-**Location:** `model/early_predictor.py`
-
-The Early Predictor (EP) serves as a fast, lightweight multimodal initial estimate. It classifies the article using a fine-tuned multimodal model and provides grounding context to downstream modules. It acts strictly as an evidentiary signal and does not gate or skip downstream modules (such as Multi-Agent Debate).
-
-**Architecture & Flow:**
-1. **Input Preprocessing:** Text is cleaned (HTML tags, URLs, Emojis removed) to match the training distribution. Images are processed via `CLIPProcessor`.
-2. **Feature Extraction:** Utilizes `openai/clip-vit-base-patch32` for both text and vision encoding. 
-3. **LoRA Adapters:** Parameter-Efficient Fine-Tuning (PEFT) LoRA adapters are applied to the CLIP attention layers.
-4. **Fusion:** The text embeddings `[512]` and image embeddings `[512]` are concatenated into a single fused tensor `[1024]`.
-5. **Classification (MLP Head):** The fused tensor is passed through a single-layer Multi-Layer Perceptron (Linear `1024 -> 1` + Sigmoid activation) to output a scalar probability between `0` (Real) and `1` (Fake).
-6. **Thresholding & Signal Pass-Through:**
-   - **p >= 0.60:** Preliminary Fake.
-   - **p <= 0.40:** Preliminary Real.
-   - **0.40 < p < 0.60:** Uncertain.
-   - All news items unconditionally proceed through the full Knowledge Retrieval, Reverse Image Search, and Multi-Agent Debate pipelines regardless of EP probability.
+Everything below was read out of the source tree. Where a number appears, the file it came from is named. Anything that could not be established from code is not stated.
 
 ---
 
-### 2. Knowledge Retrieval Module
-**Location:** `model/knowledge_retrieval.py`, `backend/news_spider.py`, `backend/domain_whitelist.py`
+## 1. Purpose and scope
 
-The Knowledge Retrieval (KR) module is responsible for fetching, filtering, and synthesizing external, verified news to provide corroborating evidence (or debunking context) to both the Multi-Agent Debate (MAD) orchestrator and the Judge module.
+**What the system does.** Given `text` (article headline and/or body) and an optional `image` (base64 data-URL or HTTP URL), `POST /api/analyze` streams progress events and returns one verdict from a fixed taxonomy: `SATIRE OR PARODY`, `FALSE CONNECTION`, `MISLEADING CONTENT`, `IMPOSTER CONTENT`, `MANIPULATED CONTENT`, `FABRICATED CONTENT`, `CREDIBLE`, `INCONCLUSIVE`.
 
-#### Model & Execution Engine:
-- **Semantic Verification Embedder:** `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense semantic embeddings).
-- **Inference Engine & LLM Summarizer:** 
-  - **Local Mode (`USE_LOCAL_LLM=true`):** Connects to the local Ollama OpenAI-compatible endpoint (`LOCAL_LLM_URL`, default `http://localhost:11434/v1/chat/completions`). The active model is specified by `LOCAL_LLM_MODEL` in `.env` (currently **`qwen2.5:7b`**, with code default fallback **`llama3:8b`**).
-  - **Cloud Fallback (`USE_LOCAL_LLM=false`):** Queries OpenRouter API using `nvidia/nemotron-3-ultra-550b-a55b:free` with a resilient multi-model fallback chain (`nemotron-3-nano-omni-30b-a3b-reasoning`, `inclusionai/ling-3.0-flash`, `poolside/laguna-m.1`).
+**How it is deployed.** One Python process (`app.py`, Flask 3.0.3, bound to `127.0.0.1:5000` with `debug=True`) serving one static SPA. Local compute: PyTorch/CLIP, two sentence-embedding stages, and an Ollama-served LLM for the debate. Remote compute: OpenRouter for the final adjudication, SerpApi for Google Lens.
 
-#### Architecture & Flow:
-1. **Search & Multi-Source Retrieval:**
-   - **Query Sanitization:** Automatically extracts the concise headline/claim from the input text, stripping news wire prefixes and datelines (e.g. `SINGAPORE/JAKARTA, Sept 9 (Reuters) -`) so search engines receive clean, high-precision search keywords.
-   - **4-Tier Retrieval Pipeline:**
-     1. *Primary (DuckDuckGo HTML):* Queries `https://html.duckduckgo.com/html/` for immediate news links.
-     2. *Secondary (DDGS News Package):* Falls back to DuckDuckGo's news API (`DDGS.news()`) if fewer than 5 URLs are retrieved.
-     3. *Tertiary (Google News RSS):* If DuckDuckGo triggers bot-detection (HTTP 202) or IP rate limits (`403 Ratelimit`), queries the Google News RSS feed (`https://news.google.com/rss/search?q=...`) without API keys or IP blocks. Decodes Google News redirect tokens to direct canonical publisher URLs using `googlenewsdecoder`.
-     4. *Quaternary Fallback (SerpAPI Google News):* If surviving URLs remain below 3, queries Google News via SerpAPI with `"tbm": "nws"` and query exclusions (`-site:facebook.com -site:twitter.com -site:x.com -site:threads.net -site:instagram.com`).
-   - **Search Metadata & Headline Tracking:** Captures publication titles/headlines directly from search engine result payloads (`DDG`, `DDGS`, `Google News RSS`, `SerpAPI`) so all retrieved articles retain authentic titles even if full web extraction is blocked.
-   - **Active Social Media Exclusion:** Automatically intercepts and removes URLs from social media and user-generated content platforms (`facebook.com`, `threads.net`, `x.com`/`twitter.com`, `instagram.com`, `tiktok.com`, `reddit.com`, `youtube.com`, `linkedin.com`, `pinterest.com`, `weibo.com`) across all search stages to prevent unextractable posts from polluting downstream scraping.
-2. **Strict Domain Whitelisting:**
-   - URLs are checked against an authoritative list of verified, reputable international, regional, and national news publishers (`backend/domain_whitelist.py`, e.g., Reuters, AP, BBC, Straits Times, NYT, The Jakarta Post, Kompas, Tempo, Dawn, GMA Network).
-   - Unverified blogs, opinion sites, and tabloids are filtered out prior to scraping.
-3. **Concurrent Scrapy Spider, Heuristic Extraction & Unextractable Link Preservation:**
-   - **Isolated Scrapy Subprocess:** Spawns an asynchronous Scrapy spider (`backend/news_spider.py`) inside an ephemeral temporary directory (`tempfile.TemporaryDirectory`) with 8 concurrent connections and a 25-second timeout.
-   - **Targeted Fallback Extraction:** For any candidate URLs not extracted by Scrapy, executes per-URL in-process HTTP requests using `requests` + `trafilatura`/`BeautifulSoup` to capture body text and `<title>`/`<meta property="og:title">` tags.
-   - **Heuristic Filtering (for Synthesis):** Performs title deduplication, drops text shorter than 100 characters, and validates article recency against `max_age_years` (default <= 3 years old). Caps surviving text-extracted articles to `max_articles` (default 5).
-   - **Unextractable Whitelisted Link Preservation:** Addresses publisher anti-scraping protections (e.g. Reuters returning HTTP 401 Unauthorized, paywalls, or video media formats). Even when body text cannot be extracted (`len(text) < 100`), the article is NOT discarded. The system resolves its headline using (1) captured search engine metadata, (2) page `<title>` / OpenGraph metadata, or (3) robust URL slug parsing (`extract_title_from_url_slug`), preserving all whitelisted articles for frontend supporting references.
-4. **Dense Semantic Verification (MiniLM Embedding & Paragraph Chunking):**
-   - Splits text-extracted article bodies into paragraph chunks (>50 characters).
-   - Uses `all-MiniLM-L6-v2` to compute cosine similarity between the claim embedding and each chunk embedding.
-   - Retains the top 3 matching chunks per article that meet or exceed the semantic threshold (`similarity_threshold >= 0.35`), stripping irrelevant boilerplate or tangential reporting.
-   - *Fallback if all whitelisted links are unextractable:* If every whitelisted source blocks text extraction, the module preserves all whitelisted references for supporting links and notifies the Judge with an explanatory summary note rather than aborting.
-5. **Structured Fact-Outline LLM Synthesis:**
-   - Passes verified snippets into the local Ollama `qwen2.5:7b` or `llama3:8b` at low temperature (`0.2`) to prevent hallucination.
-   - Prompts the LLM under strict forensic rules to generate a structured 3-part key-fact outline:
-     1. *Key Entities, Names, and Roles involved*
-     2. *Monetary Amounts, Legal Rulings, or Official Outcomes*
-     3. *Timeline of Events and Corroborating Evidence*
-   - Negative constraints strictly prohibit inferring or extrapolating dates, locations, or unstated facts (mandating `"Date not specified"` if a year/date is absent). Gracefully falls back to raw snippets if LLM generation fails.
-6. **Dedicated Forensic Logging (`output/KR_output.txt`):**
-   - Automatically writes an end-to-end, timestamped forensic audit report to `output/KR_output.txt` logging:
-     - **[1] Input Claim & Execution Backend** (Local LLM vs. OpenRouter).
-     - **[2] Link Retrieval & Whitelist Audit:** Full list of candidate URLs tagged `[WHITELISTED]` or `[FILTERED OUT]`.
-     - **[3] Extracted & Preserved Article Metadata:** Text-extracted articles (titles, URLs, dates) alongside unextractable whitelisted supporting references.
-     - **[4] Semantic Verification Snippets:** All surviving chunks tagged with their source headlines and similarity pass status.
-     - **[5] LLM Synthesis Output:** The verbatim generated key-facts outline.
-     - **[6] Final Pipeline Status:** Explicit execution status (`success`, `completed - supporting links preserved`, etc.).
+**Scope of this document.** Runtime architecture and contracts: what each module is responsible for, what it consumes and produces, how it fails, how it is configured, how it is observed and evaluated. Out of scope: how the Early Predictor was trained, how the evaluation datasets were assembled, and prompt-wording rationale beyond what the contract requires.
+
+**Terminology used throughout.**
+
+| Abbreviation | Expansion | Primary file |
+|---|---|---|
+| EP | Early Predictor (CLIP + LoRA + MLP) | `model/early_predictor.py` |
+| KR | Knowledge Retrieval | `model/knowledge_retrieval.py` |
+| RIS | Reverse Image Search | `model/reverse_image_search.py` |
+| MAD | Multi-Agent Debate | `model/mad_orchestrator.py`, `model/mad_agent.py` |
+| CJM | Chief Judicial Magistrate (the Judge) | `model/judge.py` |
 
 ---
 
-### 3. Reverse Image Search (RIS) Module
-**Location:** `model/reverse_image_search.py`
+## 2. Mental model
 
-The RIS module is a visual forensic agent designed to catch "False Connection" (e.g., an authentic image paired with unrelated text) or "Imposter Content" scenarios.
-
-**Architecture & Flow:**
-1. **Image Hosting Setup:** Uploads the user's image to temporary hosts (ImgBB prioritized, with aggressive fallbacks to Freeimage, tmpfiles, envs.sh, etc.) to obtain a public URL.
-2. **Visual Query:** Executes a Google Lens search via SerpAPI using the public image URL.
-3. **Visual Filter (CLIP):** Downloads thumbnail results and embeds them using `clip-vit-base-patch32`. Computes cosine similarity against the original image. Results below a visual threshold (e.g. 0.9) are discarded to ensure only identical/highly similar images are analyzed.
-4. **Semantic Filter (MiniLM):** Uses `all-MiniLM-L6-v2` to compute semantic similarity between the user's original claim and the headlines/snippets of the visually identical image matches.
-5. **Visual Agent LLM (Nuanced 4-Way Categorization):** Passes the semantic/visual findings to the Visual Agent LLM (local Ollama `qwen2.5:7b` or `llama3:8b` or OpenRouter). The agent classifies findings into 4 distinct categories:
-   - `Authentic Context / Matching Event`: Genuine coverage of the event/subject matter, including syndicated news (Reuters, SCMP, KSL) and photo licensing agencies (Reuters Connect).
-   - `Out-of-Context (Misattributed / Recycled)`: Imagery provably recycled from a different historical year, different disaster, or unrelated geographic location.
-   - `Generic / Illustrative Imagery`: Standard stock photo or symbolic representation without deceptive intent.
-   - `Inconclusive / Insufficient Evidence`: Insufficient metadata to confirm provenance.
-6. **Dedicated Forensic Logging (`output/RIS_output.txt`):**
-   - Automatically logs the full step-by-step forensic trail to `output/RIS_output.txt`: 
-      - **[1]** Google Lens query & candidate matches
-      - **[2]** candidate CLIP visual cosine similarities (with pass/fail verdicts against the `>= 0.90` threshold), MiniLM contextual semantic similarities (`>= 0.05`)
-      - **[3]** the Visual Agent LLM prompts/responses
-      - **[4]** and the final classification with explicit `Out-of-Context` and confidence flags.
+RAHMAD is an **evidence-assembly pipeline with a single decision point**. Each module contributes a text artefact and nothing more: EP contributes a calibrated-looking scalar prior, KR contributes a fact outline built from whitelisted news sources, RIS contributes a visual-provenance finding, and MAD contributes a structured adversarial transcript. None of these stages can veto, short-circuit, or skip another — `pass_to_agents` is hardcoded `True` in `EarlyPredictor._build_verdict()` — and the only component that converts evidence into a verdict is the Judge, which receives all four artefacts as a single prompt and reasons over them under a nine-principle constitution. The architecture therefore optimises for *evidence quality and contradiction surfacing* rather than for early exit, which is why a full run costs roughly nine local LLM generations plus one to five cloud calls even when the EP is already confident.
 
 ---
 
-### 4. Multi-Agent Debate (MAD) Module
-**Location:** `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`, `model/llm_client.py`
+## 3. System architecture
 
-The Multi-Agent Debate (MAD) module is a structured, multi-agent parliamentary debate focusing exclusively on evaluating the factual veracity, reporting authenticity, and geopolitical context of the news claims.
+### 3.1 Layered view
 
-#### Model & Execution Engine:
-- **Inference Engine:** Powered locally via **Ollama** using the `LLMClient` (`model/llm_client.py`).
-- **Models Used:** Default local LLM is **`qwen2.5:7b`** (and compatible with **`llama3:8b`** as configured in `LOCAL_LLM_MODEL`).
-- **Design Rationale:** Running the debate agents locally on Ollama guarantees zero API cost and removes cloud rate-limiting across 7+ sequential LLM generation steps (1 context summary + 6 speaker rounds + 1 synthesis). It also maintains data privacy and avoids cloud content-moderation safety refusals when debating sensitive geopolitical or controversial topics.
+| Layer | Components | Responsibility |
+|---|---|---|
+| Presentation | `frontend/index.html`, `styles.css`, `script.js` | Input form, image preview, live step tracker, verdict card, evidence links, reasoning panel |
+| HTTP | `app.py` | Serve `/` and `/res/<path>`, validate `POST /api/analyze`, stream NDJSON |
+| Orchestration | `backend/analyzer.py` (`analyze_text`) | Lazy model loading, stage sequencing, per-stage error containment, artefact hand-off, logging |
+| Pre-processing | `backend/input_processing.py` | Two-branch split: cleaned full text for LLMs, lead text + 224×224 tensor for CLIP |
+| Evidence modules | `model/early_predictor.py`, `model/knowledge_retrieval.py`, `model/reverse_image_search.py` | Produce the three non-debate evidence artefacts |
+| Debate | `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`, `model/llm_client.py` | Produce a structured adversarial transcript and its synthesis |
+| Adjudication | `model/judge.py` | Single-pass, self-consistency, or three-specialist panel adjudication plus a Python-level constitutional guardrail |
+| Persistence / observability | `backend/pipeline_logger.py`, module-level `save_*_log()` methods | Five forensic logs under `output/` |
+| Evaluation | `testing/*.py` | Unit, integration, and evaluation runners with module-output caches |
 
-#### How It Was Created & Core Architecture:
-1. **Dual Context Input & Bias Framing:** 
-   - Unlike naive summarization, MAD feeds agents both the **full, original unedited article** and the **condensed verified external knowledge** (`KR`).
-   - Rather than re-summarizing the Knowledge Retrieval summary (which would cause degradation and loss of crucial factual detail), the orchestrator preserves the KR external facts verbatim. It directs the local LLM strictly to extract core factual claims from the article and analyze the **political/social climate, potential ideological biases, and narrative agendas**, pairing this analysis directly with the verified external knowledge.
-2. **Dynamic Domain Profile Assignment:**
-   - The orchestrator analyzes the news topic and assigns 6 specialized expert personas (3 per side) to provide multifaceted domain scrutiny (e.g., *Investigative Journalist*, *Forensic Data Analyst*, *Media Context Analyst* for Real News; *Public Records Specialist*, *Disinformation Researcher*, *Archival Historian* for Fake News).
-3. **Structured 3-Stage Parliamentary Debate (3 vs 3):**
-   - **Stage 1 (First Speakers):** 
-     - *Real News 1st Speaker* opens, followed by *Fake News 1st Speaker*.
-     - Role: Define the scope of verification, establish primary constructive arguments, and present initial evidence from their specialized domain.
-   - **Stage 2 (Second Speakers):**
-     - *Real News 2nd Speaker*, followed by *Fake News 2nd Speaker*.
-     - Role: Vigorously attack the opposition using the **"even if" rebuttal tactic** (*"Even if we agreed to your premise/definition (which we don't), your arguments are still wrong because..."*). Summarize their own first speaker in at most 1–2 sentences, and introduce **brand new substantive arguments and evidence** from their distinct domain expertise.
-   - **Stage 3 (Third Speakers):**
-     - *Real News 3rd Speaker*, followed by *Fake News 3rd Speaker*.
-     - Role: Act as "whip" speakers. Deliver targeted rebuttals to remaining claims and crystallize the central clash points by comparatively weighing cumulative evidence against the opposing side's gaps. Strictly prohibited from introducing new constructive arguments.
-4. **Anti-Regurgitation Guardrails:**
-   - To prevent agents from repeating points or echoing teammates, strict prompting rules prohibit point-cycling. Speakers are constrained to 1–2 sentence summaries and are required to explore distinct evidentiary angles (e.g. data logs vs. journalistic sourcing vs. historical precedents) based on their profile.
-5. **Shared Memory Bank (`SharedMemoryBank`):**
-   - Central state repository that logs all speeches, stances, and metadata round-by-round, providing the full transcript history to subsequent debaters for contextual continuity.
-6. **Consolidated Discourse Synthesis:**
-   - An objective academic synthesis pass summarizes the debate, mapping the key evidential weights, clash points, and veracity indicators. The complete discourse transcript is saved to `output/MAD_output.txt` and forwarded to the Judge module.
+### 3.2 Component diagram
 
----
+```mermaid
+flowchart TD
+    UI["frontend/script.js<br/>NDJSON reader"] -->|"POST /api/analyze {text,image}"| FLASK["app.py<br/>Flask 3.0.3"]
+    FLASK -->|"analyze_text() generator"| ORCH["backend/analyzer.py"]
 
-### 5. Judge Module (Reasoning & Judicial Synthesis Layer)
-**Location:** `model/judge.py`, `backend/analyzer.py`
+    ORCH --> PRE["input_processing.py<br/>clean_for_llm / preprocess_inputs"]
+    PRE -->|"llm_text"| ORCH
+    PRE -->|"input_ids, attention_mask, pixel_values"| EP
 
-The Judge module serves as the final judicial authority within RAHMAD. It consumes the raw article text, the Early Predictor (EP) multimodal signal, the synthesized Knowledge Retrieval (KR) facts, the Reverse Image Search (RIS) visual provenance, and the Multi-Agent Debate (MAD) discourse. 
+    ORCH --> EP["Early Predictor<br/>CLIP ViT-B/32 + LoRA r=16 + MLP"]
+    EP -->|"ep_result dict"| ORCH
 
-To support rigorous empirical evaluation and ablation studies, the Judge module implements three configurable architectural modes controlled via the `JUDGE_MODE` environment variable in `.env`:
-1. **`single` (Baseline):** Standard Single-Pass Constitutional Chain-of-Thought reasoning.
-2. **`self_consistency`:** Stochastic majority-vote aggregation across $N=3$ parallel reasoning paths.
-3. **`panel` (Revamped Multi-Judge Architecture):** A concurrent committee of 3 domain specialists that runs in parallel (Fact-Checker, Linguist, Logician) and is synthesized by a Chief Judicial Magistrate.
+    ORCH --> KR["Knowledge Retrieval<br/>DDG / GNews RSS / SerpApi"]
+    KR -->|"external_knowledge string"| ORCH
 
-#### Model & Execution Engine:
-- **Inference Provider:** OpenRouter Cloud API.
-- **Models Used:** Dynamically loaded via `JUDGE_MODEL` (defaulting to **`deepseek/deepseek-v4-flash-0731`**), backed by a fault-tolerant fallback chain configured in `JUDGE_MODEL_FALLBACK` (`nvidia/nemotron-3-nano-omni-30b`, `inclusionai/ling-3.0-flash`, `poolside/laguna-m.1`).
-- **Prompt Frameworks:** Constitutional AI, Step-Back Domain Orientation, Persona Specialization, Chain-of-Thought (CoT), and Judicial Synthesis.
+    ORCH --> RIS["Reverse Image Search<br/>hosting bridge + SerpApi Lens"]
+    RIS -->|"ris_summary string"| ORCH
 
----
+    ORCH --> MAD["Multi-Agent Debate<br/>3 rounds x 2 speakers"]
+    MAD -->|"mad_summary string"| ORCH
 
-#### Architectural Pipelines:
+    ORCH --> JUDGE["Judge<br/>OpenRouter"]
+    JUDGE -->|"verdict payload"| ORCH
+    ORCH -->|"status + result events"| FLASK
 
-##### Pipeline A: Standard Single-Pass Mode (`JUDGE_MODE=single`)
-- **Execution Cost:** 1x API cost | **Latency:** Fastest (single LLM pass).
-- **Architecture:** A single generalist LLM processes all multimodal and agentic evidence concurrently through a mandatory 7-step Chain-of-Thought protocol:
-  1. **Step 1 — Domain Orientation:** Step-back analysis determining publication domain (Politics, Health, Satire, Finance).
-  2. **Step 2 — Claim Extraction:** Isolating 3–5 core verifiable claims.
-  3. **Step 3 — Internal Consistency Audit:** Auditing headline-to-body coherence, quote alignment, and numerical data.
-  4. **Step 4 — Framing and Style Analysis:** Detecting emotional manipulation, sensationalism, and urgency cues.
-  5. **Step 5 — Source and Attribution Analysis:** Scrutinizing source authenticity and imposter markers.
-  6. **Step 6 — Multimodal & Multi-Agent Evidence Integration:** Corroborating claims against KR, checking RIS visual provenance (Authentic vs. Recycled/Out-of-Context), weighing MAD debater clash points, and calibrating against EP.
-  7. **Step 7 — Self-Critique (Self-Refine):** Counterfactual reasoning challenging initial assumptions before committing to a verdict.
+    EP -.->|"local: torch"| HW1["CPU / DirectML / CUDA"]
+    KR -.->|"embeddings: MiniLM"| HW1
+    RIS -.->|"CLIP vision + MiniLM"| HW1
+    MAD -.->|"OLLAMA_BASE_URL/api/generate"| OLL["Ollama<br/>qwen2.5:7b -> llama3:8b"]
+    KR -.->|"USE_LOCAL_LLM=true"| OLL
+    RIS -.->|"USE_LOCAL_LLM=true"| OLL
+    JUDGE -.->|"OpenRouter chat/completions"| OR["OpenRouter<br/>deepseek/deepseek-v4.1-flash + fallbacks"]
 
-##### Pipeline B: Self-Consistency Majority Vote (`JUDGE_MODE=self_consistency`)
-- **Execution Cost:** 3x API cost | **Latency:** Parallelized across $N=3$ threads.
-- **Architecture:** Dispatches 3 parallel API queries of the 7-step protocol using a higher sampling temperature (`temperature=0.7`) to promote diverse reasoning paths.
-- **Aggregation Protocol:**
-  - Performs majority voting across candidate verdicts to filter out stochastic generation anomalies.
-  - Averages confidence percentages across runs that agree on the majority verdict.
-  - Selects the reasoning trace and justification from the highest-confidence majority run, merging unique key facts.
+    ORCH --> LOGS["output/output_log.txt<br/>KR / RIS / MAD / JUDGE_output.txt"]
+```
 
-##### Pipeline C: Multi-Judge Specialized Panel (`JUDGE_MODE=panel`)
-- **Execution Cost:** ~4x API cost | **Latency:** 2-stage pipelined execution (3 parallel specialists + 1 sequential chief synthesizer).
-- **Architecture:** Rather than placing the entire cognitive load onto a single generalist prompt (which suffers from "lost in the middle" degradation), this architecture divides evaluation across three specialized, independent domain personas running concurrently via `ThreadPoolExecutor(max_workers=3)`:
-  1. **The Senior Fact-Checker (`_FACT_CHECKER_PROMPT`):**
-     - **Focus:** Factual veracity, external evidence corroboration, and visual/discourse provenance.
-     - **Inputs Evaluated:** KR ground-truth news, RIS Google Lens findings (Out-of-Context vs. Authentic), and MAD arguments.
-     - **Outputs:** Qualitative claim-by-claim corroboration summary and a **Factual Risk Score (1–10)**.
-  2. **The Senior Linguist (`_LINGUIST_PROMPT`):**
-     - **Focus:** Stylometrics, emotional manipulation, semantic coherence, and rhetorical framing.
-     - **Inputs Evaluated:** Article text, headline-to-body alignment, sensationalism cues, loaded language, and satirical tropes.
-     - **Outputs:** Stylistic markers, emotional manipulation rating (Low/Medium/High), and a **Linguistic Risk Score (1–10)**.
-  3. **The Senior Logician (`_LOGICIAN_PROMPT`):**
-     - **Focus:** Internal contradictions, logical fallacies, source attribution plausibility, and communicative intent.
-     - **Inputs Evaluated:** Article structure, statistical consistency, imposter/attribution cues, and intent categorization (Informational, Satirical, Deceptive, Imposter, or Sensationalist).
-     - **Outputs:** Logical audit trail and a **Logical Risk Score (1–10)**.
+### 3.3 Request lifecycle
 
-  4. **Chief Judicial Magistrate (`_CHIEF_JUDGE_PROMPT`):**
-     - **Role:** Presiding judge and final synthesis arbiter.
-     - **Mechanism:** Receives the original text, EP signal, and the structured assessments + risk scores from all 3 specialists.
-     - **Judicial Synthesis Principles:**
-       - *Factual Dominance:* Strong refutation by the Fact-Checker or recycled imagery from RIS leads to `FABRICATED CONTENT`, `FALSE CONNECTION`, or `MISLEADING CONTENT`.
-       - *Satire Resolution:* If the Linguist and Logician identify satirical tropes and humor intent, the article is classified as `SATIRE OR PARODY` even if facts are literal inventions.
-       - *Imposter Detection:* If the Logician detects impersonation of official institutions or journalists, classified as `IMPOSTER CONTENT`.
-       - *Credibility Threshold:* Low risk scores (1–3) across all three specialists corroborate `CREDIBLE`.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser (script.js)
+    participant F as Flask (app.py)
+    participant A as Orchestrator (analyzer.py)
+    participant E as EP
+    participant K as KR
+    participant R as RIS
+    participant M as MAD
+    participant J as Judge
 
----
+    B->>F: POST /api/analyze {text, image?}
+    F->>F: validate 'text' present (else HTTP 400 JSON)
+    F->>A: analyze_text(text, image) [generator]
+    A-->>B: status CHECKING LLM BACKEND... IN PROGRESS
+    A->>A: TCP probe OLLAMA_BASE_URL (+ LOCAL_LLM_URL if USE_LOCAL_LLM)
+    A-->>B: status CHECKING LLM BACKEND... OK | FAIL
+    A-->>B: status PRE-PROCESSING INPUT... IN PROGRESS
+    A->>A: decode image, clean text, build CLIP tensors
+    A-->>B: status PRE-PROCESSING INPUT... OK
+    A-->>B: status RUNNING EARLY PREDICTOR... IN PROGRESS
+    A->>E: predict_from_tensors_verbose(...)
+    E-->>A: ep_result
+    A-->>B: status RUNNING EARLY PREDICTOR... OK | FAIL
+    A-->>B: status FETCHING EVIDENCE... IN PROGRESS
+    A->>K: retrieve_detailed(text[:800])
+    K-->>A: {summary, articles}
+    A-->>B: status FETCHING EVIDENCE... OK | FAIL
+    A-->>B: status SEARCHING FOR SIMILAR IMAGES... IN PROGRESS
+    A->>R: execute(text, image_data)
+    R-->>A: {category, is_out_of_context, judge_summary, ...}
+    A-->>B: status SEARCHING FOR SIMILAR IMAGES... OK | FAIL
+    A-->>B: status DEBATING... IN PROGRESS
+    A->>M: run_debate(text, external_knowledge)
+    M-->>A: consolidated summary, agents_info
+    A-->>B: status DEBATING... OK | FAIL
+    A-->>B: status SYNTHESIZING RESULTS... IN PROGRESS
+    A->>J: analyze | self_consistency_analyze | panel_analyze
+    J-->>A: verdict payload
+    A-->>B: status SYNTHESIZING RESULTS... OK
+    A-->>B: status OUTPUTTING PREDICTION... IN PROGRESS, then OK
+    A-->>B: result {verdict, color_class, confidence, ...}
+```
 
-#### Constitutional Principles, Evidentiary Hierarchy & Judicial Guardrails:
+Latency is dominated by MAD: nine sequential Ollama generations (`summarize_context`, `assign_profiles`, six arguments, `consolidate_discourse`), each with a 180 s per-model timeout in `LLMClient.generate()`. KR adds up to four search tiers plus a 25 s Scrapy subprocess timeout. The Judge adds one 45 s-timeout request per model attempt. There is no global pipeline deadline.
 
-##### 1. The Evidentiary Hierarchy (KR > Automated RIS Heuristics):
-Multimodal misinformation detection requires resolving friction between external fact-checking and visual provenance. In previous versions of RAHMAD, the Judge prompt treated Reverse Image Search (RIS) flags with absolute veto power (*"STRICTLY FORBIDDEN from classifying as CREDIBLE if RIS detects Out-of-Context: YES"*). While effective for synthetic cheapfake benchmarks like *NewsCLIPpings* (where unrelated photos are arbitrarily paired with text), this rigid rule caused catastrophic false-positive errors on archival and historical benchmarks like *Fauxtography* (where authentic historical photographs resurfacing on modern social media or YouTube were mistakenly flagged by local vision models as "recycled").
+### 3.4 NDJSON event contract
 
-RAHMAD resolves this by formalizing an **Epistemic Evidentiary Hierarchy**:
-- **Primary Ground Truth (Knowledge Retrieval):** Verified journalistic reporting and archival fact-checks (Snopes, Reuters, AP, verified Wikipedia) represent authoritative ground truth. If KR conclusively verifies that the photograph and text accurately document the authentic event, person, or historical context described, this authoritative factual evidence **strictly outranks** automated visual provenance flags.
-- **Automated Visual Heuristics (Reverse Image Search):** Automated image search algorithms operate on metadata timestamps and web scrape clusters, frequently confusing archival recirculation or viral clips with deceptive recycling. When KR corroborates the event, the Judge treats the image as authentic context rather than a deceptive cheapfake.
-- **Cheapfake Preservation:** If KR is absent, silent, uncorroborated, or confirms an image-to-text mismatch, RIS retains full forensic authority. Attaching an unrelated photo to news text remains classified as `FALSE CONNECTION` (Cheapfake).
+`app.py` wraps the generator as `Response(generate(), mimetype='application/x-ndjson')` and serialises each yielded dict as one JSON object followed by `\n`.
 
-##### 2. Reasoning-Aware Constitutional Principle P8 Guardrail:
-To prevent silent LLM hallucinations or judicial negligence, `Judge._enforce_constitutional_guardrails()` implements a Python-level safety net:
-- **Previous Implementation Flaw:** In earlier versions, Python code searched for hardcoded Snopes rating strings (e.g. `"rating: true"`) inside KR outlines. Because KR produces rich, structured key-fact outlines rather than literal rating strings, the guardrail always failed to detect verified KR confirmation, forcibly overriding valid judicial `CREDIBLE` decisions to `FALSE CONNECTION`.
-- **Reasoning-Aware Implementation:** The updated P8 guardrail inspects the Judge's own chain-of-thought scratchpad and justification:
-  1. *Visual Acknowledgment:* Verifies whether the Judge explicitly acknowledged the RIS visual finding (`"reverse image search"`, `"out-of-context"`, `"recycled"`).
-  2. *Corroborating Evidence:* Verifies whether the Judge cited external fact-checking corroboration (`"external knowledge"`, `"confirms"`, `"snopes"`, `"verified news"`, `"genuine"`).
-- If **both** signals are present, Python trusts the Judge's deliberate, evidence-weighted decision. If the Judge ignored the visual warning without citing verified knowledge, P8 intervenes to override the verdict to `FALSE CONNECTION`.
+**Two event types only.**
 
-##### 3. Resilient JSON Output & OpenRouter Reasoning Optimization:
-- **Reasoning Parameter Tuning (`reasoning: {"effort": "low"}`):** Modern reasoning LLMs (such as `deepseek/deepseek-v4.1-flash`) allocate tokens dynamically between internal chain-of-thought scratchpads and final answer content. Under default configurations, models could exhaust their token budget entirely within `message["reasoning"]`, returning `message["content"] = None` and triggering JSON parse failures. Passing `reasoning: {"effort": "low"}` guarantees that token allocation prioritizes generating the clean, final JSON object in `content`.
-- **Multi-Pass Balanced-Brace & Regex Parser:** `_parse_response()` features a 5-stage resilient parsing pipeline:
-  1. Direct `json.loads` parsing.
-  2. Candidate JSON extraction via balanced braces scanning around `"verdict"`.
-  3. Reverse greedy brace extraction.
-  4. Truncated JSON auto-repair (closing open quotes and unclosed braces).
-  5. Fallback regex field extraction for conversational preambles or severe truncation, ensuring the Judge never crashes to `INCONCLUSIVE (0.0%)` when a verdict was generated.
-
----
-
-#### Output Format & Contract:
-Regardless of the active mode, the Judge module guarantees an identical JSON schema to the frontend contract:
 ```json
-{
-  "verdict": "SATIRE OR PARODY" | "FALSE CONNECTION" | "MISLEADING CONTENT" | "IMPOSTER CONTENT" | "MANIPULATED CONTENT" | "FABRICATED CONTENT" | "CREDIBLE" | "INCONCLUSIVE",
-  "color_class": "satire" | "false-connection" | "misleading" | "imposter" | "manipulated" | "fabricated" | "credible" | "inconclusive",
-  "confidence": "92.0%",
-  "justification": "2–3 sentence executive explanation with **markdown bolded** evidence and entities.",
-  "reasoning": "Full step-by-step or panel judicial deliberation scratchpad.",
-  "key_facts": ["Observation 1", "Observation 2", "Observation 3"],
-  "links": [{"source": "REUTERS", "title": "...", "url": "..."}],
-  "ep_signal": { ... },
-}
+{"type": "status", "step": "DEBATING...", "status": "IN PROGRESS"}
+{"type": "result", "data": { "verdict": "...", "color_class": "...", "confidence": "...", "justification": "...", "reasoning": "...", "key_facts": ["..."], "links": [...], "ep_signal": {...} }}
 ```
 
-#### Dedicated Forensic Logging (`output/JUDGE_output.txt`):
-Automatically logs the end-to-end judicial reasoning session to `output/JUDGE_output.txt`:
-- **[1] Configuration & Context Audit:** Active mode (`single`, `panel`, `self_consistency`), active model IDs, EP multimodal metrics, and external evidence ingestion status.
-- **[2] Original News Article:** Verbatim text analyzed.
-- **[3] Mode-Specific Intermediates:**
-  - `panel`: Detailed reports from the Senior Fact-Checker, Senior Linguist, and Senior Logician along with their domain risk scores (1-10) and the Chief Judge synthesis scratchpad.
-  - `self_consistency`: Majority vote tallies across the $N=3$ parallel reasoning paths and selected run reasoning.
-  - `single`: Full 7-step Constitutional Chain-of-Thought deliberation.
-- **[4] Final Judicial Verdict:** The final classified verdict, confidence rating, color class, executive justification, key facts, and verified links.
+**Step vocabulary.** The frontend pre-draws these eight lines as pending (`streamSteps` in `frontend/script.js`) and matches incoming events by exact `step` string.
+
+| # | `step` | Terminal statuses the backend can emit | Notes |
+|---|---|---|---|
+| 0 | `CHECKING LLM BACKEND...` | `OK`, `FAIL` | Preflight TCP probe; `FAIL` does not abort the run |
+| 1 | `PRE-PROCESSING INPUT...` | `OK` | Always `OK`, including when it silently degrades to text-only |
+| 2 | `RUNNING EARLY PREDICTOR...` | `OK`, `FAIL` | `FAIL` when no image is supplied or EP raises |
+| 3 | `FETCHING EVIDENCE...` | `OK`, `FAIL` | `FAIL` on any KR exception |
+| 4 | `SEARCHING FOR SIMILAR IMAGES...` | `OK`, `FAIL` | `FAIL` when no image is supplied or RIS raises |
+| 5 | `DEBATING...` | `OK`, `FAIL` | `FAIL` only if the orchestrator raises; LLM errors are contained inside the transcript |
+| 6 | `SYNTHESIZING RESULTS...` | `OK` | `FAIL` is never emitted, including on Judge failure |
+| 7 | `OUTPUTTING PREDICTION...` | `OK` | Emitted only on the success path |
+
+**Contract guarantees and gaps.**
+
+- `IN PROGRESS` is always emitted before the matching terminal status for steps 0–5, and for step 6/7 on the success path.
+- Exactly one `result` event is emitted per request.
+- If the Judge raises, the orchestrator emits **no** terminal status for `SYNTHESIZING RESULTS...` and **no** `OUTPUTTING PREDICTION...` events; it jumps straight to a `result` with `INCONCLUSIVE` / `0.0%`. The UI therefore leaves those two lines pending while still rendering the verdict.
+- `SKIPPED` is handled by the frontend but never emitted by the backend; a skipped stage is reported as `FAIL`.
+- The frontend creates a new log line for any `step` string it does not recognise, so adding a step server-side is backward-compatible with an older page.
 
 ---
 
-### 6. Backend Orchestrator & Frontend
-**Location:** `backend/analyzer.py`, `app.py`, `frontend/script.js`
+## 4. Module reference
 
-- **Analyzer (`analyzer.py`):** Acts as the central nervous system. It lazily loads the heavy machine learning models, handles fallback logic (e.g., text-only processing if no image is uploaded), routes data between modules, and coordinates the Pipeline Logger. It formats up to 6 supporting links from Knowledge Retrieval articles (incorporating unextractable whitelisted outlets like Reuters alongside extracted sources). Crucially, it functions as a Python generator, yielding progressive status events (`{"type": "status"}`) before and after each sub-module runs, followed by the final `{"type": "result"}` payload.
-- **Server API (`app.py`):** Exposes the `/api/analyze` route which consumes the analyzer's generator and streams the output directly to the client as an NDJSON (Newline Delimited JSON) response. This enables real-time progress tracking without waiting for the full pipeline to finish.
-- **Pipeline Logger (`pipeline_logger.py`):** Captures intermediate states, LLM prompts, tensor shapes, and tracks the LLM backend utilized, logging them to the terminal and saving them to `output_log.txt`.
-- **Frontend App (`script.js`):** A sleek vanilla JS/CSS web app that renders the analysis dynamically. It leverages the modern `Fetch` API's `response.body.getReader()` to continuously read the NDJSON stream chunks. This drives a live, real-time process tracker in the UI, updating the status of each pipeline stage exactly in sync with the backend. It also securely handles DOM creation so special characters and quotes render cleanly, and parses Markdown bolding tags into HTML `<strong>`.
+### 4.1 Pre-processing — `backend/input_processing.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Split raw input into two branches: a cleaned full text for every LLM prompt, and a short "lead text" plus tensors for CLIP |
+| Entry points | `clean_for_llm(raw_text)`, `extract_and_clean_lead_text(raw_text)`, `tokenize_text(...)`, `process_image(...)`, `preprocess_inputs(raw_text, image)` |
+| Inputs | Raw article string; PIL image in RGB |
+| Outputs | `clean_for_llm` → `str`; `preprocess_inputs` → `{llm_text, lead_text, input_ids[1,77], attention_mask[1,77], pixel_values[1,3,224,224]}` |
+| Key behaviour | `lead_text` is headline plus first body sentence (`" ".join(lines[:2])`), cleaned and truncated to CLIP's 77-token window. `llm_text` is the full cleaned text and is what the Judge sees. Images are resized/cropped to 224×224 by the CLIP processor |
+| Config | None; `_MAX_TEXT_LEN = 77` is a module constant |
+| Failure behaviour | No internal try/except. If `preprocess_inputs` raises, the orchestrator catches it, falls back to `clean_for_llm`, and sets `has_clip = False` |
+
+The lead-text design is the reason EP and Judge can disagree about the same article: EP never sees more than roughly one sentence, while the Judge sees up to 6 000 characters.
+
+### 4.2 Early Predictor (EP) — `model/early_predictor.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Fast multimodal prior over the article; strictly advisory |
+| Entry points | `EarlyPredictor(...)`, `.predict(raw_text, image)`, `.predict_from_tensors(...)`, `.predict_from_tensors_verbose(...)` (used by the orchestrator so CLIP embeddings can be logged) |
+| Model | Frozen `openai/clip-vit-base-patch32` + PEFT LoRA `r=16`, `lora_alpha=32`, `lora_dropout=0.1`, targeting `text_projection`, `visual_projection`, and the `q_proj`/`v_proj` of both encoders (`data_processing/early_predictor_output/lora_adapter/adapter_config.json`). Text and image embeddings (512 each) are concatenated to 1024 and passed through `Linear(1024→1) + Sigmoid` |
+| Artifacts | `data_processing/early_predictor_output/{lora_adapter,mlp_head.pt,processor}`; falls back to `archive/data_processing/early_predictor_output` if the primary path is absent (`_ARTIFACTS_DIR`). All three are validated at construction and raise `FileNotFoundError` if missing |
+| Decision rule | `p >= 0.60` → `FAKE`; `p <= 0.40` → `REAL`; otherwise `UNCERTAIN`. `confidence` is `f"{p*100:.1f}%"` — the probability itself, not a margin |
+| Output | `{probability, label, confidence, color_class, pass_to_agents: True}`; `color_class` is `manipulated` / `real` / `inconclusive` |
+| Device | Auto-selects DirectML → CUDA → CPU |
+| Config | No env vars; thresholds are constructor parameters defaulting to the module constants |
+| Failure behaviour | Construction failures and inference exceptions propagate. The orchestrator pre-seeds `ep_result` with the neutral no-image signal, so an EP exception degrades to `{probability 0.5, label UNKNOWN, confidence "N/A"}` rather than aborting |
+
+The model is loaded once and cached by `_get_predictor()` in the orchestrator; the first request pays the load cost.
+
+### 4.3 Knowledge Retrieval (KR) — `model/knowledge_retrieval.py`, `backend/news_spider.py`, `backend/domain_whitelist.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Retrieve whitelisted news coverage of the claim, keep only semantically relevant passages, and synthesise a fact outline for MAD and the Judge |
+| Entry points | `KnowledgeRetriever(similarity_threshold=0.35, max_age_years=3, max_articles=5)`, `.retrieve_detailed(claim)` → `{claim, articles, summary, llm_used}`; internals `search_claim`, `filter_domains`, `metadata_filter`, `semantic_filter`, `synthesize`, `save_kr_log` |
+| Query construction | The orchestrator passes `input_text[:800]`. `search_claim` then takes the first non-empty line as the query, strips wire datelines (`CITY, Sept 9 (Reuters) -`), and truncates to the first sentence if over 140 characters |
+| Retrieval tiers | ① DuckDuckGo HTML endpoint; ② `DDGS.news()` if too few URLs; ③ Google News RSS (used when DDG returns bot-detection/ratelimit), with `googlenewsdecoder` resolving redirect tokens; ④ SerpApi Google News with social-site exclusions. Social-media domains are filtered out at every tier |
+| Whitelist | `VERIFIED_DOMAINS` in `backend/domain_whitelist.py` — 76 entries; `is_domain_whitelisted(url)` matches exact host or `.<domain>` subdomain after stripping `www.` |
+| Extraction | `backend/news_spider.py` (`NewsArticleSpider`) runs in a temp directory via a Scrapy subprocess: 8 concurrent requests, `DOWNLOAD_TIMEOUT=10`, `ROBOTSTXT_OBEY=False`, subprocess timeout 25 s. Extraction is `trafilatura` first, BeautifulSoup `<p>` fallback second; articles shorter than 100 characters are dropped. Un-extractable whitelisted URLs are retained as headline-only references resolved from search metadata, page metadata, or the URL slug |
+| Relevance filter | Paragraph chunks > 50 characters embedded with `all-MiniLM-L6-v2`; up to 3 chunks per article at cosine ≥ 0.35 survive |
+| Synthesis | Prompt-constrained fact outline (entities, amounts/rulings, timeline) at `temperature=0.2`, `max_tokens=1200`, `timeout=120`. Falls back to concatenated raw snippets if every model in the chain fails |
+| Config | `USE_LOCAL_LLM`, `LOCAL_LLM_URL`, `LOCAL_LLM_MODEL`, `LOCAL_LLM_MODEL_FALLBACK`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_MODEL_FALLBACK`, `SERPAPI_API_KEY` (tier ④) |
+| Failure behaviour | Returns a summary string rather than raising in the normal cases: no URLs, no whitelisted URLs, no snippet above threshold each produce an explanatory summary and a `failed - *` status in `KR_output.txt`. Only unexpected exceptions reach the orchestrator, which marks `FETCHING EVIDENCE...` as `FAIL` and passes an empty `external_knowledge` |
+
+### 4.4 Reverse Image Search (RIS) — `model/reverse_image_search.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Establish visual provenance: is the image authentic to the claimed event, recycled from another event, generic, or undeterminable |
+| Entry point | `ReverseImageSearchPipeline(visual_threshold=0.68, semantic_threshold=0.0).execute(claim_text, image_url)`; also `.log_skipped(...)`, `.save_ris_log(...)` |
+| Stage 1 — hosting | The image is published to a temporary host so SerpApi can fetch it. Five tiers in order: ImgBB (if `IMGBB_API_KEY`), freeimage.host, tmpfiles.org, envs.sh, catbox.moe. Base64 data-URLs and local file paths are uploaded; HTTP(S) URLs are used directly as the Lens query |
+| Stage 2 — Lens | `serpapi.GoogleSearch` with `engine="google_lens"`; returns candidate matches (title, source, link, thumbnail) |
+| Stage 3 — CLIP filter | Thumbnails downloaded (10 s timeout) and embedded with CLIP vision; cosine ≥ 0.68 survives. Purely image-to-image, so language-agnostic |
+| Stage 4 — MiniLM filter | Claim vs. candidate **title** cosine ≥ 0.0 — i.e. permissive by design; the scores are recorded but effectively only empty titles fail. Rationale: a hard semantic gate discards valid cross-lingual and archival matches, and the Visual Agent can weigh weak matches itself |
+| Context fallback | `candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered` — visual matches are never lost to the semantic stage |
+| Stage 5 — Visual Agent | Local Ollama (or OpenRouter when `USE_LOCAL_LLM=false`) classifies into `Authentic Context / Matching Event`, `Out-of-Context (Misattributed / Recycled)`, `Generic / Illustrative Imagery`, `Inconclusive / Insufficient Evidence`, and returns `is_out_of_context`, `confidence`, `summary`, `judge_summary` |
+| Output | `{status, category, is_out_of_context, confidence, visual_agent_summary, judge_summary, matches, search_url, llm_used}` |
+| Config | `SERPAPI_API_KEY`, `IMGBB_API_KEY`, `USE_LOCAL_LLM`, `LOCAL_LLM_URL`, `LOCAL_LLM_MODEL(_FALLBACK)`, `OPENROUTER_*` |
+| Failure behaviour | Missing SerpApi key or zero Lens results → `status: "failed"`, no exception. Zero CLIP matches → `status` stays `"success"` with category `Unknown`. Visual Agent unreachable → `Inconclusive / Insufficient Evidence` with `is_out_of_context: false`. Any unhandled exception → `status: "failed"` plus an error summary, logged to `RIS_output.txt` |
+
+### 4.5 Multi-Agent Debate (MAD) — `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`, `model/llm_client.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Stress-test the claim through structured adversarial argument so the Judge sees both the strongest defence and the strongest attack |
+| Entry point | `OrchestratorAgent().run_debate(article, external_knowledge)` → `(consolidated_summary, agents_info)`; internals `summarize_context`, `assign_profiles`, `consolidate_discourse`, `save_debate_log` |
+| Shape | 6 agents (3 Real News, 3 Fake News) × 3 stages. Each stage runs one Real then one Fake speaker; each agent speaks exactly once, so 6 arguments total. Stage names: `Round 1: First Speakers`, `Round 2: Second Speakers`, `Round 3: Third Speakers` |
+| Context construction | `summarize_context` sends the **full raw article** (not the cleaned `llm_text`) and asks for core claims plus political/social framing analysis; the KR summary is appended **verbatim** rather than re-summarised, to avoid fact loss |
+| Profiles | `assign_profiles` asks the LLM for exactly 6 short role titles parsed from a JSON array, with a hardcoded six-role fallback (`Investigative Journalist`, `Forensic Data Analyst`, `Political Fact-Checker`, `Media Context Analyst`, `Public Records Specialist`, `Source Verification Expert`) |
+| Memory | `SharedMemoryBank` holds the article, the context summary, and a per-stage argument list; `get_formatted_history()` serialises article + context + all arguments so far into every prompt, so prompts grow monotonically |
+| Speaker discipline | `mad_agent.py` injects role-specific structure (introduction / arguments / summary / conclusion for First; rebuttal + *new* evidence for Second; whip-style weighing for Third) plus seven critical rules (anti-regurgitation, concise summaries, domain specialisation, factual-veracity focus, no policy debate, bias analysis, aggressive defence) |
+| Third Speaker override | The Third Speaker prompt carries a `CRITICAL OVERRIDE` exempting it from rule 1 (anti-regurgitation) and rule 3 (domain specialisation): it must weigh the existing record and is barred from introducing new evidence |
+| LLM access | All calls go through `LLMClient.generate()` → `POST {OLLAMA_BASE_URL}/api/generate` with `stream: false`. There is no cloud path. Primary `LOCAL_LLM_MODEL` (`.env.example` sets `qwen2.5:7b`; the code default is the first fallback entry, `llama3:8b`), fallback chain from `LOCAL_LLM_MODEL_FALLBACK`, 180 s timeout per attempt |
+| Output | `consolidated` synthesis string (3-part neutral analysis of both sides and the clash points) plus `agents_info` for logging |
+| Failure behaviour | `LLMClient.generate()` never raises: on exhaustion it returns a bracketed error string such as `[Error calling Ollama API (qwen2.5:7b): 404 ... - Response: ...]` or `[Error connecting to Ollama (qwen2.5:7b): ...]`. The debate therefore "succeeds" with an error-laden transcript and `DEBATING...` reports `OK`; only an exception from the orchestrator itself yields `FAIL` |
+
+The design rationale for local-only inference is cost and rate limits: a full run issues nine sequential generations, and a cloud model would be billed nine times per article and could refuse politically sensitive topics.
+
+### 4.6 Chief Judicial Magistrate (Judge) — `model/judge.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Convert all evidence into one taxonomy verdict with confidence, justification, key facts, and reasoning |
+| Entry points | `Judge(api_key=None, model_name=None, temperature=0.2, max_tokens=4096)`, `.analyze(...)`, `.self_consistency_analyze(..., n=3, sc_temperature=0.7)`, `.panel_analyze(...)`, `.save_judge_log(...)` |
+| Provider | OpenRouter OpenAI-compatible endpoint `https://openrouter.ai/api/v1/chat/completions`, 45 s timeout per attempt, `reasoning: {"effort": "low"}` to stop reasoning models from spending the whole budget in `message.reasoning` |
+| Model chain | `[JUDGE_MODEL or OPENROUTER_MODEL or "deepseek/deepseek-v4.1-flash"] + JUDGE_MODEL_FALLBACK or OPENROUTER_MODEL_FALLBACK`, deduplicated at call time. `.env.example` ships `deepseek/deepseek-v4.1-flash`, `z-ai/glm-5.3-flash`, `stealth/space-bunny-alpha`, `deepseek/deepseek-v4-flash-0731`; the code default fallback list is different (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`, `inclusionai/ling-3.0-flash:free`, `poolside/laguna-m.1:free`) |
+| Modes (`JUDGE_MODE`) | `single` (default) — one pass; `self_consistency` — n=3 parallel paths at temperature 0.7, majority vote, confidence averaged over agreeing runs, `sc_votes` returned; `panel` — three parallel specialists (`_FACT_CHECKER_PROMPT`, `_LINGUIST_PROMPT`, `_LOGICIAN_PROMPT`, each emitting a 1–10 risk score) followed by a sequential Chief synthesizer (`_CHIEF_JUDGE_PROMPT`) |
+| Constitution | Nine principles P1–P9 in `_SYSTEM_PROMPT`. P5 sets confidence calibration; P6 makes EP advisory; P7 makes KR the authoritative factual source; **P8** governs visual provenance and contains the evidentiary hierarchy — verified KR fact-checking outranks automated RIS heuristics, while an authentic photo never certifies uncorroborated text; P9 admits debate findings |
+| Reasoning protocol | Seven mandatory steps: domain orientation, claim extraction, internal consistency, framing/style, source attribution, multimodal/multi-agent integration, self-critique |
+| Output parsing | Five-stage parser: ① direct `json.loads`; ② scan for a brace-balanced object containing `"verdict"`; ③ reverse greedy brace extraction from the last `"verdict"`; ④ auto-close truncated JSON (unbalanced braces/quotes); ⑤ regex field extraction from prose. Verdict strings are normalised through a trigger table (e.g. `MISLEADING` → `MISLEADING CONTENT`) and unknown values fall back to `INCONCLUSIVE` |
+| Python guardrail | `_enforce_constitutional_guardrails()` post-processes any `CREDIBLE` verdict when `ris_summary` contains `out-of-context imagery detected: yes`: it checks whether the Judge's own `reasoning`/`justification` both acknowledge the visual finding and cite external corroboration; if not, it rewrites the verdict to `FALSE CONNECTION` and appends an explanatory note |
+| Output | `{verdict, color_class, confidence, justification, reasoning, key_facts, links, ep_signal}` (+ `sc_votes` in self-consistency) |
+| Failure behaviour | Any API or parse failure returns a structured fallback: `INCONCLUSIVE`, `0.0%`, justification containing the error, one key fact pointing at `OPENROUTER_API_KEY` and connectivity. Missing API key raises `ValueError` at construction, which the orchestrator converts into the same structured fallback via its exception handler |
+
+Two details worth knowing before touching this file: the guardrail's `external_knowledge` parameter is accepted but never read — the decision is made purely from phrase matching over the Judge's own output; and the class docstring still says `max_tokens` defaults to 1024 while the constructor default is 4096.
+
+### 4.7 Orchestrator — `backend/analyzer.py`
+
+| Aspect | Detail |
+|---|---|
+| Responsibility | Own the run: lazy singletons, stage sequencing, per-stage error containment, artefact assembly, logging |
+| Entry point | `analyze_text(input_text, image_data=None)` — a **generator** (its docstring still says "return a dict") |
+| Lazy singletons | `_get_predictor`, `_get_judge`, `_get_retriever`, `_get_ris_pipeline`, `_get_mad_orchestrator` |
+| Image decoding | `_decode_image` accepts `data:` base64 or `http(s)://`; anything else returns `None` |
+| Preflight | `_preflight_local_llm()` TCP-connects (1.5 s) to `OLLAMA_BASE_URL`, and to `LOCAL_LLM_URL` when `USE_LOCAL_LLM=true` and it is a different host:port |
+| RIS gating | RIS runs only when `has_clip` and the image string starts with `data:`, `http://`, or `https://` |
+| Artefact assembly | Builds `ris_summary` from `judge_summary`/`visual_agent_summary` plus category, OOC flag, confidence and an entailment-scope disclaimer; converts up to 6 KR articles into `links`; attaches `ep_signal` |
+| Config | `JUDGE_MODE`, `USE_LOCAL_LLM`, `OLLAMA_BASE_URL`, `LOCAL_LLM_URL` |
+| Failure behaviour | Every stage is individually wrapped; the run continues with whatever artefacts exist. A Judge exception ends the stream with a synthetic `INCONCLUSIVE` result (see §3.4 for the status-event gap) |
+
+### 4.8 Web tier and frontend — `app.py`, `frontend/`
+
+| Aspect | Detail |
+|---|---|
+| Routes | `GET /` → `frontend/index.html`; `GET /res/<path:filename>` → `res/`; `POST /api/analyze` → NDJSON stream |
+| Validation | `request.get_json()`; missing body or missing `text` → HTTP 400 `{"error": "No text provided"}` |
+| CORS | `flask_cors.CORS(app)` — permissive, which is why the SPA can hardcode `http://127.0.0.1:5000/api/analyze` |
+| Frontend behaviour | Pre-draws the eight steps as pending; reads the stream with `response.body.getReader()` and a manual newline buffer; updates the matched line in place; on `result`, renders verdict (with a `<br>` after the first space), confidence, justification (markdown-bold converted), key facts, up to 6 links, and a collapsible reasoning panel |
+| Not rendered | `ep_signal` is returned but never displayed; there is no UI for EP probability |
 
 ---
 
-### 7. Multilingual Capability & Cross-Lingual Fallback Architecture
+## 5. End-to-end data flow of one analysis
 
-RAHMAD incorporates defense-in-depth architectural provisions to process non-English media (e.g., Bahasa Melayu, Indonesian) without requiring total model retraining. Because real-world misinformation frequently involves cross-lingual decontextualization (e.g., local vernacular text paired with sensational foreign photography), the pipeline operates across multiple language-agnostic and multilingual fail-safes.
+1. **Input.** Browser posts `{text, image}`. `image` is a data-URL (from the file input) or an HTTP URL.
+2. **Preflight.** Two or three TCP probes. Result recorded in log section `[0]`; `FAIL` is informational only.
+3. **Pre-processing.** `_decode_image` → PIL RGB (or `None`). `preprocess_inputs` → `llm_text` (full, cleaned) and CLIP tensors from `lead_text` (headline + first sentence). On any failure: `llm_text = clean_for_llm(text)`, `has_clip = False`.
+4. **EP.** If `has_clip`, `predict_from_tensors_verbose` returns `ep_result` plus `text_embeds`, `image_embeds`, and the fused 1024-d vector, all logged. Otherwise `ep_result` stays `{probability 0.5, label UNKNOWN, confidence "N/A", pass_to_agents True}`.
+5. **KR.** `retrieve_detailed(input_text[:800])` → `external_knowledge` (fact outline or explanatory failure string) and `articles` (used later for `links`).
+6. **RIS.** If an image exists, `execute(input_text, image_data)` → `judge_summary`, `category`, `is_out_of_context`, `confidence`. The orchestrator wraps these into a block with an explicit entailment-scope disclaimer ("visual provenance confirms only that the media file is genuine…").
+7. **MAD.** `run_debate(input_text, external_knowledge)` — note the raw text, not `llm_text` — produces the consolidated synthesis. The full transcript is written to `MAD_output.txt` but only the synthesis reaches the Judge.
+8. **Judge.** One of the three modes, with `llm_text`, `ep_result`, `external_knowledge`, `ris_summary`, `mad_summary`. Guardrail applied. `links` and `ep_signal` attached.
+9. **Response.** Two closing status events plus the `result` object.
 
+### 5.1 What the Judge actually receives
+
+The user message is built by `Judge._build_user_message()` from `_USER_TEMPLATE`; the article is truncated to `_MAX_TEXT_CHARS = 6000`:
+
+```text
+=== KNOWLEDGE RETRIEVAL EVIDENCE ===
+{external_knowledge | "No external text knowledge provided."}
+
+Note: This is verified external ground-truth evidence retrieved from reputable
+whitelisted news outlets via semantic similarity filtering.
+
+=== REVERSE IMAGE SEARCH EVIDENCE ===
+{ris_summary | "No Reverse Image Search data provided."}
+
+=== MULTI-AGENT DEBATE SUMMARY ===
+{mad_summary | "No Multi-Agent Debate data provided."}
+
+=== EARLY PREDICTOR SIGNAL ===
+Label       : {ep_label}
+Probability : {ep_prob:.4f}  (0.0 = Real, 1.0 = Fake)
+Confidence  : {ep_confidence}
+
+Note: This is a preliminary multimodal signal from a CLIP+LoRA model — treat it
+as evidence, not as a definitive answer. You must run your own full reasoning
+protocol before reaching a verdict.
+
+=== ARTICLE TEXT ===
+{llm_text[:6000]}
+
+Now work through your 7-step reasoning protocol and return your verdict as a
+JSON object.
 ```
-[Non-English / Malay Article & Media]
-                  │
-  ┌───────────────┴───────────────┐
-  ▼                               ▼
-[Pixel-Level Visual Provenance]  [Multilingual Search & Scraping]
-  • Language-agnostic CLIP         • Google / DDG queries in native tongue
-  • Pure image-to-image matching   • Regional whitelisted news sources
-  │                               │
-  └───────────────┬───────────────┘
-                  ▼
-[Semantic Filter & Automatic Visual Fallback]
-  • If text transformer produces depressed similarity on non-English text,
-    system automatically bypasses threshold to retain all visual matches:
-    candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered
-                  ▼
-[Multilingual Visual Agent & Debate (Qwen 2.5 / DeepSeek)]
-  • Cross-lingual entity alignment (e.g., Malay claim vs. English wire provenance)
-  • Constitutional reasoning & factual synthesis in native tongue
+
+`ris_summary` is not the raw RIS output. The orchestrator composes it as:
+
+```text
+--- REVERSE IMAGE SEARCH FINDINGS ---
+Category: <category>
+Out-of-Context Imagery Detected: YES (Decontextualized / Misattributed) | NO (Authentic Context / Non-Deceptive)
+Confidence: <High | Medium | ...>
+Entailment Scope: Authentic visual provenance confirms only that the media file is genuine and not recycled from an unrelated event; it does NOT independently corroborate unverified claims or speculative character attributions in the caption/text.
+Executive Evidence Summary for Judge:
+<judge_summary>
 ```
 
-#### 1. Layer-by-Layer Multilingual Behavior:
+Consequences worth remembering:
 
-1. **Input Preprocessing (`input_processing.py`):**
-   - Pure UTF-8 normalization and character-level sanitization; language-agnostic across Latin-script and international alphabets.
+- The Judge never sees individual KR snippets, URLs, similarity scores, or the KR article list — only the synthesised outline.
+- The Judge never sees the debate transcript — only the consolidation. Individual agent profiles and arguments live in `MAD_output.txt`.
+- If RIS returns `status: "failed"` (e.g. Lens returned nothing), the orchestrator does **not** build a block, so the Judge sees the neutral placeholder and cannot tell "no evidence" from "search failed".
+- Only on a raised exception does `ris_summary` contain an explicit error string.
 
-2. **Early Predictor (`model/early_predictor.py`):**
-   - *Baseline:* OpenAI CLIP (`openai/clip-vit-base-patch32`) text encoder is predominantly English-trained.
-   - *Graceful Fallback (Principle P6):* If non-English syntax yields ambiguous or neutral probability (~0.50), the system never fails or halts. Under Constitutional Principle P6 (*"Treat Early Predictor as Evidence, Not Authority"*), the Judge recognizes low-confidence triage signals and defers to retrieved external evidence.
+---
 
-3. **Knowledge Retrieval (`model/knowledge_retrieval.py`):**
-   - *Search Engine Multilingualism:* Google Search and DuckDuckGo query APIs natively handle Bahasa Melayu claims and regional entity searches.
-   - *Regional Whitelist Ingestion:* The verification whitelist (`backend/domain_whitelist.py`) explicitly includes major national news agencies and accredited publishers across Malaysia and Southeast Asia:
-     - `bernama.com` (National News Agency of Malaysia)
-     - `astroawani.com`
-     - `malaysiakini.com`
-     - `thestar.com.my`
-     - `nst.com.my`
-     - `freemalaysiatoday.com`
-     - `theedgemalaysia.com` / `theedgemarkets.com`
-     - Regional neighbors: `kompas.com`, `tempo.co`, `antaranews.com`, `thejakartapost.com`, `straitstimes.com`.
+## 6. Configuration
 
-4. **Reverse Image Search & The Semantic Fallback Mechanism (`model/reverse_image_search.py`):**
-   - *Image-to-Image Matching (CLIP Vision):* Visual similarity verification (`filter_visually`) operates purely on raw image feature tensors extracted from the target and retrieved thumbnails. This stage is **100% language-agnostic**.
-   - *Semantic Filter Automatic Fallback:* While `all-MiniLM-L6-v2` is an English-specialized sentence embedder, non-English claims will produce lower cosine scores against international image metadata. To prevent valid evidence from being discarded, RAHMAD implements an architectural fallback in `ReverseImageSearchPipeline.execute()`:
-     ```python
-     candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered
-     ```
-     If language divergence causes zero candidates to exceed the semantic threshold, the pipeline automatically falls back to all verified visual matches, preserving complete visual provenance for the LLM Visual Agent.
+### 6.1 Environment variables
 
-5. **Cross-Lingual Forensic Synthesis (Visual Agent & Chief Judicial Magistrate):**
-   - Powered by large multilingual foundation models (`deepseek/deepseek-v4.1-flash` and `qwen2.5:7b`), which are pre-trained on tens of trillions of multilingual tokens.
-   - The Visual Agent and Judge seamlessly perform cross-lingual reasoning: evaluating a local vernacular claim (e.g. Bahasa Melayu) against foreign wire provenance (e.g. English, French, or Spanish image archives), detecting cross-modal decontextualization without requiring manual translation.
+Loaded by `load_dotenv()` in `app.py`, `model/judge.py`, and `model/llm_client.py`. Defaults below are the values used when the variable is unset.
 
-#### 2. Comparison: English vs. Multilingual Sentence Transformers:
+| Variable | Code default | Consumed by | Effect |
+|---|---|---|---|
+| `USE_LOCAL_LLM` | `false` | KR, RIS, preflight | Route KR synthesis and RIS Visual Agent to the local endpoint instead of OpenRouter |
+| `LOCAL_LLM_URL` | `http://localhost:11434/v1/chat/completions` | KR, RIS, preflight | OpenAI-compatible chat-completions endpoint for local synthesis |
+| `LOCAL_LLM_MODEL` | first entry of `LOCAL_LLM_MODEL_FALLBACK` | KR, RIS, MAD | Primary local model id |
+| `LOCAL_LLM_MODEL_FALLBACK` | `llama3:8b` | KR, RIS, `LLMClient` | Ordered local fallback chain (comma-separated) |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | MAD, preflight | Base URL for `POST /api/generate` |
+| `OPENROUTER_API_KEY` | — (required) | Judge, KR, RIS | Bearer token; `Judge.__init__` raises if absent |
+| `OPENROUTER_MODEL` | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | KR, RIS | Primary cloud synthesis / visual-agent model |
+| `OPENROUTER_MODEL_FALLBACK` | comma-separated list | KR, RIS | Cloud fallback chain |
+| `JUDGE_MODEL` | `deepseek/deepseek-v4.1-flash` | Judge | Primary judicial model (also read as `OPENROUTER_MODEL` fallback) |
+| `JUDGE_MODEL_FALLBACK` | see §4.6 | Judge | Judicial fallback chain; duplicates of the primary are dropped |
+| `JUDGE_MODE` | `single` | Orchestrator | `single` \| `self_consistency` \| `panel` |
+| `SERPAPI_API_KEY` | — (required for RIS) | RIS, KR tier ④ | Google Lens and Google News |
+| `IMGBB_API_KEY` | — (optional) | RIS | Preferred image host; without it the free-host chain is used |
 
-| Dimension | Default: `all-MiniLM-L6-v2` | Multilingual Alternative: `paraphrase-multilingual-MiniLM-L12-v2` |
-| :--- | :--- | :--- |
-| **Primary Language** | English-specialized | 50+ Languages (Native Malay, Indonesian, Chinese, etc.) |
-| **Model Size / Weights** | ~90 MB (6 Transformer Layers) | ~470 MB (12 Transformer Layers) |
-| **Inference Latency** | ~10–15 ms / sample | ~25–35 ms / sample |
-| **English Benchmark STS** | Slightly higher (~0.5–1% edge on pure English NLI) | Strong general performance across all languages |
-| **Cross-Lingual Alignment** | Near-zero cosine alignment across language boundaries | High cross-lingual vector alignment (Malay text maps to English vector) |
-| **Production Recommendation** | Recommended for English benchmarks; relies on RAHMAD visual fallback for other languages | Recommended for dedicated Southeast Asian multi-lingual deployment |
+`.env.example` ships `USE_LOCAL_LLM=true` and `LOCAL_LLM_URL=http://your-url-here`, i.e. the intended production configuration is fully local for KR/RIS synthesis. The code default is the opposite, so an unset environment silently falls back to OpenRouter for those two stages — and then fails to synthesise if no OpenRouter key exists (KR degrades to raw snippets; RIS degrades to `Inconclusive`).
 
+### 6.2 Compute routing
+
+| Stage | Runs on |
+|---|---|
+| Pre-processing, EP, KR search/scraping, CLIP + MiniLM filters | Local (CPU / DirectML / CUDA) |
+| KR synthesis, RIS Visual Agent | Local Ollama if `USE_LOCAL_LLM=true`, else OpenRouter |
+| MAD (9 generations) | Local Ollama, always — `LLMClient` has no cloud path |
+| Judge (all modes) | OpenRouter, always |
+
+Note the split endpoint: MAD talks to `OLLAMA_BASE_URL/api/generate` (native Ollama API), while KR and RIS talk to `LOCAL_LLM_URL/v1/chat/completions` (OpenAI-compatible). Both default to port 11434, but they are configured independently and the preflight probes both when they differ.
+
+### 6.3 Hardcoded thresholds
+
+| Constant | Value | Location |
+|---|---|---|
+| EP FAKE / REAL thresholds | 0.60 / 0.40 | `model/early_predictor.py` |
+| EP text window | 77 tokens | `model/early_predictor.py`, `backend/input_processing.py` |
+| EP image size | 224 × 224 | `backend/input_processing.py` (CLIP processor) |
+| KR similarity threshold | 0.35 | `KnowledgeRetriever.__init__` |
+| KR max articles / max age | 5 / 3 years | `KnowledgeRetriever.__init__` |
+| KR chunks per article | 3 | `semantic_filter` |
+| RIS CLIP threshold | 0.68 | `ReverseImageSearchPipeline.__init__` |
+| RIS MiniLM threshold | 0.0 | `ReverseImageSearchPipeline.__init__` |
+| Judge article cap | 6 000 chars | `model/judge.py` |
+| Judge temperature / max tokens | 0.2 / 4096 | `Judge.__init__` |
+| Self-consistency n / temperature | 3 / 0.7 | `self_consistency_analyze` defaults |
+| Links surfaced | 6 | `backend/analyzer.py` |
+
+None of these is environment-configurable; changing them means editing code.
+
+---
+
+## 7. Failure modes and degradation matrix
+
+Every stage is contained, so a single failure degrades quality rather than aborting the run. The table states what actually happens, not what ideally should.
+
+| Condition | Detection | Behaviour | User-visible signal |
+|---|---|---|---|
+| Ollama down | Preflight TCP fails | `CHECKING LLM BACKEND... FAIL`; run continues | Step 0 marked failed |
+| Ollama down, `USE_LOCAL_LLM=true` | Same | KR synthesis → concatenated raw snippets; RIS Visual Agent → `Inconclusive / Insufficient Evidence`, `is_out_of_context: false`; MAD → 9 error strings forming the transcript | KR/RIS steps may still report `OK`; only the content degrades |
+| Ollama down, MAD | `LLMClient` catches `RequestException` per model | Debate transcript is error strings; consolidation is an error string; `DEBATING... OK` | Nothing, unless you read the transcript |
+| Ollama slow | 180 s per model attempt, ×2 models, ×9 calls | No global timeout; a single article can block for a long time | Step 5 stays `IN PROGRESS` |
+| OpenRouter down / key invalid | `_call_api` exhausts the chain, then raises | Structured fallback: `INCONCLUSIVE`, `0.0%`, error text in justification | `SYNTHESIZING RESULTS...` never terminates; result still arrives |
+| OpenRouter returns unparsable text | Five-stage parser fails | Same structured fallback | As above |
+| No image supplied | `_decode_image` → `None` | EP neutral `{0.5, UNKNOWN}`; RIS skipped; both steps `FAIL` | Steps 2 and 4 marked failed |
+| Image undecodable | Exception inside `_decode_image` | Same as no image (logged warning) | Steps 2 and 4 marked failed |
+| `preprocess_inputs` raises | Orchestrator `except` | Falls back to text-only; EP skipped | Step 2 `FAIL`, step 1 still `OK` |
+| EP artifacts missing | `FileNotFoundError` at construction | EP step `FAIL`; neutral signal retained | Step 2 `FAIL` |
+| SerpApi key missing / quota exhausted | `fetch_results` returns no results | RIS `status: "failed"`; Judge receives the neutral placeholder (not an error) | Step 4 `FAIL` |
+| Lens returns matches but none pass CLIP 0.68 | `visually_filtered` empty | RIS reports `status: "success"`, category `Unknown`, OOC `NO`; Judge is told nothing similar was found | Step 4 `OK` |
+| Image hosting fails on all five hosts | Upload returns `None` | RIS cannot query Lens; treated as no results | Step 4 `FAIL` |
+| KR finds no whitelisted URLs | `filter_domains` empty | Summary explains the failure; `external_knowledge` is a message, not facts | Step 3 `OK` (the module returned normally) |
+| KR scraping blocked by every publisher | All articles un-extractable | Whitelisted references preserved as headlines; summary notes the situation | Step 3 `OK`, `links` populated |
+| Debate profiles unparsable | `assign_profiles` exception | Hardcoded six-role fallback | None |
+
+---
+
+## 8. Observability
+
+### 8.1 The five logs
+
+All five live in `output/`, are overwritten on each run, and are gitignored (`/output`).
+
+| File | Writer | Contents |
+|---|---|---|
+| `output/output_log.txt` | `PipelineLogger.save()` | Unified per-stage log (sections listed below), including the full Judge system prompt and user message, the raw model response, and per-module runtimes |
+| `output/KR_output.txt` | `KnowledgeRetriever.save_kr_log()` | Claim, backend used, every URL tagged `[WHITELISTED]`/`[FILTERED OUT]`, extracted articles, preserved un-extractable references, semantic snippets with the 0.35 threshold, synthesis output, final status |
+| `output/RIS_output.txt` | `ReverseImageSearchPipeline.save_ris_log()` | Search URL, raw Lens matches, per-candidate CLIP similarity with pass/fail against 0.68, MiniLM scores, Visual Agent prompt/response, `judge_summary`, final category and OOC flag |
+| `output/MAD_output.txt` | `OrchestratorAgent.save_debate_log()` | Article, context summary, agent roster, every argument tagged by side and stage, consolidated synthesis |
+| `output/JUDGE_output.txt` | `Judge.save_judge_log()` | Mode, primary model, fallback chain, runtimes, EP context, whether KR/RIS/MAD were ingested, article text, mode-specific intermediates (panel reports with risk scores / self-consistency vote tally / single-pass CoT), final verdict and key facts |
+
+### 8.2 `pipeline_logger` sections
+
+`PipelineLogger` appends sections to an in-memory buffer and writes it on `save()`:
+
+| Section | Title | Content |
+|---|---|---|
+| `[0]` | LOCAL LLM BACKEND PREFLIGHT | Each probed URL and its reachability |
+| `[1]` | PRE-PROCESSING — INPUT | Raw text preview, image size/mode |
+| `[2]` | PRE-PROCESSING — OUTPUT | Runtime, `llm_text`, `lead_text`, tensor shapes with min/max/norm and the first values |
+| `[3]` | CLIP ENCODER — OUTPUT (or SKIPPED) | `text_embeds`, `image_embeds`, fused 1024-d summary |
+| `[4]` | EARLY PREDICTOR — OUTPUT (or SKIPPED) | Probability, label, confidence, `pass_to_agents`, runtime |
+| `[5]` | KNOWLEDGE RETRIEVAL — OUTPUT | Claim, article count, summary |
+| `[5B]` | REVERSE IMAGE SEARCH — OUTPUT | Status, category, OOC flag, summary |
+| `[5C]` | MULTI-AGENT DEBATE (MAD) — OUTPUT | Summary, agent roster |
+| `[6]` | JUDGE (LLM) — INPUT | Full system prompt and full user message |
+| `[7]` | JUDGE (LLM) — OUTPUT | Raw response and parsed verdict |
+| `SUMMARY` | MODULE RUNTIMES BREAKDOWN | Per-stage and total timings |
+
+The module docstring at the top of `pipeline_logger.py` still lists only sections `[1]`–`[6]` and omits preflight, KR, RIS and MAD; the implementation is ahead of the comment.
+
+Each module also prints ASCII banner blocks to stdout (`=====` headers with step counters), which is the fastest way to watch a run live.
+
+---
+
+## 9. Evaluation harness
+
+### 9.1 Datasets
+
+Held-out CSV splits under `testing/` (gitignored). Each row carries `text`, `label` (0 = Real, 1 = Fake), and `image_path`.
+
+| Dataset | Provenance | Shape |
+|---|---|---|
+| `test_dataset_fauxtography.csv` | Fauxtography (Zlatkova et al., EMNLP 2019) — Snopes rumour/doctored-image claims | 60 balanced samples (30/30) for Phase 3 |
+| `test_dataset_newsclippings.csv` | NewsCLIPpings (Luo et al., EMNLP 2021) — authentic text paired with an unrelated authentic photo | 60 balanced samples (30/30) |
+| `test_dataset_combined.csv` | Concatenation, tagged by `source_dataset` | 120 samples (60/60 per source, 60 Real / 60 Fake) |
+
+`testing/test_phase3_evaluation.py::load_test_split(path, n_samples_ablation=60, seed=42)` performs the split, so runs are reproducible given the same CSV.
+
+### 9.2 The seven ablation configurations
+
+Configurations accumulate layers so each contribution can be isolated (`CONFIGS` in `testing/run_phase3_newsclippings_ablation.py`):
+
+1. EP Only
+2. Judge Only
+3. EP + Judge
+4. EP + KR + Judge
+5. EP + KR + RIS + Judge
+6. EP + KR + MAD + Judge
+7. Full RAHMAD (EP + KR + RIS + MAD + Judge)
+
+Binarisation for scoring: `CREDIBLE` → Real (0), every other verdict including `INCONCLUSIVE` → Fake (1) (`run_combined_120_pipeline.py`).
+
+### 9.3 Caching and checkpointing
+
+Each full-pipeline sample costs web searches plus cloud calls, so module outputs are pre-computed once and reused:
+
+- `.cache_kr_*.json`, `.cache_ris_*.json`, `.cache_mad_*.json` — module output strings keyed by sample id. The runners read them instead of re-running KR/RIS/MAD.
+- `.checkpoint_*.json` — per-sample result records written after each iteration; a rerun skips completed ids and reprints their stored verdict.
+
+Consequence for interpretation: the ablation varies *what the Judge is given*, not what the modules produce, so ablation results measure adjudication quality over a fixed evidence set.
+
+### 9.4 Reproducing
+
+From the repository root:
+
+```powershell
+# 120-sample end-to-end benchmark (needs .env, Ollama, caches or a willingness to wait)
+python testing/run_combined_120_pipeline.py
+
+# NewsCLIPpings 7-way ablation (configs 2-6; config 1 and 7 come from the full run)
+python testing/run_phase3_newsclippings_ablation.py
+
+# Fauxtography standalone evaluation + ablation
+python testing/run_phase3_fauxtography_final.py
+
+# Unit / integration
+python -m pytest testing/test_phase1_unit.py
+python testing/test_phase2_integration.py
+```
+
+`run_combined_120_pipeline.py` hardcodes `PROJECT_ROOT = Path(r"c:\Users\ahmad\Documents\Programming\fyp\RAHMAD")`; on another machine that line must be edited before the script will find the dataset. The Phase 3 scripts derive `PROJECT_ROOT` from `__file__` and are portable.
+
+### 9.5 Recorded results
+
+**End-to-end, 120-sample combined benchmark** (`testing/combined_120_evaluation_results.txt`):
+
+| Metric | Combined (120) | Fauxtography (60) | NewsCLIPpings (60) |
+|---|---|---|---|
+| Accuracy | 80.00% (96/120) | 88.33% (53/60) | 71.67% (43/60) |
+| Real accuracy (specificity) | 76.67% (46/60) | 80.00% (24/30) | 73.33% (22/30) |
+| Fake accuracy (sensitivity) | 83.33% (50/60) | 96.67% (29/30) | 70.00% (21/30) |
+| Precision | 78.12% | 82.86% | 72.41% |
+| Recall | 83.33% | 96.67% | 70.00% |
+| F1 | 80.65% | 89.23% | 71.19% |
+| Confusion (TP, FP, TN, FN) | (50, 14, 46, 10) | (29, 6, 24, 1) | (21, 8, 22, 9) |
+
+**NewsCLIPpings 7-way ablation, 60 samples** (`testing/final_phase3_newsclippings_evaluation_results.txt`):
+
+| Configuration | Accuracy | Precision | Recall | Specificity | F1 |
+|---|---|---|---|---|---|
+| 1. EP Only | 50.00% | 50.00% | 30.00% | 70.00% | 37.50% |
+| 2. Judge Only | 48.33% | 42.86% | 10.00% | 86.67% | 16.22% |
+| 3. EP + Judge | 43.33% | 16.67% | 3.33% | 83.33% | 5.56% |
+| 4. EP + KR + Judge | 50.00% | 50.00% | 13.33% | 86.67% | 21.05% |
+| 5. EP + KR + RIS + Judge | 73.33% | 75.00% | 70.00% | 76.67% | 72.41% |
+| 6. EP + KR + MAD + Judge | 53.33% | 58.33% | 23.33% | 83.33% | 33.33% |
+| 7. Full RAHMAD | 73.33% | 71.88% | 76.67% | 70.00% | 74.19% |
+
+Full-pipeline agreement statistics in the same report: Cohen's κ = 0.4667, mean confidence 78.6%. The headline result is that RIS is the decisive layer for cheapfakes — configs without it sit at 43–53%, configs with it at 73%.
+
+**Fauxtography 7-way ablation, 60 samples** (`testing/final_phase3_fauxtography_evaluation_results.txt`):
+
+| Configuration | Accuracy | Precision | Recall | Specificity | F1 |
+|---|---|---|---|---|---|
+| 1. EP Only | 43.33% | 44.44% | 53.33% | 33.33% | 48.48% |
+| 2. Judge Only | 78.33% | 72.97% | 90.00% | 66.67% | 80.60% |
+| 3. EP + Judge | 78.33% | 74.29% | 86.67% | 70.00% | 80.00% |
+| 4. EP + KR + Judge | 93.33% | 93.33% | 93.33% | 93.33% | 93.33% |
+| 5. EP + KR + RIS + Judge | 86.67% | 80.56% | 96.67% | 76.67% | 87.88% |
+| 6. EP + KR + MAD + Judge | 95.00% | 93.55% | 96.67% | 93.33% | 95.08% |
+| 7. Full RAHMAD | 86.67% | 80.56% | 96.67% | 76.67% | 87.88% |
+
+Full-pipeline κ = 0.7333, mean confidence 81.8%. The report attributes the pre-fix 61.67% ceiling on this dataset to the old P8 guardrail forcing every OOC flag to `FALSE CONNECTION`, which penalised genuine archival photographs; the reasoning-aware guardrail (§4.6) raised Full RAHMAD to 86.67% and Config 5 from 61.67% to 86.67%.
+
+**Note on Fauxtography figures.** The 88.33% above is the Fauxtography subset of the separate 120-sample combined run; the standalone Phase 3 Fauxtography report records 86.67% (52/60) with κ = 0.7333. These are two different runs over the same dataset family, not one number reported twice. Quote whichever the context requires and name the file.
+
+---
+
+## 10. Extension points and known limitations
+
+### Extension points
+
+| Goal | Where to change |
+|---|---|
+| Add or reorder a pipeline stage | `backend/analyzer.py` — insert a yield pair around the stage; the frontend tolerates unknown step names but must be updated to pre-draw them |
+| Change the verdict taxonomy | `_SYSTEM_PROMPT` Section 2, `_VERDICT_RULES` and `_VALID_CLASSES` in `model/judge.py`, plus the CSS colour classes and `color_class` consumers in `frontend/` |
+| Add a whitelisted publisher | `VERIFIED_DOMAINS` in `backend/domain_whitelist.py` (exact host or subdomain match) |
+| Tune retrieval strictness | `KnowledgeRetriever(similarity_threshold=..., max_articles=..., max_age_years=...)` |
+| Tune visual strictness | `ReverseImageSearchPipeline(visual_threshold=..., semantic_threshold=...)` |
+| Swap the debate model | `LOCAL_LLM_MODEL` / `LOCAL_LLM_MODEL_FALLBACK`; no code change |
+| Add a Judge mode | New `*_analyze()` method plus a branch in `analyzer.py`'s `mode_labels`/dispatch |
+| Add a fourth evidence stream | Extend `_USER_TEMPLATE` and `_build_user_message()`; every mode funnels through them |
+| Re-target the local backend | `OLLAMA_BASE_URL` (MAD) and `LOCAL_LLM_URL` (KR/RIS) are independent |
+
+### Known limitations
+
+**Dead and stale code.**
+
+- `backend/analyzer_new.py` is a near-duplicate of `analyzer.py` and is imported nowhere. Deleting it is safe.
+- `analyze_text()`'s docstring claims it returns a dict; it is a generator.
+- `Judge.__init__` docstring says `max_tokens` defaults to 1024; the signature says 4096.
+- `Judge._enforce_constitutional_guardrails()` accepts `external_knowledge` and never uses it.
+- `pipeline_logger.py`'s module docstring documents sections `[1]`–`[6]` only.
+
+**Architectural constraints.**
+
+- Single local model dependency: MAD has no cloud path, so without Ollama the debate is a transcript of error strings while the UI reports success.
+- Sequential MAD: nine blocking generations with a 180 s per-model timeout and no global deadline. Worst case latency is unbounded in practice.
+- Growing prompts: `get_formatted_history()` prepends the full article plus the full context summary to every argument, so prompt size grows with each stage.
+- EP sees only the lead text: a long, subtly misleading body cannot influence the EP signal by construction.
+- `semantic_threshold = 0.0` in RIS is deliberate (cross-lingual and archival matches would otherwise be discarded) but means the MiniLM stage filters almost nothing; the Visual Agent carries the real discrimination.
+- `RIS_output.txt` records `matches_count` as `len(semantically_filtered)`, so it can be 0 even when the Visual Agent was given visually-filtered contexts.
+- Frontend hardcodes `http://127.0.0.1:5000/api/analyze`; changing the port requires editing `script.js`. CORS is enabled app-wide, which is what makes that work.
+- `app.py` runs with `debug=True` — acceptable for a single-user research deployment, not for anything exposed.
+- `ep_signal` is returned to the client but never rendered.
+
+**Evaluation caveats.**
+
+- The runners hardcode absolute paths (`run_combined_120_pipeline.py`).
+- Ablations reuse cached module outputs, so they measure adjudication, not retrieval.
+- `INCONCLUSIVE` is scored as Fake in binarised metrics; a system that abstains is penalised.
+- Sample sizes are 60 per dataset — one sample is 1.67 percentage points, so small deltas between configurations are not meaningful.
+
+---
+
+## 11. Where to start reading the code
+
+1. **`app.py`** (56 lines) — the whole HTTP surface. Understand the generator-to-NDJSON wrapping before anything else.
+2. **`backend/analyzer.py`** — read `analyze_text()` top to bottom. It is the only place that knows the stage order, the error containment policy, and how artefacts are assembled. Everything else is a leaf module.
+3. **`backend/input_processing.py`** — the `llm_text` / `lead_text` split explains most surprising EP-versus-Judge disagreements.
+4. **`model/early_predictor.py`** — `_build_verdict()` (static) holds the threshold logic and `predict()` the tensor plumbing; the LoRA/MLP wiring is in `_load_clip_with_lora()` and `_load_mlp()`.
+5. **`model/judge.py`** — start at `_SYSTEM_PROMPT` (principles and taxonomy), then `_USER_TEMPLATE`, then `_parse_response()` and `_enforce_constitutional_guardrails()`. The three mode methods are variations on `analyze()`.
+6. **`model/knowledge_retrieval.py`** — `retrieve_detailed()` is a readable five-step narrative with print statements at every boundary.
+7. **`model/reverse_image_search.py`** — `execute()` first; the four stages are labelled in comments. Read `filter_semantically()` and the `candidate_contexts` fallback together.
+8. **`model/mad_orchestrator.py` + `mad_agent.py`** — `run_debate()` is 60 lines; `mad_agent.py` is almost entirely prompt construction.
+9. **`frontend/script.js`** — `streamSteps` (lines ~95–103) and the NDJSON reader (~170–235) are the whole integration.
+10. **`testing/run_combined_120_pipeline.py`** — the shortest complete example of driving EP + Judge over a dataset without the web layer.
+
+---
+
+## 12. Source map
+
+| Claim area | Verified against |
+|---|---|
+| Routes, NDJSON wrapping, validation | `app.py` |
+| Stage order, status strings, error containment, no-image EP signal, preflight, link formatting | `backend/analyzer.py` |
+| Log sections and fields | `backend/pipeline_logger.py`, `output/output_log.txt` |
+| Text/image pre-processing, 77-token window, 224×224 | `backend/input_processing.py` |
+| EP architecture, thresholds, artifact paths, device selection | `model/early_predictor.py`, `data_processing/early_predictor_output/lora_adapter/adapter_config.json` |
+| KR tiers, whitelist count, thresholds, timeouts, synthesis fallback | `model/knowledge_retrieval.py`, `backend/domain_whitelist.py`, `backend/news_spider.py` |
+| RIS thresholds, hosting tiers, taxonomy, fallbacks | `model/reverse_image_search.py` |
+| MAD structure, prompt rules, Third Speaker override, LLM client behaviour | `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`, `model/llm_client.py` |
+| Judge constitution, taxonomy, modes, parser, guardrail, model chain | `model/judge.py` |
+| Environment variable names and defaults | `.env.example`, `model/judge.py`, `model/knowledge_retrieval.py`, `model/reverse_image_search.py`, `model/llm_client.py`, `backend/analyzer.py` |
+| Evaluation numbers | `testing/combined_120_evaluation_results.txt`, `testing/final_phase3_newsclippings_evaluation_results.txt`, `testing/final_phase3_fauxtography_evaluation_results.txt` |
+| Ablation definitions, caching, checkpointing | `testing/run_phase3_newsclippings_ablation.py`, `testing/run_combined_120_pipeline.py`, `testing/test_phase3_evaluation.py` |

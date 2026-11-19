@@ -58,7 +58,8 @@ class DebaterAgent:
                 "- Rebuttal: Systematically dismantle the opposing team's latest arguments and expose their analytical flaws.\n"
                 "- Summary of team arguments and case: Crystallize the central clash. Weigh your team's cumulative evidence against the opposing side's gaps. DO NOT regurgitate earlier speeches verbatim; synthesize the clash.\n"
                 "- No new arguments except as specific rebuttal: Do not introduce unrelated constructive claims; focus entirely on defending against attacks and finalizing rebuttals.\n"
-                "- Conclusion: Final, authoritative verdict affirming your team's case."
+                "- Conclusion: Final, authoritative verdict affirming your team's case.\n\n"
+                "CRITICAL OVERRIDE: Rules 1 (Anti-Regurgitation) and 3 (Domain Specialization) of the CRITICAL RULES do NOT apply to you as Third Speaker. Your job is NOT to introduce new evidence or fresh arguments — it is to WEIGH the evidence already on the record, expose the opposing team's weakest links, identify the decisive clash point, and deliver the final authoritative verdict. Every substantive point you make must be anchored to material already presented in the debate history."
             )
 
         if not (self.speaker_role == "First Speaker" and self.side == "Real News"):

@@ -146,7 +146,7 @@ flowchart TD
     M1 --> M2[Module 2: Early Predictor<br/>CLIP+LoRA+MLP → advisory p∈0..1]
     M1 --> M3[Module 3: Knowledge Retrieval<br/>4-engine search → whitelist → scrape → MiniLM → LLM synthesis]
     M3 --> M4[Module 4: Reverse Image Search<br/>hosting bridge → Google Lens → CLIP filter → Visual Agent]
-    M4 --> M5[Module 5: Multi-Agent Debate<br/>Orchestrator + 6 agents × 3 rounds on local Ollama]
+    M4 --> M5[Module 5: Multi-Agent Debate<br/>Orchestrator + 6 agents, 3 rounds × 2 speakers on local Ollama]
     M5 --> M6[Module 6: Chief Judicial Magistrate<br/>OpenRouter — mode: single / panel / self_consistency]
     M2 --> M6
     
@@ -166,8 +166,6 @@ flowchart TD
 7. `OUTPUTTING PREDICTION...`
 
 followed by a final `{"type": "result", "data": {...}}` chunk.
-
-**Guard first:** if the stripped input is **< 10 characters**, the pipeline short-circuits and yields an instant `INCONCLUSIVE (0.0%)` result instructing the user to submit complete article content.
 
 **KR query construction:** the retriever is called with `input_text[:800]` — the first line (headline) drives the search query while the rest provides claim context for semantic verification.
 
@@ -222,7 +220,6 @@ Before raw text and images are fed into neural networks they must be sanitized a
 * Anything else, or any decode failure → `None` (graceful skip, no exception).
 
 ### 3.3 Guardrails & Fallback Behaviors
-* **Sub-Threshold Length Guard:** text < 10 characters ⇒ instant `INCONCLUSIVE (0.0%)` verdict, pipeline halted.
 * **Missing Image Fallback:** no image ⇒ `preprocess_inputs` is not called; `clean_for_llm()` runs alone; EP and RIS are cleanly skipped (see the neutral EP signal in §4.4); text-only verification proceeds unimpeded.
 * **Pre-processing Failure Fallback:** if `preprocess_inputs()` throws, the analyzer logs the failure and falls back to text-only mode rather than aborting.
 
@@ -431,7 +428,7 @@ The pipeline normalizes free-text LLM category strings back onto these four cano
 ## 7. Module 5: Multi-Agent Debate (MAD) — Adversarial Dialectic
 * **Source Location:** `model/mad_orchestrator.py`, `model/mad_agent.py`, `model/shared_memory.py`, `model/llm_client.py`
 * **Execution Environment:** **Local Ollama** via `LLMClient` (`LOCAL_LLM_MODEL`, fallback chain from `LOCAL_LLM_MODEL_FALLBACK`, `OLLAMA_BASE_URL`, 180 s timeout per call)
-* **Average Latency:** `~10 – 40 s` on local hardware (14 LLM calls total: 1 context summary + 1 profile assignment + 6×2 debate turns + 1 consolidation… see below)
+* **Average Latency:** `~10 – 40 s` on local hardware (9 LLM calls total: 1 context summary + 1 profile assignment + 6 debate arguments — 3 rounds × 2 speakers, each agent speaks once — + 1 consolidation… see below)
 
 ### 7.1 Purpose
 A single LLM inspecting an article is vulnerable to confirmation bias. MAD eliminates this through **adversarial debate**: three agents argue the article is authentic ("Real News") while three argue it is fabricated ("Fake News"), forcing weaknesses, selective quoting, and hidden assumptions into the open.
@@ -471,9 +468,9 @@ A single LLM inspecting an article is vulnerable to confirmation bias. MAD elimi
 Each speaker role has a mandatory structure:
 * **First Speaker:** stance intro → substantive arguments from own expertise → 1–2 sentence case summary → conclusion. (The Real-side First Speaker is the only agent excused from the rebuttal instruction.)
 * **Second Speaker:** acknowledges flow → **vigorous rebuttal with the "even if" tactic** → ≤ 2-sentence summary of the first speaker → **brand-new domain-specific arguments** (anti-regurgitation) → team synthesis → conclusion.
-* **Third Speaker:** frames the final clash → systematic rebuttal → crystallized team-case weighing → *no new constructive arguments* → authoritative closing.
+* **Third Speaker:** frames the final clash → systematic rebuttal → crystallized team-case weighing → *no new constructive arguments* → authoritative closing. This role is explicitly exempted from the global anti-regurgitation and domain-specialization rules via a **CRITICAL OVERRIDE** clause in its system prompt: its job is to weigh the evidence already on the record, expose the opposing team's weakest links, identify the decisive clash point, and deliver the final verdict — every substantive point must be anchored to material already in the debate history.
 
-Global rules baked into every system prompt: (1) strict anti-regurgitation, (2) concise summaries, (3) full embodiment of the assigned profile, (4) **debate factual veracity only** — never policy merit/economic viability, (5) evaluate political climate and bias, and the Fake-side *critical cheapfake check* ("an authentic photo alone does NOT prove an uncorroborated story").
+Global rules baked into every system prompt: (1) strict anti-regurgitation, (2) concise summaries, (3) full embodiment of the assigned profile, (4) **debate factual veracity only** — never policy merit/economic viability, (5) evaluate political climate and bias, and the Fake-side *critical cheapfake check* ("an authentic photo alone does NOT prove an uncorroborated story"). Rules (1) and (3) are the reason the Second Speakers aggressively differentiate themselves — and, before the CRITICAL OVERRIDE was added, they also overrode the Third Speakers' no-new-arguments instruction, causing third-speaker turns to resemble second-speaker turns (three fresh "new evidence" blocks instead of clash weighing). The OVERRIDE resolves this conflict in favour of the weighing role.
 
 ### 7.4 The Shared Memory Bank (`model/shared_memory.py`)
 All arguments are appended to a `SharedMemoryBank` keyed by the three stages. Every agent receives the **full formatted history** (article + orchestrator context + all prior arguments with speaker labels) before generating its own turn, forcing direct engagement with opposing arguments rather than parallel monologues.
@@ -487,7 +484,7 @@ All arguments are appended to a `SharedMemoryBank` keyed by the three stages. Ev
 
 ## 8. Module 6: Chief Judicial Magistrate (The Judge)
 * **Source Location:** `model/judge.py`
-* **Execution Environment:** **OpenRouter cloud LLM only.** Default `deepseek/deepseek-v4.1-flash`; fallback chain `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` → `inclusionai/ling-3.0-flash:free` → `poolside/laguna-m.1:free` (configurable via `JUDGE_MODEL` / `JUDGE_MODEL_FALLBACK`)
+* **Execution Environment:** **OpenRouter cloud LLM only.** Primary `deepseek/deepseek-v4.1-flash`; fallback chain `z-ai/glm-5.3-flash` → `stealth/space-bunny-alpha` → `deepseek/deepseek-v4-flash-0731` (configurable via `JUDGE_MODEL` / `JUDGE_MODEL_FALLBACK`; at runtime the chain is built as `[primary] + fallback list` with duplicates of the primary dropped, so the configured primary-first fallback entry is a no-op and 4 distinct models are tried in total).
 * **Call parameters:** temperature `0.2` (single/panel), `max_tokens 4096`, HTTP timeout `45 s`, `reasoning: {"effort": "low"}`
 * **Average Latency:** `~2 – 5 s` (single) / `~15 – 30 s` (panel or self-consistency, parallelised)
 
@@ -593,7 +590,6 @@ RAHMAD is built on the principle of **Zero Fatal Failures**: no single network d
 
 | Failure Event | Subsystem Handling | Fallback Output to Pipeline | Final Impact on Verdict |
 | :--- | :--- | :--- | :--- |
-| **Input text < 10 chars** | Length guard short-circuits pipeline | Instant `INCONCLUSIVE (0.0%)` result chunk | User prompted to submit full article |
 | **No image provided** | Pre-processing & analyzer skip vision branches | Neutral EP signal (`p=0.5, UNKNOWN`), RIS `SKIPPED` log | Clean text-only verification |
 | **`preprocess_inputs()` throws** | Analyzer catches, logs `log_ep_skipped` | Text-only mode (`clean_for_llm` only) | EP/RIS skipped, pipeline continues |
 | **EP runtime error** | Analyzer catches exception | Neutral EP signal; step shows `FAIL` | Judge relies on text + retrieved evidence |
@@ -628,10 +624,10 @@ All configuration lives in `.env` (see `.env.example`). Defaults shown are from 
 | `LOCAL_LLM_MODEL_FALLBACK` | `llama3:8b` (comma-separated list) | KR, RIS, `LLMClient` | Ordered local model fallback chain |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | `LLMClient` (MAD) | Ollama generate endpoint base |
 | `OPENROUTER_API_KEY` | *(required)* | Judge, KR, RIS | OpenRouter bearer token; Judge raises at init if missing |
-| `OPENROUTER_MODEL` | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (KR/RIS) | KR, RIS | Primary cloud synthesis/visual-agent model |
+| `OPENROUTER_MODEL` | `deepseek/deepseek-v4.1-flash` (code default when unset: `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`) | KR, RIS | Primary cloud synthesis/visual-agent model |
 | `OPENROUTER_MODEL_FALLBACK` | comma-separated chain | KR, RIS | Cloud model fallback chain |
 | `JUDGE_MODEL` | `deepseek/deepseek-v4.1-flash` | Judge | Primary judicial LLM |
-| `JUDGE_MODEL_FALLBACK` | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, inclusionai/ling-3.0-flash:free, poolside/laguna-m.1:free` | Judge | Judicial fallback chain |
+| `JUDGE_MODEL_FALLBACK` | `deepseek/deepseek-v4.1-flash, z-ai/glm-5.3-flash, stealth/space-bunny-alpha, deepseek/deepseek-v4-flash-0731` (comma-separated; entries duplicating the primary are dropped at runtime) | Judge | Judicial fallback chain |
 | `JUDGE_MODE` | `single` | analyzer | `single` \| `panel` \| `self_consistency` |
 | `SERPAPI_API_KEY` | *(required for RIS; optional for KR tier ④)* | RIS, KR | SerpApi key for Google Lens and Google News |
 | `IMGBB_API_KEY` | *(optional)* | RIS | Preferred image host; omitted ⇒ free hosts used |
@@ -641,7 +637,7 @@ All configuration lives in `.env` (see `.env.example`). Defaults shown are from 
 |---|---|
 | Pre-processing, EP, RIS CLIP/MiniLM filters, KR search & scraping | **Local** (CPU / DirectML / CUDA) |
 | KR synthesis + RIS Visual Agent | **OpenRouter cloud** (or local when `USE_LOCAL_LLM=true`) |
-| MAD (all 14 LLM calls) | **Local Ollama** always (`LLMClient` has no cloud path) |
+| MAD (all 9 LLM calls) | **Local Ollama** always (`LLMClient` has no cloud path) |
 | Judge (all modes) | **OpenRouter cloud** always |
 
 ---

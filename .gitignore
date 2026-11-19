@@ -34,3 +34,6 @@ testing/test_dataset.csv
 # agents
 /.opencode
 /.claude
+
+# graphify (commit graph.json + GRAPH_REPORT.md, not the incremental cache)
+graphify-out/cache/
