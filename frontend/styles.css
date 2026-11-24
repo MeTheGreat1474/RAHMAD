@@ -10,8 +10,18 @@
     --tag-text: #ffffff;
     --red-alert: #9e2a2b;
     --orange-alert: #ee7b30;
-    --green: #249831;
+    --green: #1e6b39;
     --grey-inconclusive: #6b7280;
+
+    /* Image drop zone */
+    --field-bg: #efebdf;
+    --field-bg-hover: #e9e5d7;
+    --field-border: #c7beab;
+    --field-border-hover: #a9a18c;
+    --field-ink: #605e59;
+
+    /* Hairline rule used by the process stream and confidence bar */
+    --rule: #ddd6c6;
 
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Inter', sans-serif;
@@ -189,32 +199,36 @@ textarea {
 
 .image-upload {
     flex: 1;
-    border: 2px dashed var(--border-light);
+    border: 1px dashed var(--field-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f5f5f5;
-    min-height: 200px;
+    background-color: var(--field-bg);
+    min-height: 300px;
     background-size: cover;
     background-position: center;
     cursor: pointer;
     position: relative;
     transition: border-color 0.2s, background-color 0.2s;
-    max-height: 150px;
 }
 
 .image-upload:hover,
 .image-upload.drag-over {
-    /* border-color: var(--text-main); */
-    background-color: #ebebeb;
+    background-color: var(--field-bg-hover);
+    border-color: var(--field-border-hover);
+}
+
+.image-upload:focus-visible {
+    outline: 2px solid var(--text-main);
+    outline-offset: 2px;
 }
 
 .image-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
-    color: var(--text-muted);
+    gap: 0.7rem;
+    color: var(--field-ink);
     pointer-events: none;
     text-align: center;
 }
@@ -222,10 +236,10 @@ textarea {
 .upload-hint {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    line-height: 1.6;
-    color: var(--text-muted);
+    line-height: 1.9;
+    color: var(--field-ink);
 }
 
 .upload-link {
@@ -244,6 +258,11 @@ textarea {
     padding: 5px;
 }
 
+.image-preview-wrap[hidden],
+.image-placeholder[hidden] {
+    display: none;
+}
+
 .image-preview {
     width: 100%;
     height: 100%;
@@ -258,23 +277,29 @@ textarea {
 
 .image-remove-btn {
     position: absolute;
-    top: 0.4rem;
-    right: 0.4rem;
-    color: rgb(0, 0, 0);
-    background-color: transparent;
+    top: 0.55rem;
+    right: 0.55rem;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.55);
     border: none;
-    width: 1.6rem;
-    height: 1.6rem;
-    font-size: 1rem;
-    font-weight: 600;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1;
+    padding: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
+    transition: background-color 0.2s;
 }
 
 .image-remove-btn:hover {
-    color: var(--red-alert);
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
 /* Mobile image picker row — hidden on desktop */
@@ -337,24 +362,63 @@ textarea {
 
 .stream-content {
     font-family: var(--font-sans);
-    font-size: 0.85rem;
-    color: var(--text-muted);
+    font-size: 0.95rem;
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
 }
 
 .log-line {
-    display: flex;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    column-gap: 0.9rem;
+    padding: 0.7rem 0;
+}
+
+.log-line + .log-line {
+    border-top: 1px dotted var(--rule);
 }
 
 .log-time {
-    color: #999;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: #6d675c;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+.log-text {
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.log-line.is-pending .log-text,
+.log-line.is-pending .log-time {
+    color: #8f8a7d;
 }
 
 .log-status {
-    margin-left: auto;
+    justify-self: end;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.log-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex: 0 0 auto;
 }
 
 .log-status--ok {
@@ -363,7 +427,7 @@ textarea {
 
 /* green  */
 .log-status--in-progress {
-    color: var(--orange-alert);
+    color: #a85c00;
 }
 
 /* orange */
@@ -466,6 +530,31 @@ h2.verdict-text.inconclusive {
     font-size: 4rem;
     font-weight: 700;
     line-height: 1;
+}
+
+/* Thin bar under the confidence numeral, coloured by band */
+.confidence-bar {
+    width: 10.5rem;
+    max-width: 100%;
+    height: 5px;
+    margin-top: 0.6rem;
+    background-color: var(--rule);
+}
+
+.confidence-bar-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background-color: var(--green);
+    transition: width 0.7s ease, background-color 0.3s ease;
+}
+
+.confidence-bar-fill.conf-low {
+    background-color: var(--red-alert);
+}
+
+.confidence-bar-fill.conf-mid {
+    background-color: var(--orange-alert);
 }
 
 /* Justification */
@@ -723,7 +812,7 @@ footer {
     }
 
     .topbar-left strong {
-        font-size: 1.4rem;
+        font-size: clamp(1.1rem, 5.3vw, 1.4rem);
         margin-right: 0.75rem;
     }
 
@@ -732,16 +821,22 @@ footer {
     }
 
     .topbar-right a {
-        font-size: 0.75rem;
+        font-size: clamp(0.66rem, 2.9vw, 0.75rem);
     }
 
     /* Page header */
     h1 {
-        font-size: 1.7rem;
+        font-size: clamp(1.5rem, 7vw, 1.7rem);
     }
 
-    /* Panels */
-    .panel {
+    /* Panels: one gutter for the whole page. The input panel sits flush
+       with the topbar and header; the bordered stream box keeps its
+       inner padding so its content does not touch the frame. */
+    .input-panel {
+        padding: 1rem 0;
+    }
+
+    .stream-panel {
         padding: 1rem;
     }
 
@@ -752,9 +847,12 @@ footer {
     }
 
     textarea {
+        flex: none;
+        width: 100%;
+        height: clamp(240px, 60vw, 300px);
         min-height: 200px;
-        overflow: hidden;
-        font-size: 0.75rem;
+        overflow-y: auto;
+        font-size: clamp(0.78rem, 3.4vw, 0.9rem);
     }
 
     /* Swap full upload zone for compact filename row on mobile */
@@ -779,7 +877,7 @@ footer {
         background: #f5f5f5;
         cursor: pointer;
         font-family: var(--font-mono);
-        font-size: 0.72rem;
+        font-size: clamp(0.62rem, 2.8vw, 0.72rem);
         letter-spacing: 0.5px;
         text-transform: uppercase;
         color: var(--text-muted);
@@ -809,12 +907,27 @@ footer {
     }
 
     .run-btn {
-        font-size: 0.75rem;
+        font-size: clamp(0.68rem, 3vw, 0.78rem);
         padding: 0.5rem;
     }
 
+    .stream-content {
+        font-size: clamp(0.78rem, 3.4vw, 0.88rem);
+    }
+
+    .log-line {
+        column-gap: 0.55rem;
+        padding: 0.6rem 0;
+    }
+
+    .log-time {
+        font-size: clamp(0.6rem, 2.6vw, 0.7rem);
+    }
+
     .log-status {
-        text-align: end;
+        font-size: clamp(0.62rem, 2.7vw, 0.72rem);
+        letter-spacing: 0.04em;
+        gap: 0.35rem;
     }
 
     .results-section {
@@ -860,13 +973,39 @@ footer {
     }
 
     .justification-content p,
-    .justification-content li {
-        font-size: 0.9rem;
+    .justification-content li,
+    .reasoning-body p {
+        font-size: clamp(0.82rem, 3.6vw, 0.95rem);
     }
 
-    .justification-content h3 {
-        font-size: 1.1rem;
+    .justification-content h3,
+    .reasoning-body h3 {
+        font-size: clamp(0.95rem, 4.1vw, 1.15rem);
         margin-top: 0;
+    }
+
+    .reasoning-toggle {
+        font-size: clamp(0.62rem, 2.8vw, 0.72rem);
+    }
+
+    /* Secondary text scale: labels, links and metadata scale with the
+       viewport instead of holding their desktop size on a phone. */
+    .version,
+    .tag,
+    .link-source {
+        font-size: clamp(0.62rem, 2.8vw, 0.72rem);
+    }
+
+    .header-subtitle {
+        font-size: clamp(0.64rem, 2.9vw, 0.72rem);
+    }
+
+    .link-title {
+        font-size: clamp(0.9rem, 4vw, 1.1rem);
+    }
+
+    .link-number {
+        font-size: clamp(1.45rem, 6.2vw, 2.5rem);
     }
 
     .links-col {
@@ -890,7 +1029,11 @@ footer {
     }
 
     .footer-left strong {
-        font-size: 1.3rem;
+        font-size: clamp(1.05rem, 4.8vw, 1.3rem);
+    }
+
+    .footer-right a {
+        font-size: clamp(0.62rem, 2.8vw, 0.72rem);
     }
 }
 

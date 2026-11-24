@@ -50,6 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.click();
     });
 
+    // Keyboard access for the zone
+    uploadZone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput.click();
+        }
+    });
+
     // Mobile button trigger
     if (mobileImgBtn) {
         mobileImgBtn.addEventListener('click', () => {
@@ -111,7 +119,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${hours}:${minutes}:${seconds}`;
     }
 
-    function createLogLine(text, status, isFinal = false) {
+    // Backend step names are ALL CAPS; the log shows sentence case.
+    const stepLabels = {
+        "CHECKING LLM BACKEND...": "Checking LLM backend",
+        "PRE-PROCESSING INPUT...": "Pre-processing input",
+        "RUNNING EARLY PREDICTOR...": "Running early predictor",
+        "FETCHING EVIDENCE...": "Fetching evidence",
+        "SEARCHING FOR SIMILAR IMAGES...": "Searching for similar images",
+        "DEBATING...": "Debating",
+        "SYNTHESIZING RESULTS...": "Synthesizing results",
+        "OUTPUTTING PREDICTION...": "Outputting prediction"
+    };
+
+    function displayLabel(text) {
+        if (stepLabels[text]) return stepLabels[text];
+        const trimmed = String(text).replace(/\.{3}$/, '').trim();
+        const lower = trimmed.toLowerCase();
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+    }
+
+    function createLogLine(text, status, isFinal = false, rawText = false) {
         const line = document.createElement('div');
         line.className = 'log-line';
 
@@ -121,15 +148,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const textSpan = document.createElement('span');
         textSpan.className = 'log-text';
-        textSpan.textContent = ` ${text}`;
+        textSpan.textContent = rawText ? text : displayLabel(text);
 
         const statusSpan = document.createElement('span');
-        const displayStatus = isFinal ? status : 'IN PROGRESS';
-        const statusClass = displayStatus === 'OK' ? 'log-status--ok'
-            : displayStatus === 'IN PROGRESS' ? 'log-status--in-progress'
+        setStatus(statusSpan, isFinal ? status : 'IN PROGRESS');
+
+        line.appendChild(timeSpan);
+        line.appendChild(textSpan);
+        line.appendChild(statusSpan);
+
+        return line;
+    }
+
+    function setStatus(statusEl, status) {
+        const statusClass = (status === 'OK' || status === 'SKIPPED') ? 'log-status--ok'
+            : status === 'IN PROGRESS' ? 'log-status--in-progress'
                 : 'log-status--fail';
-        statusSpan.className = `log-status ${statusClass}`;
-        statusSpan.textContent = displayStatus;
+
+        statusEl.className = `log-status ${statusClass}`;
+        statusEl.textContent = '';
+
+        const dot = document.createElement('span');
+        dot.className = 'log-status-dot';
+        statusEl.appendChild(dot);
+        statusEl.appendChild(document.createTextNode(status));
+    }
+
+    function createPendingLine(text) {
+        const line = document.createElement('div');
+        line.className = 'log-line is-pending';
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'log-time';
+        timeSpan.textContent = '[--:--:--]';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'log-text';
+        textSpan.textContent = displayLabel(text);
+
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'log-status';
 
         line.appendChild(timeSpan);
         line.appendChild(textSpan);
@@ -154,15 +212,18 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsSection.classList.remove('visible');
         resultsSection.classList.add('hidden');
 
+        const confFillReset = document.getElementById('confidence-bar-fill');
+        if (confFillReset) {
+            confFillReset.className = 'confidence-bar-fill';
+            confFillReset.style.width = '0%';
+        }
+
         // Draw initial pending steps
         const linesMap = {};
         streamSteps.forEach(step => {
-            const fLine = document.createElement('div');
-            fLine.className = 'log-line';
-            fLine.style.color = 'var(--border-light)';
-            fLine.innerHTML = `<span class="log-time">[ ]</span><span class="log-text"> ${step.text}</span>`;
-            processStream.appendChild(fLine);
-            linesMap[step.text] = fLine;
+            const line = createPendingLine(step.text);
+            processStream.appendChild(line);
+            linesMap[step.text] = line;
         });
 
         let responseData = null;
@@ -218,10 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         }
                                         
                                         if (statusEl) {
-                                            statusEl.textContent = status;
-                                            statusEl.classList.remove('log-status--in-progress', 'log-status--ok', 'log-status--fail');
-                                            const finalClass = (status === 'OK' || status === 'SKIPPED') ? 'log-status--ok' : 'log-status--fail';
-                                            statusEl.classList.add(finalClass);
+                                            setStatus(statusEl, status);
                                         }
                                     }
                                 }
@@ -249,11 +307,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const confEl = document.getElementById('confidence-score');
             confEl.textContent = responseData.confidence;
             const confValue = parseFloat(responseData.confidence);
-            confEl.className = 'confidence-score ' + (
-                confValue < 50  ? 'conf-low' :
-                confValue < 70  ? 'conf-mid' :
-                                  'conf-high'
-            );
+            const confClass =
+                confValue < 50 ? 'conf-low' :
+                confValue < 70 ? 'conf-mid' :
+                                'conf-high';
+            confEl.className = 'confidence-score ' + confClass;
+
+            // Confidence bar: same band colour as the numeral
+            const confFill = document.getElementById('confidence-bar-fill');
+            const confBar = document.getElementById('confidence-bar');
+            if (confFill) {
+                confFill.className = 'confidence-bar-fill ' + confClass;
+                const confPct = Math.max(0, Math.min(100, isNaN(confValue) ? 0 : confValue));
+                // Force a reflow so the fill animates from zero on every run.
+                void confFill.offsetWidth;
+                confFill.style.width = confPct + '%';
+                if (confBar) confBar.setAttribute('aria-valuenow', String(Math.round(confPct)));
+            }
             // Helper for HTML escaping and markdown bold conversion
             const formatMarkdownText = (text) => {
                 if (!text) return '';
@@ -453,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const failureText = errorMessage
                 || (responseData && responseData.error)
                 || 'No verdict returned. Check the server log for details.';
-            const errLine = createLogLine(`ANALYSIS FAILED: ${failureText}`, 'FAIL', true);
+            const errLine = createLogLine(`ANALYSIS FAILED: ${failureText}`, 'FAIL', true, true);
             processStream.appendChild(errLine);
         }
     }
