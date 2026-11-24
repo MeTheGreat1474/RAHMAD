@@ -1,7 +1,37 @@
 from .llm_client import LLMClient
 import logging
+import re
 
 logger = logging.getLogger(__name__)
+
+# Scripts the local model occasionally leaks; MAD output must be English only.
+_NON_ENGLISH_RE = re.compile(
+    "["
+    "\u3000-\u303f"   # CJK punctuation
+    "\u3040-\u30ff"   # Hiragana / Katakana
+    "\u3400-\u4dbf"   # CJK Extension A
+    "\u4e00-\u9fff"   # CJK Unified Ideographs
+    "\uac00-\ud7af"   # Hangul
+    "\uf900-\ufaff"   # CJK Compatibility Ideographs
+    "\uff00-\uffef"   # Fullwidth forms
+    "\u0400-\u04ff"   # Cyrillic
+    "\u0590-\u05ff"   # Hebrew
+    "\u0600-\u06ff"   # Arabic
+    "\u0900-\u097f"   # Devanagari
+    "\u0e00-\u0e7f"   # Thai
+    "]+"
+)
+
+
+def strip_non_english(text: str) -> str:
+    """Remove non-Latin script runs so MAD output stays English-only."""
+    if not isinstance(text, str):
+        return "" if text is None else str(text)
+    cleaned = _NON_ENGLISH_RE.sub(" ", text)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    cleaned = re.sub(r" +\n", "\n", cleaned)
+    return cleaned.strip()
+
 
 class DebaterAgent:
     def __init__(self, name, side, profile, speaker_role="First Speaker"):
@@ -82,8 +112,10 @@ CRITICAL RULES:
 4. FOCUS STRICTLY ON FACTUAL VERACITY: Debate whether the reported event, statement, or quote ACTUALLY HAPPENED in reality as reported vs whether it is fabricated, distorted, or deceptive misinformation.
 5. DO NOT DEBATE POLICY FEASIBILITY OR MERIT: Do NOT debate whether the policy, proposal, political action, or promise described in the news is achievable, economically viable, logical, or morally good/bad. Fact-check whether the news report itself is true/authentic (Real News) vs false/misleading (Fake News).
 6. EVALUATE POLITICAL CLIMATE AND BIAS: Analyze the current political/social climate, potential agendas, and biases surrounding the topic. If the news is heavily biased or propagating an agenda, argue how this framing affects its factual authenticity.
+7. EVIDENCE REFERENCING: Every substantive claim you make MUST end with a snippet reference from the external knowledge provided in the debate context (e.g., [S1], [S2]). Claims without evidence references will be treated as unsubstantiated. Format: "... therefore X is true. [S1]"
 {rebuttal_instruction}
-7. Keep your argument concise, focused, sharp, and strictly in character. Do not refuse to argue your side."""
+8. Keep your argument concise, focused, sharp, and strictly in character. Do not refuse to argue your side.
+9. LANGUAGE RULE: Write exclusively in English. Never emit Chinese, Japanese, Korean, Cyrillic, Arabic, or any other non-Latin script characters — not even inside quotes, names, or examples. If a source term is not English, transliterate or describe it in English."""
 
         prompt = f"""Debate Stage: {stage}
 
@@ -99,5 +131,5 @@ Remember:
 - Do NOT argue whether the policy or event is achievable or logical. Focus solely on its factual veracity."""
 
         response = self.llm.generate(prompt=prompt, system_prompt=system_prompt)
-        return response
+        return strip_non_english(response)
 

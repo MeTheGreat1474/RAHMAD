@@ -335,6 +335,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     # ── 4.5. Knowledge Retrieval ──────────────────────────────────────────
     t_kr_start = time.perf_counter()
     external_knowledge = ""
+    mad_external_knowledge = ""
     kr_articles = []
     try:
         retriever = _get_retriever()
@@ -342,7 +343,20 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         # and provide substantive claim context for semantic verification
         claim_query = input_text[:800].strip()
         kr_data = retriever.retrieve_detailed(claim_query)
-        external_knowledge = kr_data["summary"]
+        # The evidence block carries the numbered [S1], [S2], … snippet
+        # citations. The Judge's evidence ledger and MAD's debate agents can
+        # only cite real snippets if they receive it; the bare synthesis
+        # summary has no snippet IDs. Fall back to the summary only when no
+        # evidence block is available (e.g. a retrieval error path).
+        kr_evidence = (kr_data.get("evidence_block") or "").strip()
+        external_knowledge = kr_evidence or kr_data["summary"]
+        # MAD gets the cited snippets without the LLM synthesis: the debaters
+        # must cite real [S#] IDs, and dropping the synthesis keeps the shared
+        # debate context inside the local model's window.
+        mad_external_knowledge = (
+            kr_evidence.split("=== SYNTHESIS ===")[0].strip()
+            if kr_evidence else kr_data["summary"]
+        )
         kr_articles = kr_data.get("articles", [])
         kr_runtime = time.perf_counter() - t_kr_start
         plog.log_knowledge_retrieval(kr_data, runtime=kr_runtime)
@@ -414,18 +428,29 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
     try:
         print("  [Step 4.7] Initializing Multi-Agent Debate locally...")
         orchestrator = _get_mad_orchestrator()
-        mad_summary, agents_info = orchestrator.run_debate(input_text, external_knowledge)
+        mad_summary, agents_info = orchestrator.run_debate(input_text, mad_external_knowledge)
         mad_runtime = time.perf_counter() - t_mad_start
         print(f"  [Step 4.7] Multi-Agent Debate completed in {mad_runtime:.2f}s")
         yield {"type": "status", "step": "DEBATING...", "status": "OK"}
     except Exception as exc:
         mad_runtime = time.perf_counter() - t_mad_start
         log.error(f"[analyzer] Multi-Agent Debate failed: {exc}", exc_info=True)
-        mad_summary = f"Multi-Agent Debate encountered an error: {exc}"
+        mad_summary = f"MAD encountered an error: {exc}"
         print(f"  [X] Multi-Agent Debate Error in {mad_runtime:.2f}s: {exc}")
         yield {"type": "status", "step": "DEBATING...", "status": "FAIL"}
         
-    plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
+    try:
+        plog.log_mad_output(mad_summary, agents_info, runtime=mad_runtime)
+    except Exception as log_err:
+        log.warning(f"[analyzer] Could not log MAD output: {log_err}")
+
+    # Downstream consumers (Judge prompt, JUDGE_output.txt) expect text.
+    if not isinstance(mad_summary, str):
+        try:
+            import json as _json
+            mad_summary = _json.dumps(mad_summary, indent=2, ensure_ascii=False)
+        except (TypeError, ValueError):
+            mad_summary = str(mad_summary)
 
     yield {"type": "status", "step": "SYNTHESIZING RESULTS...", "status": "IN PROGRESS"}
     # ── 5. Judge Module ───────────────────────────────────────────────────
@@ -486,7 +511,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         if kr_articles:
             formatted_links = []
             from urllib.parse import urlparse
-            for a in kr_articles[:6]:
+            for a in kr_articles[:10]:
                 url = a.get("source") or a.get("url", "#")
                 headline = a.get("headline") or a.get("title", url)
                 domain = urlparse(url).netloc.replace("www.", "").upper() if url and url.startswith("http") else "EXTERNAL SOURCE"
@@ -521,6 +546,11 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
             )
         except Exception as log_err:
             log.warning(f"[analyzer] Could not write JUDGE_output.txt: {log_err}")
+
+        # The response contract is the user-facing subset only. Specialist
+        # ledgers (claim/logic), snippet IDs and publisher tiers live in the
+        # forensic logs and must not travel to the browser.
+        result.pop("panel_details", None)
 
         log.info(
             f"[analyzer] Judge → {result['verdict']} ({result['confidence']})"
@@ -559,13 +589,7 @@ def analyze_text(input_text: str, image_data: str = None) -> dict:
         total_runtime = time.perf_counter() - t_pipeline_start
         log.error(f"[analyzer] Judge Module failed: {exc}", exc_info=True)
         plog.save()
-        yield {"type": "result", "data": {
-            "verdict":       "INCONCLUSIVE",
-            "color_class":   "inconclusive",
-            "confidence":    "0.0%",
-            "justification": f"Analysis pipeline encountered an unexpected error: {exc}",
-            "key_facts":     ["Pipeline error — check server logs for details."],
-            "links":         [],
-            "ep_signal":     ep_result,
-        }
-}
+        # Do not fabricate a verdict when the pipeline breaks: surface the
+        # real failure so the UI shows an error instead of placeholder text.
+        yield {"type": "status", "step": "SYNTHESIZING RESULTS...", "status": "FAIL"}
+        yield {"type": "error", "message": f"Analysis failed: {exc}"}

@@ -30,6 +30,7 @@ Usage (from analyzer.py):
 from __future__ import annotations
 
 from datetime import datetime
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -268,12 +269,20 @@ class PipelineLogger:
             self._block("EXECUTIVE EVIDENCE SUMMARY FOR JUDGE", ris_data.get("judge_summary", ""))
         self._block("VISUAL AGENT FORENSIC SUMMARY", ris_data.get("visual_agent_summary", ""))
 
-    def log_mad_output(self, mad_summary: str, agents_info: list[dict], runtime: float | None = None) -> None:
+    def log_mad_output(self, mad_summary, agents_info: list[dict], runtime: float | None = None) -> None:
         self._section("5C", "MULTI-AGENT DEBATE (MAD)  —  OUTPUT")
         if runtime is not None:
             self._runtimes["4.5. Multi-Agent Debate"] = runtime
             self._kv("runtime", f"{runtime:.2f}s")
-            
+
+        # Accept structured consolidations as well as plain text.
+        if isinstance(mad_summary, (dict, list)):
+            mad_summary = json.dumps(mad_summary, indent=2, ensure_ascii=False)
+        elif mad_summary is None:
+            mad_summary = ""
+        elif not isinstance(mad_summary, str):
+            mad_summary = str(mad_summary)
+
         if not mad_summary or mad_summary.startswith("MAD encountered an error") or mad_summary.startswith("No Multi-Agent Debate"):
             self._w("    [X] MAD skipped or failed.")
             self._w(f"        {mad_summary}")

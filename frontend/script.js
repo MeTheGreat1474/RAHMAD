@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         let responseData = null;
+        let errorMessage = null;
 
         try {
             // Start the fetch request to the Python backend
@@ -226,6 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             } else if (parsed.type === "result") {
                                 responseData = parsed.data;
+                            } else if (parsed.type === "error") {
+                                errorMessage = parsed.message || "Unknown pipeline error";
                             }
                         } catch(e) {
                             console.error("Error parsing NDJSON chunk:", e, part);
@@ -437,9 +440,22 @@ document.addEventListener('DOMContentLoaded', () => {
         runBtn.style.opacity = '1';
         runBtn.textContent = 'RUN NEWS DETECTION';
 
-        // Reveal results
-        resultsSection.classList.remove('hidden');
-        resultsSection.classList.add('visible');
+        // Reveal results only when the backend actually produced a verdict.
+        // On failure, keep the (placeholder) verdict card hidden and show the
+        // real error in the process stream instead.
+        if (responseData && !responseData.error) {
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('visible');
+        } else {
+            resultsSection.classList.add('hidden');
+            resultsSection.classList.remove('visible');
+
+            const failureText = errorMessage
+                || (responseData && responseData.error)
+                || 'No verdict returned. Check the server log for details.';
+            const errLine = createLogLine(`ANALYSIS FAILED: ${failureText}`, 'FAIL', true);
+            processStream.appendChild(errLine);
+        }
     }
 
     runBtn.addEventListener('click', simulateProcess);

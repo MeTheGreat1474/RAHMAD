@@ -44,6 +44,7 @@ RAHMAD/
 │   └── KR/RIS/MAD/JUDGE_output.txt   # Per-module forensic logs
 │
 ├── testing/                    # 3-phase test suite, evaluation runners, datasets & result artefacts
+├── docs/                       # ★ Canonical engineering reference — docs/RAHMAD_ARCHITECTURE.md
 └── archive/                    # Historical material (EP training scripts, dataset prep, notebooks)
 ```
 

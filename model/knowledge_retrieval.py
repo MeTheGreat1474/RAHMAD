@@ -5,6 +5,7 @@ Knowledge Retrieval Pipeline for RAHMAD.
 Provides verified, external supporting knowledge to the Judge module.
 """
 
+import concurrent.futures
 import json
 import logging
 import os
@@ -12,6 +13,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
@@ -27,7 +29,7 @@ load_dotenv()
 
 import urllib.parse
 from bs4 import BeautifulSoup
-from backend.domain_whitelist import is_domain_whitelisted
+from backend.domain_whitelist import is_domain_whitelisted, domain_tier, registrable_domain
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +49,64 @@ def is_social_media_url(url: str) -> bool:
         return any(soc == netloc or netloc.endswith("." + soc) for soc in SOCIAL_MEDIA_DOMAINS)
     except Exception:
         return False
+
+
+def build_publisher_stats(urls: List[str]) -> dict:
+    """
+    Build publisher statistics from a list of whitelisted URLs.
+    Returns a dict with distinct publisher count, tier breakdown, and corroboration strength.
+    """
+    from collections import defaultdict
+    
+    domain_to_tier = {}
+    domain_counts = defaultdict(int)
+    
+    for url in urls:
+        tier = domain_tier(url)
+        if tier is None:
+            continue
+        rd = registrable_domain(url)
+        if rd:
+            domain_counts[rd] += 1
+            # Keep the minimum (highest priority) tier seen for this domain
+            if rd not in domain_to_tier or tier < domain_to_tier[rd]:
+                domain_to_tier[rd] = tier
+    
+    # Build domain list with tier and count
+    domains_list = []
+    tier1_count = 0
+    tier2_count = 0
+    tier3_count = 0
+    
+    for rd, count in sorted(domain_counts.items(), key=lambda x: x[1], reverse=True):
+        tier = domain_to_tier.get(rd, 0)
+        domains_list.append({"domain": rd, "tier": tier, "count": count})
+        if tier == 1:
+            tier1_count += 1
+        elif tier == 2:
+            tier2_count += 1
+        elif tier == 3:
+            tier3_count += 1
+    
+    # Independent distinct domains = Tier 1 + Tier 2 (Tier 3 never corroborates)
+    independent_domains = tier1_count + tier2_count
+    total_distinct = len(domain_counts)
+    
+    # Corroboration rule: MULTI_PUBLISHER if (>=1 Tier 1 AND >=2 independent) OR (>=2 Tier 2)
+    if (tier1_count >= 1 and independent_domains >= 2) or (tier2_count >= 2):
+        corroboration = "MULTI_PUBLISHER"
+    else:
+        corroboration = "SINGLE_PUBLISHER"
+    
+    return {
+        "distinct_publishers": total_distinct,
+        "domains": domains_list,
+        "tier1": tier1_count,
+        "tier2": tier2_count,
+        "tier3": tier3_count,
+        "corroboration": corroboration,
+    }
+
 
 USE_LOCAL_LLM = os.environ.get("USE_LOCAL_LLM", "false").lower() == "true"
 
@@ -77,6 +137,22 @@ class KnowledgeRetriever:
         self.similarity_threshold = similarity_threshold
         self.max_age_years = max_age_years
         self.max_articles = max_articles
+
+        # Search depth management. A single search often returns mostly
+        # non-whitelisted domains (aggregators, blogs), so we keep searching
+        # with broader and then site-restricted queries.
+        #
+        #   target_whitelisted_urls : aim for this many whitelisted articles
+        #   min_whitelisted_urls    : hard floor — below this, keep searching
+        #   expansion_time_budget   : wall-clock cap for the expansion phase;
+        #                             on timeout we proceed with what we have
+        self.target_whitelisted_urls = 10
+        self.min_whitelisted_urls = 3
+        # attempt 1 = initial search, then up to 4 expansion passes.
+        self.max_search_attempts = 5
+        self.expansion_time_budget = 60.0
+        self.initial_max_results = 10
+        self.expanded_max_results = 20
         
         # Load the embedding model for semantic verification
         # Using a small, efficient model suitable for this task
@@ -176,13 +252,26 @@ class KnowledgeRetriever:
         try:
             # 1. Link Retrieval
             print("  [Step 1/5] Searching external news sources...")
-            urls = self.search_claim(claim)
+            self.search_titles = {}
+            urls = self.search_claim(claim, max_results=self.initial_max_results)
             log_data["urls_found_count"] = len(urls)
             log_data["raw_urls"] = urls
             if not urls:
                 print("  [Step 1/5] [X] No URLs found.")
                 print("=" * 50 + "\n")
                 result_info["summary"] = "No external URLs found for the claim."
+                # Empty publisher stats and evidence block
+                empty_stats = {"distinct_publishers": 0, "domains": [], "tier1": 0, "tier2": 0, "tier3": 0, "corroboration": "NONE"}
+                result_info["publisher_stats"] = empty_stats
+                log_data["publisher_stats"] = empty_stats
+                result_info["evidence_block"] = (
+                    f"Distinct publishers: 0 (Tier 1: 0 | Tier 2: 0)\n"
+                    f"Publisher domains: \n"
+                    f"Corroboration strength: NONE\n\n"
+                    f"=== RETRIEVED REPORT SNIPPETS (cite by ID as [S1], [S2], ...) ===\n"
+                    f"No snippet-level evidence retrieved.\n\n"
+                    f"=== SYNTHESIS ===\n{result_info['summary']}"
+                )
                 log_data["status"] = "failed - no urls"
                 self.save_kr_log(log_data)
                 return result_info
@@ -191,12 +280,90 @@ class KnowledgeRetriever:
             # 2. Domain Filtering
             print("  [Step 2/5] Applying strict domain whitelist filter...")
             whitelisted_urls = self.filter_domains(urls)
+
+            # 2b. Search expansion. The first query typically returns mostly
+            # non-whitelisted aggregators/blogs. Keep searching (broader query,
+            # then site-restricted batches) until we have
+            # `target_whitelisted_urls` whitelisted articles, the attempts run
+            # out, or `expansion_time_budget` seconds elapse. Minimum viable
+            # coverage is `min_whitelisted_urls`; below that we still keep
+            # going, but the time budget is the fail-safe.
+            search_attempts = 1
+            expansion_log = []
+            expansion_started = time.monotonic()
+            deadline = expansion_started + self.expansion_time_budget
+            expansion_stop_reason = "target reached" if len(whitelisted_urls) >= self.target_whitelisted_urls else ""
+
+            while (len(whitelisted_urls) < self.target_whitelisted_urls
+                   and search_attempts < self.max_search_attempts):
+                remaining = deadline - time.monotonic()
+                if remaining <= 1.0:
+                    expansion_stop_reason = "time budget exhausted"
+                    log.warning("KR expansion stopped: %.1fs budget exhausted with %d whitelisted URL(s).",
+                                self.expansion_time_budget, len(whitelisted_urls))
+                    print(f"  [Step 2/5] [!] Expansion budget exhausted "
+                          f"({self.expansion_time_budget:.0f}s) — using {len(whitelisted_urls)} whitelisted URL(s).")
+                    break
+
+                search_attempts += 1
+                print(f"  [Step 2/5] {len(whitelisted_urls)} whitelisted URL(s) "
+                      f"(target {self.target_whitelisted_urls}) — expansion search "
+                      f"{search_attempts}/{self.max_search_attempts}, {remaining:.0f}s left...")
+                try:
+                    extra_urls = self._run_expansion_with_deadline(claim, search_attempts - 1, remaining)
+                except Exception as exp_err:
+                    log.warning(f"KR expansion search {search_attempts} failed: {exp_err}")
+                    extra_urls = []
+
+                new_urls = [u for u in extra_urls if u not in urls]
+                urls.extend(new_urls)
+                whitelisted_urls = self.filter_domains(urls)
+                expansion_log.append({
+                    "attempt": search_attempts,
+                    "query": getattr(self, "last_search_query", ""),
+                    "new_urls": len(new_urls),
+                    "whitelisted_after": len(whitelisted_urls),
+                })
+                print(f"  [Step 2/5] Expansion search {search_attempts} added "
+                      f"{len(new_urls)} new URL(s) — {len(whitelisted_urls)} whitelisted now.")
+
+            if not expansion_stop_reason:
+                if len(whitelisted_urls) >= self.target_whitelisted_urls:
+                    expansion_stop_reason = "target reached"
+                elif search_attempts >= self.max_search_attempts:
+                    expansion_stop_reason = "attempt cap reached"
+                else:
+                    expansion_stop_reason = "time budget exhausted"
+            if len(whitelisted_urls) < self.min_whitelisted_urls:
+                print(f"  [Step 2/5] [!] Only {len(whitelisted_urls)} whitelisted URL(s) "
+                      f"(minimum {self.min_whitelisted_urls}) — proceeding with what was found.")
+                log.warning("KR below minimum whitelisted coverage: %d < %d (stop: %s).",
+                            len(whitelisted_urls), self.min_whitelisted_urls, expansion_stop_reason)
+
+            log_data["search_attempts"] = search_attempts
+            log_data["expansion_log"] = expansion_log
+            log_data["expansion_stop_reason"] = expansion_stop_reason
+            log_data["expansion_elapsed_s"] = round(time.monotonic() - expansion_started, 1)
+            log_data["urls_found_count"] = len(urls)
+            log_data["raw_urls"] = urls
             log_data["urls_whitelisted_count"] = len(whitelisted_urls)
             log_data["whitelisted_urls"] = whitelisted_urls
             if not whitelisted_urls:
                 print("  [Step 2/5] [X] No URLs passed domain whitelist.")
                 print("=" * 50 + "\n")
                 result_info["summary"] = "No URLs passed the domain whitelist filter."
+                # Empty publisher stats and evidence block
+                empty_stats = {"distinct_publishers": 0, "domains": [], "tier1": 0, "tier2": 0, "tier3": 0, "corroboration": "NONE"}
+                result_info["publisher_stats"] = empty_stats
+                log_data["publisher_stats"] = empty_stats
+                result_info["evidence_block"] = (
+                    f"Distinct publishers: 0 (Tier 1: 0 | Tier 2: 0)\n"
+                    f"Publisher domains: \n"
+                    f"Corroboration strength: NONE\n\n"
+                    f"=== RETRIEVED REPORT SNIPPETS (cite by ID as [S1], [S2], ...) ===\n"
+                    f"No snippet-level evidence retrieved.\n\n"
+                    f"=== SYNTHESIS ===\n{result_info['summary']}"
+                )
                 log_data["status"] = "failed - no whitelisted urls"
                 self.save_kr_log(log_data)
                 return result_info
@@ -267,6 +434,18 @@ class KnowledgeRetriever:
                         "but full textual extraction was restricted by publisher anti-scraping protections (e.g. Reuters). "
                         "Please refer to the verified supporting links for primary reporting."
                     )
+                    # Build publisher stats and evidence block even without semantic snippets
+                    stats = build_publisher_stats(log_data.get("whitelisted_urls", []))
+                    result_info["publisher_stats"] = stats
+                    log_data["publisher_stats"] = stats
+                    result_info["evidence_block"] = (
+                        f"Distinct publishers: {stats['distinct_publishers']} (Tier 1: {stats['tier1']} | Tier 2: {stats['tier2']})\n"
+                        f"Publisher domains: {', '.join(d['domain'] + ' (Tier ' + str(d['tier']) + ')' for d in stats['domains'] if d['tier'] <= 2)}\n"
+                        f"Corroboration strength: {stats['corroboration']}\n\n"
+                        f"=== RETRIEVED REPORT SNIPPETS (cite by ID as [S1], [S2], ...) ===\n"
+                        f"No snippet-level evidence retrieved.\n\n"
+                        f"=== SYNTHESIS ===\n{result_info['summary']}"
+                    )
                     log_data["status"] = "completed - supporting links preserved"
                     self.save_kr_log(log_data)
                     return result_info
@@ -293,6 +472,18 @@ class KnowledgeRetriever:
                 print("  [Step 4/5] [X] No snippets passed semantic threshold.")
                 print("=" * 50 + "\n")
                 result_info["summary"] = "No text snippets passed the semantic similarity threshold."
+                # Build publisher stats and evidence block even without semantic snippets
+                stats = build_publisher_stats(log_data.get("whitelisted_urls", []))
+                result_info["publisher_stats"] = stats
+                log_data["publisher_stats"] = stats
+                result_info["evidence_block"] = (
+                    f"Distinct publishers: {stats['distinct_publishers']} (Tier 1: {stats['tier1']} | Tier 2: {stats['tier2']})\n"
+                    f"Publisher domains: {', '.join(d['domain'] + ' (Tier ' + str(d['tier']) + ')' for d in stats['domains'] if d['tier'] <= 2)}\n"
+                    f"Corroboration strength: {stats['corroboration']}\n\n"
+                    f"=== RETRIEVED REPORT SNIPPETS (cite by ID as [S1], [S2], ...) ===\n"
+                    f"No snippet-level evidence retrieved.\n\n"
+                    f"=== SYNTHESIS ===\n{result_info['summary']}"
+                )
                 log_data["status"] = "failed - no semantic snippets"
                 self.save_kr_log(log_data)
                 return result_info
@@ -304,6 +495,32 @@ class KnowledgeRetriever:
             result_info["summary"] = summary
             log_data["summary"] = summary
             log_data["status"] = "success"
+            
+            # Build publisher stats and evidence block from whitelisted URLs
+            stats = build_publisher_stats(log_data.get("whitelisted_urls", []))
+            result_info["publisher_stats"] = stats
+            log_data["publisher_stats"] = stats
+            
+            # Build evidence block for Judge consumption
+            snippet_lines = []
+            for idx, snip in enumerate(snippets, 1):
+                # Collapse internal newlines to spaces, keep one line per snippet
+                one_line = " ".join(str(snip).strip().splitlines())
+                snippet_lines.append(f"[S{idx}] {one_line}")
+            
+            evidence_block = (
+                f"Distinct publishers: {stats['distinct_publishers']} (Tier 1: {stats['tier1']} | Tier 2: {stats['tier2']})\n"
+                f"Publisher domains: {', '.join(d['domain'] + ' (Tier ' + str(d['tier']) + ')' for d in stats['domains'] if d['tier'] <= 2)}\n"
+                f"Corroboration strength: {stats['corroboration']}\n\n"
+                f"=== RETRIEVED REPORT SNIPPETS (cite by ID as [S1], [S2], ...) ===\n"
+            )
+            if snippet_lines:
+                evidence_block += "\n".join(snippet_lines) + "\n\n"
+            else:
+                evidence_block += "No snippet-level evidence retrieved.\n\n"
+            evidence_block += f"=== SYNTHESIS ===\n{summary}"
+            
+            result_info["evidence_block"] = evidence_block
             
             summary_preview = summary[:120].encode('ascii', 'ignore').decode('ascii')
             print("=" * 50)
@@ -321,13 +538,10 @@ class KnowledgeRetriever:
             result_info["summary"] = f"Knowledge Retrieval encountered an error: {e}"
             return result_info
 
-    def search_claim(self, claim: str, max_results: int = 10) -> List[str]:
-        """
-        Queries search providers (DuckDuckGo HTML, DDGS, Google News RSS, and SerpAPI Google News fallback)
-        for news articles matching the claim.
-        Returns a list of direct article URLs.
-        """
-        # 1. Clean and isolate concise search query (prefer headline, strip datelines/wire prefixes)
+    @staticmethod
+    def _build_search_query(claim: str) -> str:
+        """Reduce the article text to a concise search query (usually the headline)."""
+        # Clean and isolate concise search query (prefer headline, strip datelines/wire prefixes)
         lines = [l.strip() for l in claim.strip().splitlines() if l.strip()]
         search_query = lines[0] if lines else claim[:120].strip()
         # Remove common news wire datelines like "SINGAPORE/JAKARTA, Sept 9 (Reuters) -"
@@ -339,11 +553,28 @@ class KnowledgeRetriever:
                 search_query = first_sent
             else:
                 search_query = search_query[:140].strip()
+        return search_query
+
+    def search_claim(self, claim: str, max_results: int = 10, query_override: str | None = None) -> List[str]:
+        """
+        Queries search providers (DuckDuckGo HTML, DDGS, Google News RSS, and SerpAPI Google News fallback)
+        for news articles matching the claim.
+        Returns a list of direct article URLs.
+
+        `query_override` replaces the headline-derived query — used by the
+        expansion passes to run broader and site-restricted searches.
+        """
+        # 1. Clean and isolate concise search query (prefer headline, strip datelines/wire prefixes)
+        search_query = (query_override or self._build_search_query(claim)).strip()
 
         log.info(f"Searching news sources for query: '{search_query}' (original claim length: {len(claim)})")
         print(f"       Search Query: '{search_query}'")
+        self.last_search_query = search_query
         urls = []
-        self.search_titles = {}
+        # Titles accumulate across expansion passes so preserved supporting
+        # links keep their headlines; retrieve_detailed resets it once.
+        if not isinstance(getattr(self, "search_titles", None), dict):
+            self.search_titles = {}
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
         
         # 1. Primary: DuckDuckGo HTML endpoint
@@ -494,12 +725,85 @@ class KnowledgeRetriever:
         log.info(f"Retrieved {len(urls)} URLs across sources.")
         return urls
 
+    # Outlets targeted by the site-restricted expansion passes. Batch 1 is
+    # wire/major outlets (MSN News included), batch 2 is trade/financial/crypto,
+    # batch 3 is additional Tier-1 majors so later passes cover new outlets
+    # instead of repeating the same results.
+    _SITE_RESTRICTED_BATCHES = (
+        ("reuters.com", "apnews.com", "bloomberg.com", "cnbc.com", "msn.com",
+         "yahoo.com", "nytimes.com", "bbc.com", "theguardian.com", "wsj.com"),
+        ("decrypt.co", "coindesk.com", "cointelegraph.com", "theblock.co",
+         "cryptoslate.com", "marketwatch.com", "barrons.com", "forbes.com",
+         "businessinsider.com", "usatoday.com"),
+        ("cnn.com", "nbcnews.com", "cbsnews.com", "npr.org", "latimes.com",
+         "time.com", "politico.com", "washingtonpost.com", "telegraph.co.uk",
+         "independent.co.uk"),
+    )
+
+    @classmethod
+    def _expansion_query(cls, base: str, attempt: int) -> str:
+        """Query for expansion pass `attempt` (1-based)."""
+        if attempt <= 1:
+            return f"{base} news"
+        batch_index = attempt - 2
+        if batch_index < len(cls._SITE_RESTRICTED_BATCHES):
+            batch = cls._SITE_RESTRICTED_BATCHES[batch_index]
+            return f"{base} ({' OR '.join('site:' + d for d in batch)})"
+        # Past the curated batches: broaden rather than repeat.
+        return f"{base} latest report"
+
+    def search_claim_expanded(self, claim: str, attempt: int) -> List[str]:
+        """
+        Extra search pass used when the search is still short of
+        `target_whitelisted_urls` whitelisted articles.
+
+        attempt 1 : broader keyword query with a larger result cap.
+        attempt 2 : site-restricted to wire/major outlets (incl. MSN News).
+        attempt 3 : site-restricted to trade/financial/crypto outlets.
+        attempt 4 : site-restricted to additional Tier-1 majors.
+        """
+        query = self._expansion_query(self._build_search_query(claim), attempt)
+
+        preview = query if len(query) <= 110 else query[:110] + "..."
+        print(f"  [Step 1/5] [R] Expansion search #{attempt}: {preview}")
+        return self.search_claim(
+            claim,
+            max_results=self.expanded_max_results,
+            query_override=query,
+        )
+
+    def _run_expansion_with_deadline(self, claim: str, attempt: int, timeout: float) -> List[str]:
+        """
+        Run one expansion search, abandoning it once `timeout` seconds elapse.
+
+        Each search pass can make up to four provider calls with 10 s request
+        timeouts, so a slow chain could otherwise overshoot the expansion
+        budget. The worker thread is left to finish on its own; its only
+        side effect is extra entries in `search_titles`.
+        """
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        try:
+            future = executor.submit(self.search_claim_expanded, claim, attempt)
+            return list(future.result(timeout=max(1.0, timeout)))
+        except concurrent.futures.TimeoutError:
+            log.warning("Expansion search %d exceeded its %.1fs slice; abandoning it.", attempt, timeout)
+            print(f"  [Step 2/5] [!] Expansion search {attempt} timed out — moving on.")
+            return []
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
+
     def filter_domains(self, urls: List[str]) -> List[str]:
         """
         Applies a strict, rule-based filter against a whitelist of verified news outlets.
         """
         filtered = [url for url in urls if is_domain_whitelisted(url)]
-        log.info(f"Domain filtering: {len(urls)} -> {len(filtered)} surviving URLs.")
+        # Per-tier counts for logging
+        tier_counts = {1: 0, 2: 0, 3: 0}
+        for url in filtered:
+            t = domain_tier(url)
+            if t:
+                tier_counts[t] += 1
+        log.info(f"Domain filtering: {len(urls)} -> {len(filtered)} surviving URLs (Tier1={tier_counts[1]}, Tier2={tier_counts[2]}, Tier3={tier_counts[3]}).")
         return filtered
 
     def metadata_filter(self, urls: List[str]) -> List[Dict]:
@@ -780,6 +1084,19 @@ class KnowledgeRetriever:
         lines.append(sep_minor)
         raw_urls = log_data.get("raw_urls", [])
         whitelisted = log_data.get("whitelisted_urls", [])
+        lines.append(f"    Search Attempts     : {log_data.get('search_attempts', 1)}")
+        lines.append(f"    Whitelist Target    : {getattr(self, 'target_whitelisted_urls', 10)} "
+                     f"(minimum {getattr(self, 'min_whitelisted_urls', 3)})")
+        if "expansion_stop_reason" in log_data:
+            lines.append(f"    Expansion Stopped   : {log_data.get('expansion_stop_reason')} "
+                         f"after {log_data.get('expansion_elapsed_s', 0)}s")
+        for exp in log_data.get("expansion_log", []) or []:
+            q = exp.get("query", "")
+            q_preview = q if len(q) <= 90 else q[:90] + "..."
+            lines.append(
+                f"      - Expansion #{exp.get('attempt')}: +{exp.get('new_urls', 0)} new URL(s), "
+                f"{exp.get('whitelisted_after', 0)} whitelisted | query: {q_preview}"
+            )
         lines.append(f"    Total URLs Retrieved (Pre-Filter) : {len(raw_urls)}")
         if raw_urls:
             lines.append("    All Retrieved URLs (Pre-Filter Status):")
@@ -792,6 +1109,21 @@ class KnowledgeRetriever:
             for idx, u in enumerate(whitelisted, 1):
                 lines.append(f"      {idx}. {u}")
         lines.append("")
+
+        # Publisher Statistics (distinct registrable domains, tiers, corroboration)
+        stats = log_data.get("publisher_stats")
+        if stats:
+            lines.append("[2.1]  PUBLISHER STATISTICS")
+            lines.append(sep_minor)
+            lines.append(f"    Distinct Publishers : {stats.get('distinct_publishers', 0)}")
+            lines.append(f"    Tier 1 (Wire/Major)  : {stats.get('tier1', 0)}")
+            lines.append(f"    Tier 2 (Trade/Finance/Crypto) : {stats.get('tier2', 0)}")
+            lines.append(f"    Tier 3 (Primary/PR)  : {stats.get('tier3', 0)}")
+            lines.append(f"    Corroboration Strength: {stats.get('corroboration', 'UNKNOWN')}")
+            lines.append("    Domain Breakdown:")
+            for d in stats.get("domains", []):
+                lines.append(f"      - {d['domain']} (Tier {d['tier']}) x {d['count']}")
+            lines.append("")
 
         lines.append("[3]  METADATA EXTRACTION")
         lines.append(sep_minor)

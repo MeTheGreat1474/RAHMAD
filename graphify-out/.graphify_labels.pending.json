@@ -1,0 +1,10 @@
+{
+  "0": "test_phase3_evaluation.py",
+  "2": "TestPipelineFlowIntegration",
+  "7": "analyzer_new.py",
+  "11": "knowledge_retrieval.py",
+  "13": "app.py",
+  "15": "PipelineLogger",
+  "16": "analyze_text",
+  "17": ".log_clip_output"
+}
