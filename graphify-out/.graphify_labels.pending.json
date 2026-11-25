@@ -1,10 +1,14 @@
 {
   "0": "test_phase3_evaluation.py",
-  "2": "TestPipelineFlowIntegration",
-  "7": "analyzer_new.py",
-  "11": "knowledge_retrieval.py",
-  "13": "app.py",
-  "15": "PipelineLogger",
-  "16": "analyze_text",
-  "17": ".log_clip_output"
+  "1": "Judge",
+  "2": "analyze_text",
+  "5": "analyzer_new.py",
+  "7": "TestJudgeModule",
+  "11": "test_phase1_unit.py",
+  "13": "input_retrieval.py",
+  "15": "JudgeResponseError",
+  "16": "._build_user_message",
+  "17": "._aggregate_verdicts",
+  "18": "NewsArticleSpider",
+  "19": ".save_judge_log"
 }

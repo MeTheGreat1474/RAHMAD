@@ -14,13 +14,13 @@ RAHMAD/
 │   └── script.js               # NDJSON stream reader (Fetch API), status & result rendering
 │
 ├── backend/                    # Web-facing orchestration & utilities
-│   ├── analyzer.py             # ★ Pipeline orchestrator — analyze_text() yields NDJSON status/result chunks
+│   ├── analyzer.py             # Pipeline orchestrator — analyze_text() yields NDJSON status/result chunks
 │   ├── input_processing.py     # Two-branch pre-processing: clean LLM text + CLIP tensors
 │   ├── input_retrieval.py      # Loads the default test article from res/ (module self-tests only)
 │   ├── domain_whitelist.py     # VERIFIED_DOMAINS set (76 accredited news outlets) + is_domain_whitelisted()
 │   ├── news_spider.py          # Scrapy spider extracting title/text/date via trafilatura
 │   ├── pipeline_logger.py      # PipelineLogger → output/output_log.txt (structured per-stage audit log)
-│   └── analyzer_new.py         # ⚠ Stale near-duplicate of analyzer.py — imported nowhere, safe to ignore
+│   └── analyzer_new.py         # Stale near-duplicate of analyzer.py — imported nowhere, safe to ignore
 │
 ├── model/                      # The six AI modules
 │   ├── early_predictor.py      # CLIP ViT-B/32 + LoRA + MLP head inference wrapper
@@ -33,18 +33,18 @@ RAHMAD/
 │   └── judge.py                # Judge: OpenRouter reasoning layer, constitution, P8 guardrail, 3 modes
 │
 ├── data_processing/
-│   └── early_predictor_output/ # ★ Trained Early Predictor artifacts (required at runtime)
-│       ├── lora_adapter/       #     PEFT LoRA adapter (r=16, α=32, dropout 0.1)
-│       ├── mlp_head.pt         #     Linear(1024→1) + Sigmoid classification head
-│       └── processor/          #     CLIPProcessor (tokenizer + image processor)
+│   └── early_predictor_output/ # Trained Early Predictor artifacts (required at runtime)
+│       ├── lora_adapter/       # PEFT LoRA adapter (r=16, α=32, dropout 0.1)
+│       ├── mlp_head.pt         # Linear(1024→1) + Sigmoid classification head
+│       └── processor/          # CLIPProcessor (tokenizer + image processor)
 │
 ├── res/                        # Bundled sample articles & images (news1–news3), served at /res/<filename>
 ├── output/                     # Runtime forensic logs (overwritten each run)
-│   ├── output_log.txt          #   Full unified pipeline log
+│   ├── output_log.txt          # Full unified pipeline log
 │   └── KR/RIS/MAD/JUDGE_output.txt   # Per-module forensic logs
 │
 ├── testing/                    # 3-phase test suite, evaluation runners, datasets & result artefacts
-├── docs/                       # ★ Canonical engineering reference — docs/RAHMAD_ARCHITECTURE.md
+├── docs/                       # Canonical engineering reference — docs/RAHMAD_ARCHITECTURE.md
 └── archive/                    # Historical material (EP training scripts, dataset prep, notebooks)
 ```
 
@@ -109,11 +109,3 @@ On every run, the pipeline first performs a **preflight health check** of the Ol
 
 **Step 4 — Run a detection:**
 Paste an article's text and (optionally) attach its image, then press **RUN NEWS DETECTION**. The live process stream shows each pipeline stage; the verdict card displays the classification, confidence, justification and supporting links.
-
-## Multilingual Support & Cross-Lingual Fallback
-
-RAHMAD natively handles non-English news claims (e.g. Bahasa Melayu, Indonesian) through defense-in-depth architectural mechanisms:
-- **Pixel-Level Visual Provenance:** Reverse Image Search (`filter_visually`) operates purely on raw CLIP image features, making visual verification 100% language-agnostic.
-- **Automatic Semantic Fallback:** If the text transformer (`all-MiniLM-L6-v2`) produces depressed cosine scores on non-English text, RAHMAD automatically bypasses the threshold (`candidate_contexts = semantically_filtered if semantically_filtered else visually_filtered`) so no visual evidence is lost.
-- **Cross-Lingual Reasoning:** Multilingual LLMs (Qwen 2.5 / DeepSeek) in the Visual Agent, Multi-Agent Debate, and Chief Judicial Magistrate evaluate local vernacular claims against global news wire provenance.
-- **Regional News Whitelist:** Verified news publishers across Malaysia (`bernama.com`, `astroawani.com`, `malaysiakini.com`, `thestar.com.my`, `nst.com.my`, `theedgemalaysia.com`) and Southeast Asia are pre-whitelisted for Knowledge Retrieval.
